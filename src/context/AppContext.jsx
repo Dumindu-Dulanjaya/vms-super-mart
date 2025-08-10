@@ -1,10 +1,8 @@
 import { createContext, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-// Create the context
 export const AppContext = createContext();
 
-// Provider component
 export const AppContextProvider = ({ children }) => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
@@ -19,7 +17,6 @@ export const AppContextProvider = ({ children }) => {
   );
 };
 
-// Custom hook to use the context
 export const useAppContext = () => {
   return useContext(AppContext);
 };
