@@ -1,5 +1,7 @@
 import React from 'react';
-import bannerImg from '../assets/banner.jpg'; // Import the banner image
+import { Link } from 'react-router-dom';
+import bannerImg from '../assets/banner.jpg';
+import { ArrowRight } from 'lucide-react';
 
 const MainBanner = () => {
   return (
@@ -11,13 +13,24 @@ const MainBanner = () => {
         className="w-full h-auto object-cover"
       />
 
-      {/* Optional Overlay Text */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="text-center text-white">
-          {/* Uncomment and edit if you want text on the banner */}
-          {/* <h1 className="text-4xl font-bold">Welcome to VMS</h1>
-          <p className="text-lg mt-2">Your tagline here</p> */}
-        </div>
+      {/* Buttons on the Banner */}
+      <div className="absolute bottom-4 left-4 flex items-center gap-4">
+        {/* Shop Now Button */}
+        <Link 
+          to="/products" 
+          className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded transition"
+        >
+          Shop now
+        </Link>
+
+        {/* Explore Deals (text + arrow) */}
+        <Link 
+          to="/products" 
+          className="flex items-center gap-2 text-white font-bold hover:gap-3 transition"
+        >
+          Explore deals 
+          <ArrowRight size={18} />
+        </Link>
       </div>
     </div>
   );
