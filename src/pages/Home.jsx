@@ -8,7 +8,7 @@ const Home = () => {
     <div className="mt-10">
       <MainBanner />
       <Categories />
-      <BestSeller/>
+      <BestSeller />
     </div>
   );
 };

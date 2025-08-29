@@ -6,6 +6,7 @@ import Navbar from './components/Navbar';
 
 // Pages
 import Home from './pages/Home';
+import { Toaster } from 'react-hot-toast';
 
 const App = () => {
   const location = useLocation();
@@ -15,6 +16,8 @@ const App = () => {
     <div className="min-h-screen">
       {/* If seller path → hide Navbar, else show Navbar */}
       {isSellerPath ? null : <Navbar />}
+
+      <Toaster />
 
       <div className={`${isSellerPath ? "p-6" : "px-6 md:px-16 lg:px-24 xl:px-32"}`}>
         <Routes>
@@ -26,6 +29,6 @@ const App = () => {
       </div>
     </div>
   );
-}
+};
 
 export default App;

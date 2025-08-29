@@ -59,3 +59,48 @@ export const categories = [
   { text: "Porcelain 3", path: "Kitchen", image: porcelain3_image, bgColor: "#E6FFFB" },
   { text: "Porcelain 4", path: "Kitchen", image: porcelain4_image, bgColor: "#FFFBE6" },
 ];
+
+// ==================== Best Sellers ====================
+
+export const bestSellers = [
+  {
+    id: 1,
+    name: "Helicopter 1",
+    category: "Toys",
+    price: 900,
+    oldPrice: 1000,
+    rating: 4,
+    reviews: 4,
+    image: helicopter1_image,
+  },
+  {
+    id: 2,
+    name: "Mugs 1",
+    category: "Kitchen",
+    price: 450,
+    oldPrice: 500,
+    rating: 5,
+    reviews: 5,
+    image: mugs1_image,
+  },
+  {
+    id: 3,
+    name: "Porcelain 1",
+    category: "Kitchen",
+    price: 1400,
+    oldPrice: 1500,
+    rating: 3,
+    reviews: 3,
+    image: porcelain1_image,
+  },
+  {
+    id: 4,
+    name: "Teddy",
+    category: "Toys",
+    price: 1200,
+    oldPrice: 1300,
+    rating: 4,
+    reviews: 6,
+    image: teddy_image,
+  },
+];
