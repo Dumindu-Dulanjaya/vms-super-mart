@@ -1,4 +1,14 @@
 // ==================== Import Images ====================
+
+// ===== Banner =====
+import bottom_banner_image from "./banner1girl.jpg";   // desktop version
+import bottom_banner_image_sm from "./banner1girl.jpg"; // mobile (can be different if you want)
+
+// ===== Feature Icons =====
+import feature_icon_1 from "./icons/feature1.png";
+import feature_icon_2 from "./icons/feature2.png";
+import feature_icon_3 from "./icons/feature3.png";
+
 // ===== Toys =====
 import car1_image from "./toys/car1.jpg";
 import car2_image from "./toys/car2.jpg";
@@ -24,6 +34,15 @@ import porcelain1_image from "./kitchen items/porcelain1.jpg";
 import porcelain2_image from "./kitchen items/porcelain2.jpg";
 import porcelain3_image from "./kitchen items/porcelain3.jpg";
 import porcelain4_image from "./kitchen items/porcelain4.jpg";
+
+// ==================== Assets Export ====================
+export const assets = {
+  bottom_banner_image,
+  bottom_banner_image_sm,
+  feature_icon_1,
+  feature_icon_2,
+  feature_icon_3,
+};
 
 // ==================== Categories ====================
 export const categories = [
