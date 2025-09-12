@@ -1,5 +1,4 @@
 // ==================== Import Images ====================
-
 // ===== Toys =====
 import car1_image from "./toys/car1.jpg";
 import car2_image from "./toys/car2.jpg";
@@ -17,51 +16,42 @@ import teddy_image from "./toys/teddy.jpg";
 import aluminiumpots1_image from "./kitchen items/aluminiumpots1.jpg";
 import aluminiumpots2_image from "./kitchen items/aluminiumpots2.jpg";
 import aluminiumpots3_image from "./kitchen items/aluminiumpots3.jpg";
-
 import mugs1_image from "./kitchen items/mugs1.jpg";
 import mugs2_image from "./kitchen items/mugs2.jpg";
 import mugs3_image from "./kitchen items/mugs3.jpg";
 import mugs4_image from "./kitchen items/mugs4.jpg";
-
 import porcelain1_image from "./kitchen items/porcelain1.jpg";
 import porcelain2_image from "./kitchen items/porcelain2.jpg";
 import porcelain3_image from "./kitchen items/porcelain3.jpg";
 import porcelain4_image from "./kitchen items/porcelain4.jpg";
 
 // ==================== Categories ====================
-
 export const categories = [
-  // ===== Toys =====
-  { text: "Car 1", path: "Toys", image: car1_image, bgColor: "#E6F7FF" },
-  { text: "Car 2", path: "Toys", image: car2_image, bgColor: "#FFF0F6" },
-  { text: "Car 3", path: "Toys", image: car3_image, bgColor: "#FFFBE6" },
-  { text: "Car 4", path: "Toys", image: car4_image, bgColor: "#F6FFED" },
-  { text: "Car 5", path: "Toys", image: car5_image, bgColor: "#FFF1F0" },
-  { text: "Car 6", path: "Toys", image: car6_image, bgColor: "#E6FFFB" },
-  { text: "Car 7", path: "Toys", image: car7_image, bgColor: "#F9F0FF" },
-  { text: "Helicopter 1", path: "Toys", image: helicopter1_image, bgColor: "#FFFBE6" },
-  { text: "Helicopter 2", path: "Toys", image: helicopter2_image, bgColor: "#F6FFED" },
-  { text: "Minion", path: "Toys", image: minion_image, bgColor: "#E6F7FF" },
-  { text: "Teddy", path: "Toys", image: teddy_image, bgColor: "#FFF0F6" },
-
-  // ===== Kitchen Items =====
-  { text: "Aluminium Pots 1", path: "Kitchen", image: aluminiumpots1_image, bgColor: "#FFFBE6" },
-  { text: "Aluminium Pots 2", path: "Kitchen", image: aluminiumpots2_image, bgColor: "#E6FFFB" },
-  { text: "Aluminium Pots 3", path: "Kitchen", image: aluminiumpots3_image, bgColor: "#FFF1F0" },
-
-  { text: "Mugs 1", path: "Kitchen", image: mugs1_image, bgColor: "#F6FFED" },
-  { text: "Mugs 2", path: "Kitchen", image: mugs2_image, bgColor: "#FFFBE6" },
-  { text: "Mugs 3", path: "Kitchen", image: mugs3_image, bgColor: "#E6F7FF" },
-  { text: "Mugs 4", path: "Kitchen", image: mugs4_image, bgColor: "#FFF0F6" },
-
-  { text: "Porcelain 1", path: "Kitchen", image: porcelain1_image, bgColor: "#FFF1F0" },
-  { text: "Porcelain 2", path: "Kitchen", image: porcelain2_image, bgColor: "#F6FFED" },
-  { text: "Porcelain 3", path: "Kitchen", image: porcelain3_image, bgColor: "#E6FFFB" },
-  { text: "Porcelain 4", path: "Kitchen", image: porcelain4_image, bgColor: "#FFFBE6" },
+  { text: "Car 1", path: "Toys", type: "Toys", image: car1_image, bgColor: "#E6F7FF" },
+  { text: "Car 2", path: "Toys", type: "Toys", image: car2_image, bgColor: "#FFF0F6" },
+  { text: "Car 3", path: "Toys", type: "Toys", image: car3_image, bgColor: "#FFFBE6" },
+  { text: "Car 4", path: "Toys", type: "Toys", image: car4_image, bgColor: "#F6FFED" },
+  { text: "Car 5", path: "Toys", type: "Toys", image: car5_image, bgColor: "#FFF1F0" },
+  { text: "Car 6", path: "Toys", type: "Toys", image: car6_image, bgColor: "#E6FFFB" },
+  { text: "Car 7", path: "Toys", type: "Toys", image: car7_image, bgColor: "#F9F0FF" },
+  { text: "Helicopter 1", path: "Toys", type: "Toys", image: helicopter1_image, bgColor: "#FFFBE6" },
+  { text: "Helicopter 2", path: "Toys", type: "Toys", image: helicopter2_image, bgColor: "#F6FFED" },
+  { text: "Minion", path: "Toys", type: "Toys", image: minion_image, bgColor: "#E6F7FF" },
+  { text: "Teddy", path: "Toys", type: "Toys", image: teddy_image, bgColor: "#FFF0F6" },
+  { text: "Aluminium Pots 1", path: "Kitchen", type: "Kitchen Items", image: aluminiumpots1_image, bgColor: "#FFFBE6" },
+  { text: "Aluminium Pots 2", path: "Kitchen", type: "Kitchen Items", image: aluminiumpots2_image, bgColor: "#E6FFFB" },
+  { text: "Aluminium Pots 3", path: "Kitchen", type: "Kitchen Items", image: aluminiumpots3_image, bgColor: "#FFF1F0" },
+  { text: "Mugs 1", path: "Kitchen", type: "Kitchen Items", image: mugs1_image, bgColor: "#F6FFED" },
+  { text: "Mugs 2", path: "Kitchen", type: "Kitchen Items", image: mugs2_image, bgColor: "#FFFBE6" },
+  { text: "Mugs 3", path: "Kitchen", type: "Kitchen Items", image: mugs3_image, bgColor: "#E6F7FF" },
+  { text: "Mugs 4", path: "Kitchen", type: "Kitchen Items", image: mugs4_image, bgColor: "#FFF0F6" },
+  { text: "Porcelain 1", path: "Kitchen", type: "Kitchen Items", image: porcelain1_image, bgColor: "#FFF1F0" },
+  { text: "Porcelain 2", path: "Kitchen", type: "Kitchen Items", image: porcelain2_image, bgColor: "#F6FFED" },
+  { text: "Porcelain 3", path: "Kitchen", type: "Kitchen Items", image: porcelain3_image, bgColor: "#E6FFFB" },
+  { text: "Porcelain 4", path: "Kitchen", type: "Kitchen Items", image: porcelain4_image, bgColor: "#FFFBE6" },
 ];
 
 // ==================== Best Sellers ====================
-
 export const bestSellers = [
   {
     id: 1,
@@ -76,7 +66,7 @@ export const bestSellers = [
   {
     id: 2,
     name: "Mugs 1",
-    category: "Kitchen",
+    category: "Kitchen Items",
     price: 450,
     oldPrice: 500,
     rating: 5,
@@ -86,7 +76,7 @@ export const bestSellers = [
   {
     id: 3,
     name: "Porcelain 1",
-    category: "Kitchen",
+    category: "Kitchen Items",
     price: 1400,
     oldPrice: 1500,
     rating: 3,
