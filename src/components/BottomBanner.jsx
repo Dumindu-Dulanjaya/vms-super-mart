@@ -37,22 +37,22 @@ const BottomBanner = () => {
       {/* ✅ Overlay Content */}
       <div className="absolute inset-0 flex flex-col items-center md:items-end md:justify-center pt-16 md:pt-0 md:pr-24">
         <div>
-          <h1 className="text-2xl md:text-3xl font-semibold text-primary mb-6">
+          <h1 className="text-2xl md:text-3xl font-semibold text-primary mb-6 transition-all duration-300 hover:scale-105 hover:text-blue-600 cursor-pointer">
             Why We Are the Best?
           </h1>
 
           {features.map((feature, index) => (
-            <div key={index} className="flex items-start gap-4 mt-4">
+            <div key={index} className="flex items-start gap-4 mt-4 group">
               <img
                 src={feature.icon}
                 alt={feature.title}
-                className="w-9 md:w-11"
+                className="w-9 md:w-11 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3"
               />
               <div>
-                <h3 className="text-lg md:text-xl font-semibold">
+                <h3 className="text-lg md:text-xl font-semibold transition-all duration-300 group-hover:text-blue-600 group-hover:scale-105 cursor-pointer">
                   {feature.title}
                 </h3>
-                <p className="text-gray-500/70 text-xs md:text-sm">
+                <p className="text-gray-500/70 text-xs md:text-sm transition-all duration-300 group-hover:text-gray-700 group-hover:scale-102 cursor-pointer">
                   {feature.description}
                 </p>
               </div>

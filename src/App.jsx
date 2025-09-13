@@ -7,19 +7,20 @@ import Navbar from './components/Navbar';
 // Pages
 import Home from './pages/Home';
 import { Toaster } from 'react-hot-toast';
+import Footer from './components/Footer';
 
 const App = () => {
   const location = useLocation();
   const isSellerPath = location.pathname.includes("seller");
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen flex flex-col">
       {/* If seller path → hide Navbar, else show Navbar */}
       {isSellerPath ? null : <Navbar />}
 
       <Toaster />
 
-      <div className={`${isSellerPath ? "p-6" : "px-6 md:px-16 lg:px-24 xl:px-32"}`}>
+      <div className={`${isSellerPath ? "p-6" : "px-6 md:px-16 lg:px-24 xl:px-32"} flex-1`}>
         <Routes>
           {/* Normal user route */}
           <Route path='/' element={<Home />} />
@@ -27,6 +28,7 @@ const App = () => {
           {/* Later you can add seller routes here if needed */}
         </Routes>
       </div>
+      {!isSellerPath && <Footer />}
     </div>
   );
 };
