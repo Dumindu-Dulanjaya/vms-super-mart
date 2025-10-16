@@ -41,7 +41,6 @@ export default function Login() {
     setTimeout(() => navigate('/'), 1400)
   }
 
-  // When done show a friendly redirect screen
   if (done) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -53,7 +52,6 @@ export default function Login() {
           </div>
           <h2 className="mt-6 text-2xl font-semibold text-gray-900">You're in!</h2>
           <p className="mt-2 text-sm text-gray-500">{success} Redirecting to home…</p>
-          <button onClick={() => navigate('/')} className="mt-6 px-6 py-2 bg-[#00FF33] hover:bg-[#00CC29] text-white rounded-full">Go now</button>
         </div>
       </div>
     )
@@ -71,7 +69,6 @@ export default function Login() {
         <div className="mt-6 space-y-4">
           {mode !== 'login' && (
             <div className="flex items-center bg-white border border-gray-200 rounded-full h-12 px-4">
-              {/* User Icon */}
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-500 mr-3" viewBox="0 0 24 24">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                 <circle cx="12" cy="7" r="4" />
@@ -90,7 +87,6 @@ export default function Login() {
           )}
 
           <div className="flex items-center bg-white border border-gray-200 rounded-full h-12 px-4">
-            {/* Mail Icon */}
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-500 mr-3" viewBox="0 0 24 24" >
               <rect width="20" height="16" x="2" y="4" rx="2" />
               <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
@@ -108,7 +104,6 @@ export default function Login() {
           </div>
 
           <div className="flex items-center bg-white border border-gray-200 rounded-full h-12 px-4">
-            {/* Lock Icon */}
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-500 mr-3" viewBox="0 0 24 24" >
               <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
               <path d="M7 11V7a5 5 0 0 1 10 0v4" />
@@ -130,7 +125,15 @@ export default function Login() {
           <a className="text-sm text-[#7c3aed]" href="#">Forgot password?</a>
         </div>
 
-        <button type="submit" className="mt-6 w-full h-11 rounded-full text-white bg-[#7c3aed] hover:bg-[#6b21a8] transition">
+        {/* Updated Login Button with VMS logo green for login mode */}
+        <button
+          type="submit"
+          className={`mt-6 w-full h-11 rounded-full text-white transition ${
+            mode === 'login'
+              ? 'bg-[#00FF33] hover:bg-[#00CC29]'
+              : 'bg-[#7c3aed] hover:bg-[#6b21a8]'
+          }`}
+        >
           {mode === 'login' ? 'Login' : 'Create Account'}
         </button>
 
