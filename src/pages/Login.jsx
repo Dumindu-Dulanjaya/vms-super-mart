@@ -57,6 +57,12 @@ export default function Login() {
     )
   }
 
+  // inline style applied to inputs to remove browser autofill highlight
+  const autofillReset = {
+    WebkitBoxShadow: '0 0 0 30px #ffffff inset',
+    WebkitTextFillColor: '#0f172a'
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <form onSubmit={submit} className="w-full max-w-md bg-white rounded-2xl p-8 text-center shadow">
@@ -77,6 +83,8 @@ export default function Login() {
               <input
                 type="text"
                 placeholder="Name"
+                autoComplete="name"
+                style={autofillReset}
                 className="bg-transparent text-zinc-600 placeholder-zinc-500 outline-none text-sm w-full"
                 name="name"
                 value={data.name}
@@ -95,6 +103,8 @@ export default function Login() {
             <input
               type="email"
               placeholder="Email id"
+              autoComplete="email"
+              style={autofillReset}
               className="bg-transparent text-zinc-600 placeholder-zinc-500 outline-none text-sm w-full"
               name="email"
               value={data.email}
@@ -112,6 +122,8 @@ export default function Login() {
             <input
               type="password"
               placeholder="Password"
+              autoComplete="current-password"
+              style={autofillReset}
               className="bg-transparent text-zinc-600 placeholder-zinc-500 outline-none text-sm w-full"
               name="password"
               value={data.password}
