@@ -137,14 +137,10 @@ export default function Login() {
           <a className="text-sm text-[#7c3aed]" href="#">Forgot password?</a>
         </div>
 
-        {/* Updated Login Button with VMS logo green for login mode */}
+        {/* Updated Login Button with VMS logo green for both modes */}
         <button
           type="submit"
-          className={`mt-6 w-full h-11 rounded-full text-white transition ${
-            mode === 'login'
-              ? 'bg-[#00FF33] hover:bg-[#00CC29]'
-              : 'bg-[#7c3aed] hover:bg-[#6b21a8]'
-          }`}
+          className="mt-6 w-full h-11 rounded-full text-white transition bg-[#00FF33] hover:bg-[#00CC29]"
         >
           {mode === 'login' ? 'Login' : 'Create Account'}
         </button>
