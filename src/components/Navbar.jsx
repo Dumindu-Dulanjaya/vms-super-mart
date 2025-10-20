@@ -36,7 +36,7 @@ const Navbar = () => {
                 <Link to="/" className="hover:text-[#00FF33] transition-colors">Home</Link>
                 {/* All Product intentionally removed */}
                 <Link to="/contact" className="hover:text-[#00FF33] transition-colors">Contact</Link>
-                <Link to="/All Products" className="hover:text-[#00FF33] transition-colors">All Products</Link>
+                <Link to="/all-products" className="hover:text-[#00FF33] transition-colors">All Products</Link>
 
                             {!hideIcons && (
                                 <div className="hidden lg:flex items-center text-sm gap-2 border border-gray-300 px-3 rounded-full">
