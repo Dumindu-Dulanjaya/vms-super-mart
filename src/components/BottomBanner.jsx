@@ -27,15 +27,19 @@ const BottomBanner = () => {
         src={assets.bottom_banner_image}
         alt="banner"
         className="w-full hidden md:block"
+        loading="lazy"
+        onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = assets.bottom_banner_image_sm }}
       />
       <img
         src={assets.bottom_banner_image_sm}
         alt="banner"
         className="w-full md:hidden"
+        loading="lazy"
+        onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = 'https://via.placeholder.com/1200x300' }}
       />
 
       {/* ✅ Overlay Content */}
-      <div className="absolute inset-0 flex flex-col items-center md:items-end md:justify-center pt-16 md:pt-0 md:pr-24">
+  <div className="absolute inset-0 flex flex-col items-center md:items-end md:justify-center pt-16 md:pt-0 md:pr-24 z-10">
         <div>
           <h1 className="text-2xl md:text-3xl font-semibold text-primary mb-6 transition-all duration-300 hover:scale-105 hover:text-blue-600 cursor-pointer">
             Why We Are the Best?
@@ -47,6 +51,8 @@ const BottomBanner = () => {
                 src={feature.icon}
                 alt={feature.title}
                 className="w-9 md:w-11 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3"
+                loading="lazy"
+                onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = 'https://via.placeholder.com/44' }}
               />
               <div>
                 <h3 className="text-lg md:text-xl font-semibold transition-all duration-300 group-hover:text-blue-600 group-hover:scale-105 cursor-pointer">

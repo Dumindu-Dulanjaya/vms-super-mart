@@ -21,8 +21,8 @@ const AllProducts = () => {
   return (
     <div className="mt-16">
       <div className="container mx-auto px-8">
-        <div className="flex flex-col items-end w-full">
-        <p className="text-2xl font-medium uppercase text-black mb-2">All Products &gt; All Products</p>
+        <div className="flex flex-col items-start w-full">
+        <p className="text-2xl font-medium uppercase text-black mb-2 text-left">All Products</p>
         <div className="w-16 h-0.5 bg-primary rounded-full"></div>
       </div>
 

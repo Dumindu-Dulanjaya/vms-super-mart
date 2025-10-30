@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { bestSellers } from "../assets/assets";
+import { bestSellers, categories } from "../assets/assets";
 
 export const AppContext = createContext();
 
@@ -17,7 +17,19 @@ export const AppContextProvider = ({ children }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
   // Use packaged assets' sample products so images resolve correctly
-  const dummyProducts = bestSellers;
+  // Combine bestSellers and categories into one products list so "All Products" shows everything
+  const categoryProducts = categories.map((c, idx) => ({
+    id: bestSellers.length + idx + 1,
+    name: c.text,
+    category: c.type || c.path || "Misc",
+    price: Math.floor(100 + (idx + 1) * 100),
+    oldPrice: Math.floor(100 + (idx + 1) * 120),
+    rating: 4,
+    reviews: 0,
+    image: c.image,
+  }));
+
+  const dummyProducts = [...bestSellers, ...categoryProducts];
 
   // ✅ Load products when app starts
   useEffect(() => {
