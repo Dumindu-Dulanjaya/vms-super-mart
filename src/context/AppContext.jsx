@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { bestSellers } from "../assets/assets";
 
 export const AppContext = createContext();
 
@@ -10,19 +11,13 @@ export const AppContextProvider = ({ children }) => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [isSeller, setIsSeller] = useState(false);
-  const [showUserLogin, setShowUserLogin] = useState(true);
+  const [showUserLogin, setShowUserLogin] = useState(false);
   const [cartItems, setCartItems] = useState({});
   const [products, setProducts] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  // ✅ Dummy product data with required fields
-  const dummyProducts = [
-    { id: 1, name: "Helicopter 1", category: "Toys", price: 1000, offerPrice: 900, image: "/images/heli1.jpg", rating: 4 },
-    { id: 2, name: "Mug 1", category: "Kitchenware", price: 500, offerPrice: 450, image: "/images/mug1.jpg", rating: 5 },
-    { id: 3, name: "Porcelain 1", category: "Decor", price: 1500, offerPrice: 1400, image: "/images/porcelain1.jpg", rating: 3 },
-    { id: 4, name: "Helicopter 2", category: "Toys", price: 1200, offerPrice: 1100, image: "/images/heli2.jpg", rating: 4 },
-    { id: 5, name: "Mug 2", category: "Kitchenware", price: 600, offerPrice: 550, image: "/images/mug2.jpg", rating: 4 },
-    { id: 6, name: "Porcelain 2", category: "Decor", price: 1800, offerPrice: 1600, image: "/images/porcelain2.jpg", rating: 5 },
-  ];
+  // Use packaged assets' sample products so images resolve correctly
+  const dummyProducts = bestSellers;
 
   // ✅ Load products when app starts
   useEffect(() => {
@@ -75,6 +70,10 @@ export const AppContextProvider = ({ children }) => {
     cartItems,
     updateCartItem,
     removeFromCart,
+    searchQuery,
+    setSearchQuery,
+    showUserLogin,
+    setShowUserLogin,
   };
 
   return (

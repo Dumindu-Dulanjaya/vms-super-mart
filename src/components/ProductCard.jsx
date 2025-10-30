@@ -11,6 +11,7 @@ const ProductCard = ({ product }) => {
           className="group-hover:scale-105 transition max-h-32 object-contain"
           src={product.image}
           alt={product.name}
+          onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = 'https://via.placeholder.com/150'; }}
         />
       </div>
 
