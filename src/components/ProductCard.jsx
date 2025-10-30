@@ -4,13 +4,14 @@ const ProductCard = ({ product }) => {
   const [count, setCount] = React.useState(0);
 
   return (
-    <div className="border border-gray-200 rounded-lg shadow-sm bg-white p-4 hover:shadow-md transition">
+    <div className="w-full border border-gray-200 rounded-lg shadow-sm bg-white p-4 hover:shadow-md transition min-h-[180px]">
       {/* Product Image */}
-      <div className="group cursor-pointer flex items-center justify-center">
+      <div className="group cursor-pointer flex items-center justify-center h-28 overflow-hidden">
         <img
-          className="group-hover:scale-105 transition max-h-32 object-contain"
+          className="group-hover:scale-105 transition max-h-full object-contain"
           src={product.image}
           alt={product.name}
+          loading="lazy"
           onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = 'https://via.placeholder.com/150'; }}
         />
       </div>
