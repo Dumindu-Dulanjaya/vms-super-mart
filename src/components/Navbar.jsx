@@ -10,6 +10,7 @@ const Navbar = () => {
     const [user, setUser] = React.useState(null)
     const location = useLocation()
     const hideIcons = location && location.pathname === '/login'
+    const hideSearch = location && (location.pathname === '/login' || location.pathname === '/')
     const { searchQuery, setSearchQuery } = useAppContext()
     
     const handleLogoClick = () => {
@@ -40,7 +41,7 @@ const Navbar = () => {
                 <Link to="/contact" className="hover:text-[#00FF33] transition-colors">Contact</Link>
                 <Link to="/all-products" className="hover:text-[#00FF33] transition-colors">All Products</Link>
 
-                            {!hideIcons && (
+                            {!hideSearch && (
                                 <div className="hidden lg:flex items-center text-sm gap-2 border border-gray-300 px-3 rounded-full">
                                     <input className="py-1.5 w-full bg-transparent outline-none placeholder-gray-500" type="text" placeholder="Search products" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
                                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
