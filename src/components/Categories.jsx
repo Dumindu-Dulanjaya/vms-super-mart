@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { categories } from '../assets/assets';
-import { useAppContext } from '../context/useAppContext';
 
 const Categories = () => {
-  const { navigate } = useAppContext();
   const [expandedCategories, setExpandedCategories] = useState({});
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
   // Manually define category groups based on path
   const toysItems = categories.filter(item => item.path === 'Toys');
@@ -22,29 +21,48 @@ const Categories = () => {
     }));
   };
 
+  const selectCategory = (categoryKey) => {
+    setSelectedCategory(categoryKey);
+    setExpandedCategories({ [categoryKey]: true });
+  };
+
+  const showAllCategories = () => {
+    setSelectedCategory(null);
+    setExpandedCategories({});
+  };
+
   return (
     <div className="mt-16">
-      <p className="text-2xl md:text-3xl font-medium">Categories</p>
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-2xl md:text-3xl font-medium">Categories</p>
+        {selectedCategory && (
+          <button
+            onClick={showAllCategories}
+            className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-sm font-medium transition"
+          >
+            ← Back to All Categories
+          </button>
+        )}
+      </div>
       
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-8">
-        {categoryGroups.map((group, groupIndex) => (
+      <div className="flex flex-wrap gap-16 mt-4">
+        {(selectedCategory ? categoryGroups.filter(group => group.key === selectedCategory) : categoryGroups).map((group, groupIndex) => (
           group.items.length > 0 && (
             <div key={groupIndex} className="flex flex-col">
               <h3 className="text-xl font-semibold mb-4 text-gray-700">{group.title}</h3>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              <div className="flex flex-wrap gap-4">
                 {(expandedCategories[group.key] ? group.items : group.items.slice(0, 1)).map((category, index) => (
                   <div
                     key={index}
-                    className="group cursor-pointer py-4 px-2 gap-2 rounded-lg flex flex-col justify-center items-center transition"
+                    className="group cursor-pointer py-4 px-2 gap-2 rounded-lg flex flex-col justify-center items-center transition w-40"
                     style={{ backgroundColor: category.bgColor }}
                     onClick={() => {
                       if (!expandedCategories[group.key] && index === 0) {
                         // If collapsed and first item clicked, expand
                         toggleCategory(group.key);
                       } else {
-                        // Navigate to products
-                        navigate(`/products/${category.path.toLowerCase()}`);
-                        window.scrollTo(0, 0);
+                        // Select this category to show only its items
+                        selectCategory(group.key);
                       }
                     }}
                   >
@@ -62,7 +80,7 @@ const Categories = () => {
                 
                 {expandedCategories[group.key] && group.items.length > 1 && (
                   <div
-                    className="group cursor-pointer py-4 px-2 gap-2 rounded-lg flex flex-col justify-center items-center transition bg-gray-100 hover:bg-gray-200"
+                    className="group cursor-pointer py-4 px-2 gap-2 rounded-lg flex flex-col justify-center items-center transition bg-gray-100 hover:bg-gray-200 w-40"
                     onClick={() => toggleCategory(group.key)}
                   >
                     <div className="w-12 h-12 flex items-center justify-center">
