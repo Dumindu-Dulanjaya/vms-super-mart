@@ -21,11 +21,6 @@ const Categories = () => {
     }));
   };
 
-  const selectCategory = (categoryKey) => {
-    setSelectedCategory(categoryKey);
-    setExpandedCategories({ [categoryKey]: true });
-  };
-
   const showAllCategories = () => {
     setSelectedCategory(null);
     setExpandedCategories({});
@@ -48,50 +43,89 @@ const Categories = () => {
       <div className="flex flex-wrap gap-16 mt-4">
         {(selectedCategory ? categoryGroups.filter(group => group.key === selectedCategory) : categoryGroups).map((group, groupIndex) => (
           group.items.length > 0 && (
-            <div key={groupIndex} className="flex flex-col">
+            <div key={groupIndex} className="flex flex-col w-full">
               <h3 className="text-xl font-semibold mb-4 text-gray-700">{group.title}</h3>
               <div className="flex flex-wrap gap-4">
-                {(expandedCategories[group.key] ? group.items : group.items.slice(0, 1)).map((category, index) => (
+                {/* Show only first item when collapsed */}
+                {!expandedCategories[group.key] && (
                   <div
-                    key={index}
+                    key={0}
                     className="group cursor-pointer py-4 px-2 gap-2 rounded-lg flex flex-col justify-center items-center transition w-40"
-                    style={{ backgroundColor: category.bgColor }}
-                    onClick={() => {
-                      if (!expandedCategories[group.key] && index === 0) {
-                        // If collapsed and first item clicked, expand
-                        toggleCategory(group.key);
-                      } else {
-                        // Select this category to show only its items
-                        selectCategory(group.key);
-                      }
-                    }}
+                    style={{ backgroundColor: group.items[0].bgColor }}
+                    onClick={() => toggleCategory(group.key)}
                   >
                     <img
-                      src={category.image}
-                      alt={category.text}
+                      src={group.items[0].image}
+                      alt={group.items[0].text}
                       className="group-hover:scale-110 transition-transform max-w-20"
                     />
-                    <p className="text-xs font-medium mt-2 text-center">{category.text}</p>
-                    
-                    {/* Show price when expanded or when selected category */}
-                    {(expandedCategories[group.key] || selectedCategory === group.key) && category.price && (
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-sm font-bold text-green-600">Rs. {category.price}</span>
-                        {category.oldPrice && (
-                          <span className="text-xs text-gray-500 line-through">Rs. {category.oldPrice}</span>
-                        )}
-                      </div>
-                    )}
-                    
-                    {!expandedCategories[group.key] && index === 0 && group.items.length > 1 && (
+                    <p className="text-xs font-medium mt-2 text-center">{group.items[0].text}</p>
+                    {group.items.length > 1 && (
                       <p className="text-xs text-gray-600 mt-1">+{group.items.length - 1} more</p>
                     )}
                   </div>
-                ))}
+                )}
+
+                {/* Show all items as product cards when expanded */}
+                {expandedCategories[group.key] && group.items.map((category, index) => {
+                  const rating = (index % 3) + 3; // Rating between 3-5
+                  const reviews = (index % 7) + 2; // Reviews between 2-8
+                  
+                  return (
+                    <div
+                      key={index}
+                      className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 p-4 flex flex-col w-72"
+                    >
+                      {/* Product Image */}
+                      <div className="relative overflow-hidden rounded-lg mb-4" style={{ backgroundColor: category.bgColor }}>
+                        <img
+                          src={category.image}
+                          alt={category.text}
+                          className="w-full h-48 object-contain hover:scale-110 transition-transform duration-300"
+                        />
+                      </div>
+
+                      {/* Product Info */}
+                      <h4 className="text-lg font-semibold text-gray-800 mb-1">{category.text}</h4>
+                      <p className="text-sm text-gray-500 mb-3">{category.type}</p>
+
+                      {/* Price */}
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="text-xl font-bold text-green-600">Rs. {category.price}</span>
+                        {category.oldPrice && (
+                          <span className="text-sm text-gray-400 line-through">Rs. {category.oldPrice}</span>
+                        )}
+                      </div>
+
+                      {/* Rating */}
+                      <div className="flex items-center gap-2 mb-4">
+                        <div className="flex">
+                          {[...Array(5)].map((_, i) => (
+                            <svg
+                              key={i}
+                              className={`w-4 h-4 ${i < rating ? 'text-yellow-400' : 'text-gray-300'}`}
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                          ))}
+                        </div>
+                        <span className="text-sm text-gray-600">({reviews})</span>
+                      </div>
+
+                      {/* Add to Cart Button */}
+                      <button className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 rounded-lg transition-colors duration-300">
+                        Add to Cart
+                      </button>
+                    </div>
+                  );
+                })}
                 
+                {/* Show Less Button */}
                 {expandedCategories[group.key] && group.items.length > 1 && (
                   <div
-                    className="group cursor-pointer py-4 px-2 gap-2 rounded-lg flex flex-col justify-center items-center transition bg-gray-100 hover:bg-gray-200 w-40"
+                    className="group cursor-pointer py-4 px-2 gap-2 rounded-lg flex flex-col justify-center items-center transition bg-gray-100 hover:bg-gray-200 w-72 h-auto"
                     onClick={() => toggleCategory(group.key)}
                   >
                     <div className="w-12 h-12 flex items-center justify-center">
@@ -99,7 +133,7 @@ const Categories = () => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
                       </svg>
                     </div>
-                    <p className="text-xs font-medium mt-2 text-gray-600">Show Less</p>
+                    <p className="text-sm font-medium mt-2 text-gray-600">Show Less</p>
                   </div>
                 )}
               </div>
