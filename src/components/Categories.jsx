@@ -40,10 +40,10 @@ const Categories = () => {
         )}
       </div>
       
-      <div className="flex flex-wrap gap-16 mt-4">
+      <div className="flex flex-wrap gap-8 mt-4">
         {(selectedCategory ? categoryGroups.filter(group => group.key === selectedCategory) : categoryGroups).map((group, groupIndex) => (
           group.items.length > 0 && (
-            <div key={groupIndex} className="flex flex-col w-full">
+            <div key={groupIndex} className="flex flex-col">
               <h3 className="text-xl font-semibold mb-4 text-gray-700">{group.title}</h3>
               <div className="flex flex-wrap gap-4 justify-center">
                 {/* Show only first item when collapsed */}
