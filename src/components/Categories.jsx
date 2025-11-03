@@ -115,7 +115,7 @@ const Categories = () => {
                       </div>
 
                       {/* Add to Cart Button */}
-                      <button className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 rounded-lg transition-colors duration-300">
+                      <button className="w-full text-white font-medium py-3 rounded-lg transition-colors duration-300" style={{ backgroundColor: '#00FF33' }} onMouseEnter={(e) => e.target.style.backgroundColor = '#00CC29'} onMouseLeave={(e) => e.target.style.backgroundColor = '#00FF33'}>
                         Add to Cart
                       </button>
                     </div>
