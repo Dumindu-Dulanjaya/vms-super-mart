@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { categories } from '../assets/assets';
 
 const Categories = () => {
+  const navigate = useNavigate();
   const [expandedCategories, setExpandedCategories] = useState({});
   const [selectedCategory, setSelectedCategory] = useState(null);
 
@@ -74,7 +76,11 @@ const Categories = () => {
                   return (
                     <div
                       key={index}
-                      className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 p-4 flex flex-col w-64"
+                      className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 p-4 flex flex-col w-64 cursor-pointer"
+                      onClick={() => {
+                        navigate('/product/' + category.text.toLowerCase().replace(/\s+/g, '-'));
+                        window.scrollTo(0, 0);
+                      }}
                     >
                       {/* Product Image */}
                       <div className="relative overflow-hidden rounded-lg mb-3" style={{ backgroundColor: category.bgColor }}>
@@ -115,7 +121,17 @@ const Categories = () => {
                       </div>
 
                       {/* Add to Cart Button */}
-                      <button className="w-full text-white font-medium py-2.5 rounded-lg transition-colors duration-300" style={{ backgroundColor: '#00FF33' }} onMouseEnter={(e) => e.target.style.backgroundColor = '#00CC29'} onMouseLeave={(e) => e.target.style.backgroundColor = '#00FF33'}>
+                      <button 
+                        className="w-full text-white font-medium py-2.5 rounded-lg transition-colors duration-300" 
+                        style={{ backgroundColor: '#00FF33' }} 
+                        onMouseEnter={(e) => e.target.style.backgroundColor = '#00CC29'} 
+                        onMouseLeave={(e) => e.target.style.backgroundColor = '#00FF33'}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // Add to cart logic here
+                          alert('Added to cart!');
+                        }}
+                      >
                         Add to Cart
                       </button>
                     </div>

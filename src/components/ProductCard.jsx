@@ -1,12 +1,14 @@
 import React from "react";
+import { useAppContext } from "../context/useAppContext";
 
 const ProductCard = ({ product }) => {
-  const { currency, addToCart, removeFromCart, cartItems, navigate } = useAppContext();
+  const { navigate } = useAppContext();
+  const [count, setCount] = React.useState(0);
 
   return product && (
-    <div onClick={() => navigate(`/product/${product.category.toLowerCase()}/${product._id}`); scrollTo(0, 0)}} className="w-full border border-gray-200 rounded-lg shadow-sm bg-white p-4 hover:shadow-md transition min-h-[180px]">
+    <div onClick={() => { navigate(`/product/${product.category.toLowerCase()}/${product._id}`); scrollTo(0, 0); }} className="w-full border border-gray-200 rounded-lg shadow-sm bg-white p-4 hover:shadow-md transition min-h-[180px] cursor-pointer">
       {/* Product Image */}
-      <div className="group cursor-pointer flex items-center justify-center h-28 overflow-hidden">
+      <div className="group flex items-center justify-center h-28 overflow-hidden">
         <img
           className="group-hover:scale-105 transition max-h-full object-contain"
           src={product.image}
@@ -47,7 +49,7 @@ const ProductCard = ({ product }) => {
           </p>
 
           {/* Add to Cart / Counter */}
-          <div>
+          <div onClick={(e) => e.stopPropagation()}>
             {count === 0 ? (
               <button
                 className="flex items-center justify-center gap-1 bg-indigo-100 border border-indigo-300 px-3 py-1 rounded text-indigo-600 font-medium"

@@ -9,6 +9,8 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import { Toaster } from 'react-hot-toast';
 import Footer from './components/Footer';
+import ProductCategory from './pages/ProductCategory';
+import ProductDetails from './pages/ProductDetails';
 
 const App = () => {
   const location = useLocation();
@@ -26,6 +28,8 @@ const App = () => {
           {/* Normal user routes */}
           <Route path='/' element={<Home />} />
           <Route path='/login' element={<Login />} />
+          <Route path='/product/:id' element={<ProductDetails />} />
+          <Route path='/products/category/:element' element={<ProductCategory />} />
 
           {/* Later you can add seller routes here if needed */}
         </Routes>
