@@ -45,7 +45,7 @@ const Categories = () => {
           group.items.length > 0 && (
             <div key={groupIndex} className="flex flex-col w-full">
               <h3 className="text-xl font-semibold mb-4 text-gray-700">{group.title}</h3>
-              <div className="flex flex-wrap gap-4">
+              <div className="flex flex-wrap gap-4 justify-center">
                 {/* Show only first item when collapsed */}
                 {!expandedCategories[group.key] && (
                   <div
