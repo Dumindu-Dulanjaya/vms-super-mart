@@ -74,36 +74,36 @@ const Categories = () => {
                   return (
                     <div
                       key={index}
-                      className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 p-4 flex flex-col w-72"
+                      className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 p-4 flex flex-col w-64"
                     >
                       {/* Product Image */}
-                      <div className="relative overflow-hidden rounded-lg mb-4" style={{ backgroundColor: category.bgColor }}>
+                      <div className="relative overflow-hidden rounded-lg mb-3" style={{ backgroundColor: category.bgColor }}>
                         <img
                           src={category.image}
                           alt={category.text}
-                          className="w-full h-48 object-contain hover:scale-110 transition-transform duration-300"
+                          className="w-full h-40 object-contain hover:scale-110 transition-transform duration-300"
                         />
                       </div>
 
                       {/* Product Info */}
-                      <h4 className="text-lg font-semibold text-gray-800 mb-1">{category.text}</h4>
-                      <p className="text-sm text-gray-500 mb-3">{category.type}</p>
+                      <h4 className="text-base font-semibold text-gray-800 mb-1">{category.text}</h4>
+                      <p className="text-xs text-gray-500 mb-2">{category.type}</p>
 
                       {/* Price */}
-                      <div className="flex items-center gap-2 mb-3">
-                        <span className="text-xl font-bold text-green-600">Rs. {category.price}</span>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-lg font-bold text-green-600">Rs. {category.price}</span>
                         {category.oldPrice && (
-                          <span className="text-sm text-gray-400 line-through">Rs. {category.oldPrice}</span>
+                          <span className="text-xs text-gray-400 line-through">Rs. {category.oldPrice}</span>
                         )}
                       </div>
 
                       {/* Rating */}
-                      <div className="flex items-center gap-2 mb-4">
+                      <div className="flex items-center gap-1 mb-3">
                         <div className="flex">
                           {[...Array(5)].map((_, i) => (
                             <svg
                               key={i}
-                              className={`w-4 h-4 ${i < rating ? 'text-yellow-400' : 'text-gray-300'}`}
+                              className={`w-3.5 h-3.5 ${i < rating ? 'text-yellow-400' : 'text-gray-300'}`}
                               fill="currentColor"
                               viewBox="0 0 20 20"
                             >
@@ -111,11 +111,11 @@ const Categories = () => {
                             </svg>
                           ))}
                         </div>
-                        <span className="text-sm text-gray-600">({reviews})</span>
+                        <span className="text-xs text-gray-600">({reviews})</span>
                       </div>
 
                       {/* Add to Cart Button */}
-                      <button className="w-full text-white font-medium py-3 rounded-lg transition-colors duration-300" style={{ backgroundColor: '#00FF33' }} onMouseEnter={(e) => e.target.style.backgroundColor = '#00CC29'} onMouseLeave={(e) => e.target.style.backgroundColor = '#00FF33'}>
+                      <button className="w-full text-white font-medium py-2.5 rounded-lg transition-colors duration-300" style={{ backgroundColor: '#00FF33' }} onMouseEnter={(e) => e.target.style.backgroundColor = '#00CC29'} onMouseLeave={(e) => e.target.style.backgroundColor = '#00FF33'}>
                         Add to Cart
                       </button>
                     </div>
@@ -125,7 +125,7 @@ const Categories = () => {
                 {/* Show Less Button */}
                 {expandedCategories[group.key] && group.items.length > 1 && (
                   <div
-                    className="group cursor-pointer py-4 px-2 gap-2 rounded-lg flex flex-col justify-center items-center transition bg-gray-100 hover:bg-gray-200 w-72 h-auto"
+                    className="group cursor-pointer py-4 px-2 gap-2 rounded-lg flex flex-col justify-center items-center transition bg-gray-100 hover:bg-gray-200 w-64 h-auto"
                     onClick={() => toggleCategory(group.key)}
                   >
                     <div className="w-12 h-12 flex items-center justify-center">
