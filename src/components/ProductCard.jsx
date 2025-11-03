@@ -1,10 +1,10 @@
 import React from "react";
 
 const ProductCard = ({ product }) => {
-  const [count, setCount] = React.useState(0);
+  const { currency, addToCart, removeFromCart, cartItems, navigate } = useAppContext();
 
-  return (
-    <div className="w-full border border-gray-200 rounded-lg shadow-sm bg-white p-4 hover:shadow-md transition min-h-[180px]">
+  return product && (
+    <div onClick={() => navigate(`/product/${product.category.toLowerCase()}/${product._id}`); scrollTo(0, 0)}} className="w-full border border-gray-200 rounded-lg shadow-sm bg-white p-4 hover:shadow-md transition min-h-[180px]">
       {/* Product Image */}
       <div className="group cursor-pointer flex items-center justify-center h-28 overflow-hidden">
         <img

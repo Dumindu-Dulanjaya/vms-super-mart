@@ -72,6 +72,17 @@ const Categories = () => {
                       className="group-hover:scale-110 transition-transform max-w-20"
                     />
                     <p className="text-xs font-medium mt-2 text-center">{category.text}</p>
+                    
+                    {/* Show price when expanded or when selected category */}
+                    {(expandedCategories[group.key] || selectedCategory === group.key) && category.price && (
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-sm font-bold text-green-600">Rs. {category.price}</span>
+                        {category.oldPrice && (
+                          <span className="text-xs text-gray-500 line-through">Rs. {category.oldPrice}</span>
+                        )}
+                      </div>
+                    )}
+                    
                     {!expandedCategories[group.key] && index === 0 && group.items.length > 1 && (
                       <p className="text-xs text-gray-600 mt-1">+{group.items.length - 1} more</p>
                     )}
