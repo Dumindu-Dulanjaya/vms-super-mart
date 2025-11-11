@@ -19,13 +19,13 @@ const MainBanner = () => {
   return (
     <div className="relative">
       {/* Banner Image with fade transition */}
-      <div className="relative w-full h-auto overflow-hidden">
+      <div className="relative w-full h-[400px] md:h-[500px] lg:h-[600px] overflow-hidden bg-gray-100">
         {banners.map((banner, index) => (
           <img
             key={index}
             src={banner}
             alt={`Banner ${index + 1}`}
-            className={`w-full h-auto object-cover transition-opacity duration-1000 ${
+            className={`w-full h-full object-cover transition-opacity duration-1000 ${
               index === currentBannerIndex ? 'opacity-100' : 'opacity-0 absolute top-0 left-0'
             }`}
           />
