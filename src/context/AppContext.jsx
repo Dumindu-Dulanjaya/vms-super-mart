@@ -1,10 +1,9 @@
-import { useState, createContext } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { bestSellers, categories } from "../assets/assets";
 
-const AppContext = createContext();
-
-export { AppContext };
+export const AppContext = createContext();
 
 export const AppContextProvider = ({ children }) => {
   const currency = import.meta.env.VITE_CURRENCY || "$";
@@ -12,18 +11,30 @@ export const AppContextProvider = ({ children }) => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [isSeller, setIsSeller] = useState(false);
+  const [showUserLogin, setShowUserLogin] = useState(false);
   const [cartItems, setCartItems] = useState({});
-  // ✅ Dummy product data with required fields
-  const dummyProducts = [
-    { id: 1, name: "Helicopter 1", category: "Toys", price: 1000, oldPrice: 900, image: "/images/heli1.jpg", rating: 4, reviews: 10, description: "A fun toy helicopter for kids" },
-    { id: 2, name: "Mug 1", category: "Kitchenware", price: 500, oldPrice: 450, image: "/images/mug1.jpg", rating: 5, reviews: 20, description: "A ceramic mug for your morning coffee" },
-    { id: 3, name: "Porcelain 1", category: "Decor", price: 1500, oldPrice: 1400, image: "/images/porcelain1.jpg", rating: 3, reviews: 5, description: "Beautiful porcelain decor piece" },
-    { id: 4, name: "Helicopter 2", category: "Toys", price: 1200, oldPrice: 1100, image: "/images/heli2.jpg", rating: 4, reviews: 15, description: "Advanced toy helicopter with remote control" },
-    { id: 5, name: "Mug 2", category: "Kitchenware", price: 600, oldPrice: 550, image: "/images/mug2.jpg", rating: 4, reviews: 12, description: "Insulated mug to keep drinks hot" },
-    { id: 6, name: "Porcelain 2", category: "Decor", price: 1800, oldPrice: 1600, image: "/images/porcelain2.jpg", rating: 5, reviews: 8, description: "Elegant porcelain vase for home decor" },
-  ];
-  const [products, _setProducts] = useState(dummyProducts);
+  const [products, setProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Use packaged assets' sample products so images resolve correctly
+  // Combine bestSellers and categories into one products list so "All Products" shows everything
+  const categoryProducts = categories.map((c, idx) => ({
+    id: bestSellers.length + idx + 1,
+    name: c.text,
+    category: c.type || c.path || "Misc",
+    price: Math.floor(100 + (idx + 1) * 100),
+    oldPrice: Math.floor(100 + (idx + 1) * 120),
+    rating: 4,
+    reviews: 0,
+    image: c.image,
+  }));
+
+  const dummyProducts = [...bestSellers, ...categoryProducts];
+
+  // ✅ Load products when app starts
+  useEffect(() => {
+    setProducts(dummyProducts);
+  }, []);
 
   // Add product to cart
   const addToCart = (itemId) => {
@@ -69,10 +80,12 @@ export const AppContextProvider = ({ children }) => {
     products,
     addToCart,
     cartItems,
-    searchQuery,
-    setSearchQuery,
     updateCartItem,
     removeFromCart,
+    searchQuery,
+    setSearchQuery,
+    showUserLogin,
+    setShowUserLogin,
   };
 
   return (
@@ -82,4 +95,6 @@ export const AppContextProvider = ({ children }) => {
   );
 };
 
-// useAppContext moved to ./useAppContext.jsx so this file exports only components (required for fast refresh)
+export const useAppContext = () => {
+  return useContext(AppContext);
+};
