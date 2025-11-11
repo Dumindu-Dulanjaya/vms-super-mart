@@ -16,6 +16,13 @@ export const AppContextProvider = ({ children }) => {
   const [products, setProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Generate unique slug from name
+  const generateSlug = (name) => {
+    const nameSlug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    const uniqueId = Math.random().toString(36).substring(2, 10); // Random 8-char string
+    return `${nameSlug}-${uniqueId}`;
+  };
+
   // Use packaged assets' sample products so images resolve correctly
   // Combine bestSellers and categories into one products list so "All Products" shows everything
   const categoryProducts = categories.map((c, idx) => ({
@@ -27,13 +34,18 @@ export const AppContextProvider = ({ children }) => {
     rating: 4,
     reviews: 0,
     image: c.image,
+    slug: generateSlug(c.text),
   }));
 
-  const dummyProducts = [...bestSellers, ...categoryProducts];
+  const dummyProducts = [...bestSellers.map(p => ({
+    ...p,
+    slug: generateSlug(p.name)
+  })), ...categoryProducts];
 
   // ✅ Load products when app starts
   useEffect(() => {
     setProducts(dummyProducts);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Add product to cart

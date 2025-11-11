@@ -2,16 +2,15 @@ import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useAppContext } from "../context/AppContext";
 import ProductCategory from "./ProductCategory";
-import { assets } from "../assets/assets";
 
 const ProductDetails  = () => {
     const{products,navigate,currency,addToCart}=useAppContext();
-    const { id } = useParams();
+    const { slug } = useParams();
     const [relatedProducts,setrelatedProducts] = useState([]);
     const [thumbnail, setThumbnail] = useState(null);
 
 
-    const product = products.find((item) => item._id === id);
+    const product = products.find((item) => item.slug === slug);
 
     useEffect(() => {
         if (product) {
@@ -23,8 +22,9 @@ const ProductDetails  = () => {
     }, [product, products]);
 
     useEffect(() => {
-        setThumbnail(product.images[0])? product.images[0] : null;
-
+        if (product && product.image) {
+            setThumbnail(product.image);
+        }
     }, [product]);
 
     return product && (
@@ -38,16 +38,8 @@ const ProductDetails  = () => {
 
             <div className="flex flex-col md:flex-row gap-16 mt-4">
                 <div className="flex gap-3">
-                    <div className="flex flex-col gap-3">
-                        {product.images.map((image, index) => (
-                            <div key={index} onClick={() => setThumbnail(image)} className="border max-w-24 border-gray-500/30 rounded overflow-hidden cursor-pointer" >
-                                <img src={image} alt={`Thumbnail ${index + 1}`} />
-                            </div>
-                        ))}
-                    </div>
-
-                    <div className="border border-gray-500/30 max-w-100 rounded overflow-hidden">
-                        <img src={thumbnail} alt="Selected product" className="w-full h-full object-cover" />
+                    <div className="border border-gray-500/30 max-w-md rounded overflow-hidden">
+                        <img src={thumbnail || product.image} alt={product.name} className="w-full h-full object-cover" />
                     </div>
                 </div>
 
@@ -56,29 +48,28 @@ const ProductDetails  = () => {
 
                     <div className="flex items-center gap-0.5 mt-1">
                         {Array(5).fill('').map((_, i) => (
-                            <img key={i} src={i<4 ? assets.star_icon : assets.star_dull_icon} alt="" className="md:w-4 w-3.5"/>
+                            <span key={i} className={`text-xl ${i < product.rating ? 'text-yellow-400' : 'text-gray-300'}`}>★</span>
                         ))}
-                        <p className="text-base ml-2">(4)</p>
+                        <p className="text-base ml-2">({product.reviews || 0} reviews)</p>
                     </div>
 
                     <div className="mt-6">
-                        <p className="text-gray-500/70 line-through">MRP: {currency}{product.price}</p>
-                        <p className="text-2xl font-medium">MRP: {currency}{product.offerPrice}</p>
+                        <p className="text-gray-500/70 line-through">MRP: {currency}{product.oldPrice}</p>
+                        <p className="text-2xl font-medium">MRP: {currency}{product.price}</p>
                         <span className="text-gray-500/70">(inclusive of all taxes)</span>
                     </div>
 
                     <p className="text-base font-medium mt-6">About Product</p>
-                    <ul className="list-disc ml-4 text-gray-500/70">
-                        {product.description.map((desc, index) => (
-                            <li key={index}>{desc}</li>
-                        ))}
-                    </ul>
+                    <p className="text-gray-500/70 mt-2">
+                        This is a quality {product.category.toLowerCase()} item available at VMS Super Mart. 
+                        Get the best value for your money with our competitive pricing.
+                    </p>
 
                     <div className="flex items-center mt-10 gap-4 text-base">
-                        <button onClick={() => addToCart(product._id)} className="w-full py-3.5 cursor-pointer font-medium bg-gray-100 text-gray-800/80 hover:bg-gray-200 transition" >
+                        <button onClick={() => addToCart(product.id)} className="w-full py-3.5 cursor-pointer font-medium bg-gray-100 text-gray-800/80 hover:bg-gray-200 transition" >
                             Add to Cart
                         </button>
-                        <button onClick={()=> {addToCart(product._id);navigate("/cart")}} className="w-full py-3.5 cursor-pointer font-medium bg-indigo-500 text-white hover:bg-indigo-600 transition" >
+                        <button onClick={()=> {addToCart(product.id);navigate("/cart")}} className="w-full py-3.5 cursor-pointer font-medium bg-indigo-500 text-white hover:bg-indigo-600 transition" >
                             Buy now
                         </button>
                     </div>
