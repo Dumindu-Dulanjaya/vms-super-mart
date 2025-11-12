@@ -19,15 +19,13 @@ const ProductCategory = () => {
                 <div className='w-16 h-0.5 bg-primary rounded-full'></div>
               </div>
               
-              <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-6 mt-6'>
+              <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6'>
                 {filteredProducts.length > 0 ? (
                   filteredProducts.map((product) => (
-                    <ProductCard key={product._id} product={product} />
+                    <ProductCard key={product.id} product={product} />
                   ))
                 ) : (
-                  <div className='flex items-center justify-center h-[60vh]'>
-                    <p className='text-gray-500'> No products found in this category.</p>
-                  </div>
+                  <p className='text-gray-500 col-span-full text-center py-10'>No products found in this category.</p>
                 )}
               </div>
             </div>

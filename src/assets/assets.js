@@ -2,7 +2,7 @@
 
 // ===== Banner =====
 import bottom_banner_image from "./banner1girl.jpg";   // desktop version
-import bottom_banner_image_sm from "./banner1girl.jpg"; // mobile (can be different if you want)
+import bottom_banner_image_sm from "./banner1girl.jpg"; // mobile version
 
 // ===== Feature Icons =====
 import feature_icon_1 from "./icons/feature1.png";
@@ -46,28 +46,28 @@ export const assets = {
 
 // ==================== Categories ====================
 export const categories = [
-  { text: "Car 1", path: "Toys", type: "Toys", image: car1_image, bgColor: "#E6F7FF", price: 850, oldPrice: 950 },
-  { text: "Car 2", path: "Toys", type: "Toys", image: car2_image, bgColor: "#FFF0F6", price: 900, oldPrice: 1000 },
-  { text: "Car 3", path: "Toys", type: "Toys", image: car3_image, bgColor: "#FFFBE6", price: 750, oldPrice: 850 },
-  { text: "Car 4", path: "Toys", type: "Toys", image: car4_image, bgColor: "#F6FFED", price: 800, oldPrice: 900 },
-  { text: "Car 5", path: "Toys", type: "Toys", image: car5_image, bgColor: "#FFF1F0", price: 950, oldPrice: 1050 },
-  { text: "Car 6", path: "Toys", type: "Toys", image: car6_image, bgColor: "#E6FFFB", price: 880, oldPrice: 980 },
-  { text: "Car 7", path: "Toys", type: "Toys", image: car7_image, bgColor: "#F9F0FF", price: 920, oldPrice: 1020 },
-  { text: "Helicopter 1", path: "Toys", type: "Toys", image: helicopter1_image, bgColor: "#FFFBE6", price: 900, oldPrice: 1000 },
-  { text: "Helicopter 2", path: "Toys", type: "Toys", image: helicopter2_image, bgColor: "#F6FFED", price: 950, oldPrice: 1050 },
-  { text: "Minion", path: "Toys", type: "Toys", image: minion_image, bgColor: "#E6F7FF", price: 600, oldPrice: 700 },
-  { text: "Teddy", path: "Toys", type: "Toys", image: teddy_image, bgColor: "#FFF0F6", price: 1200, oldPrice: 1300 },
-  { text: "Aluminium Pots 1", path: "Kitchen", type: "Kitchen Items", image: aluminiumpots1_image, bgColor: "#FFFBE6", price: 1500, oldPrice: 1700 },
-  { text: "Aluminium Pots 2", path: "Kitchen", type: "Kitchen Items", image: aluminiumpots2_image, bgColor: "#E6FFFB", price: 1600, oldPrice: 1800 },
-  { text: "Aluminium Pots 3", path: "Kitchen", type: "Kitchen Items", image: aluminiumpots3_image, bgColor: "#FFF1F0", price: 1400, oldPrice: 1600 },
-  { text: "Mugs 1", path: "Kitchen", type: "Kitchen Items", image: mugs1_image, bgColor: "#F6FFED", price: 450, oldPrice: 500 },
-  { text: "Mugs 2", path: "Kitchen", type: "Kitchen Items", image: mugs2_image, bgColor: "#FFFBE6", price: 480, oldPrice: 530 },
-  { text: "Mugs 3", path: "Kitchen", type: "Kitchen Items", image: mugs3_image, bgColor: "#E6F7FF", price: 420, oldPrice: 470 },
-  { text: "Mugs 4", path: "Kitchen", type: "Kitchen Items", image: mugs4_image, bgColor: "#FFF0F6", price: 500, oldPrice: 550 },
-  { text: "Porcelain 1", path: "Kitchen", type: "Kitchen Items", image: porcelain1_image, bgColor: "#FFF1F0", price: 1400, oldPrice: 1500 },
-  { text: "Porcelain 2", path: "Kitchen", type: "Kitchen Items", image: porcelain2_image, bgColor: "#F6FFED", price: 1350, oldPrice: 1450 },
-  { text: "Porcelain 3", path: "Kitchen", type: "Kitchen Items", image: porcelain3_image, bgColor: "#E6FFFB", price: 1450, oldPrice: 1550 },
-  { text: "Porcelain 4", path: "Kitchen", type: "Kitchen Items", image: porcelain4_image, bgColor: "#FFFBE6", price: 1380, oldPrice: 1480 },
+  { text: "Car 1", path: "Toys", type: "Toys", image: car1_image, price: 850, oldPrice: 950 },
+  { text: "Car 2", path: "Toys", type: "Toys", image: car2_image, price: 900, oldPrice: 1000 },
+  { text: "Car 3", path: "Toys", type: "Toys", image: car3_image, price: 750, oldPrice: 850 },
+  { text: "Car 4", path: "Toys", type: "Toys", image: car4_image, price: 800, oldPrice: 900 },
+  { text: "Car 5", path: "Toys", type: "Toys", image: car5_image, price: 950, oldPrice: 1050 },
+  { text: "Car 6", path: "Toys", type: "Toys", image: car6_image, price: 880, oldPrice: 980 },
+  { text: "Car 7", path: "Toys", type: "Toys", image: car7_image, price: 920, oldPrice: 1020 },
+  { text: "Helicopter 1", path: "Toys", type: "Toys", image: helicopter1_image, price: 900, oldPrice: 1000 },
+  { text: "Helicopter 2", path: "Toys", type: "Toys", image: helicopter2_image, price: 950, oldPrice: 1050 },
+  { text: "Minion", path: "Toys", type: "Toys", image: minion_image, price: 600, oldPrice: 700 },
+  { text: "Teddy", path: "Toys", type: "Toys", image: teddy_image, price: 1200, oldPrice: 1300 },
+  { text: "Aluminium Pots 1", path: "Kitchen", type: "Kitchen Items", image: aluminiumpots1_image, price: 1500, oldPrice: 1700 },
+  { text: "Aluminium Pots 2", path: "Kitchen", type: "Kitchen Items", image: aluminiumpots2_image, price: 1600, oldPrice: 1800 },
+  { text: "Aluminium Pots 3", path: "Kitchen", type: "Kitchen Items", image: aluminiumpots3_image, price: 1400, oldPrice: 1600 },
+  { text: "Mugs 1", path: "Kitchen", type: "Kitchen Items", image: mugs1_image, price: 450, oldPrice: 500 },
+  { text: "Mugs 2", path: "Kitchen", type: "Kitchen Items", image: mugs2_image, price: 480, oldPrice: 530 },
+  { text: "Mugs 3", path: "Kitchen", type: "Kitchen Items", image: mugs3_image, price: 420, oldPrice: 470 },
+  { text: "Mugs 4", path: "Kitchen", type: "Kitchen Items", image: mugs4_image, price: 500, oldPrice: 550 },
+  { text: "Porcelain 1", path: "Kitchen", type: "Kitchen Items", image: porcelain1_image, price: 1400, oldPrice: 1500 },
+  { text: "Porcelain 2", path: "Kitchen", type: "Kitchen Items", image: porcelain2_image, price: 1350, oldPrice: 1450 },
+  { text: "Porcelain 3", path: "Kitchen", type: "Kitchen Items", image: porcelain3_image, price: 1450, oldPrice: 1550 },
+  { text: "Porcelain 4", path: "Kitchen", type: "Kitchen Items", image: porcelain4_image, price: 1380, oldPrice: 1480 },
 ];
 
 // ==================== Best Sellers ====================

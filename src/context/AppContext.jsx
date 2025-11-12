@@ -44,6 +44,7 @@ export const AppContextProvider = ({ children }) => {
 
   // ✅ Load products when app starts
   useEffect(() => {
+    console.log('Setting products:', dummyProducts.length, 'products');
     setProducts(dummyProducts);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

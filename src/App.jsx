@@ -9,6 +9,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import { Toaster } from 'react-hot-toast';
 import Footer from './components/Footer';
+import AllProducts from './pages/AllProducts';
 import ProductCategory from './pages/ProductCategory';
 import ProductDetails from './pages/ProductDetails';
 
@@ -28,6 +29,7 @@ const App = () => {
           {/* Normal user routes */}
           <Route path='/' element={<Home />} />
           <Route path='/login' element={<Login />} />
+          <Route path='/all-products' element={<AllProducts />} />
           <Route path='/product/:id' element={<ProductDetails />} />
           <Route path='/products/category/:element' element={<ProductCategory />} />
 
