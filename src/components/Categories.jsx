@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { categories } from '../assets/assets';
+import { useNavigate } from 'react-router-dom';
 
 const Categories = () => {
+  const navigate = useNavigate();
   const [expandedCategories, setExpandedCategories] = useState({});
-  const [selectedCategory, setSelectedCategory] = useState(null);
 
   // Manually define category groups based on path
   const toysItems = categories.filter(item => item.path === 'Toys');
@@ -21,32 +22,14 @@ const Categories = () => {
     }));
   };
 
-  const selectCategory = (categoryKey) => {
-    setSelectedCategory(categoryKey);
-    setExpandedCategories({ [categoryKey]: true });
-  };
-
-  const showAllCategories = () => {
-    setSelectedCategory(null);
-    setExpandedCategories({});
-  };
-
   return (
     <div className="mt-16">
       <div className="flex items-center justify-between mb-4">
         <p className="text-2xl md:text-3xl font-medium">Categories</p>
-        {selectedCategory && (
-          <button
-            onClick={showAllCategories}
-            className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-sm font-medium transition"
-          >
-            ← Back to All Categories
-          </button>
-        )}
       </div>
       
       <div className="flex flex-wrap gap-16 mt-4">
-        {(selectedCategory ? categoryGroups.filter(group => group.key === selectedCategory) : categoryGroups).map((group, groupIndex) => (
+        {categoryGroups.map((group, groupIndex) => (
           group.items.length > 0 && (
             <div key={groupIndex} className="flex flex-col">
               <h3 className="text-xl font-semibold mb-4 text-gray-700">{group.title}</h3>
@@ -61,8 +44,9 @@ const Categories = () => {
                         // If collapsed and first item clicked, expand
                         toggleCategory(group.key);
                       } else {
-                        // Select this category to show only its items
-                        selectCategory(group.key);
+                        // Navigate to the category page to show products
+                        navigate(`/products/category/${category.path.toLowerCase()}`);
+                        window.scrollTo(0, 0);
                       }
                     }}
                   >

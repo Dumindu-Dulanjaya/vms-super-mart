@@ -31,7 +31,7 @@ const App = () => {
           <Route path='/login' element={<Login />} />
           <Route path='/all-products' element={<AllProducts />} />
           <Route path='/product/:id' element={<ProductDetails />} />
-          <Route path='/products/category/:element' element={<ProductCategory />} />
+          <Route path='/products/category/:category' element={<ProductCategory />} />
 
           {/* Later you can add seller routes here if needed */}
         </Routes>
