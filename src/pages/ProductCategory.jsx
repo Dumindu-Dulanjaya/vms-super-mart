@@ -21,7 +21,7 @@ const ProductCategory = () => {
               {/* Category Title - Left aligned */}
               <div className='mb-8'>
                 <h1 className='text-3xl md:text-4xl font-bold uppercase text-gray-800'>
-                  {selectedCategory.text}
+                  {selectedCategory.path}
                 </h1>
               </div>
               
