@@ -9,10 +9,12 @@ const ProductCategory = () => {
     const { category } = useParams();
     const selectedCategory = categories.find((item) => item.path.toLowerCase() === category);
     
-    // Filter products by the category path (e.g., "Toys", "Kitchen")
-    const filteredProducts = products.filter((product) => 
-      product.category.toLowerCase() === selectedCategory?.path.toLowerCase()
-    );
+    // Filter products by the category type (e.g., "Toys", "Kitchen Items")
+    const filteredProducts = products.filter((product) => {
+      // Match against the type field from categories, which is the actual category value
+      const categoryType = selectedCategory?.type || selectedCategory?.path;
+      return product.category.toLowerCase() === categoryType?.toLowerCase();
+    });
     
     // Get proper category display name
     const getCategoryDisplayName = (path) => {
