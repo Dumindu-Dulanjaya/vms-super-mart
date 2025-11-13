@@ -40,14 +40,9 @@ const Categories = () => {
                     className="group cursor-pointer py-4 px-2 gap-2 rounded-lg flex flex-col justify-center items-center transition w-40"
                     style={{ backgroundColor: category.bgColor }}
                     onClick={() => {
-                      if (!expandedCategories[group.key] && index === 0) {
-                        // If collapsed and first item clicked, expand
-                        toggleCategory(group.key);
-                      } else {
-                        // Navigate to the category page to show products
-                        navigate(`/products/category/${category.path.toLowerCase()}`);
-                        window.scrollTo(0, 0);
-                      }
+                      // Navigate to the category page to show products
+                      navigate(`/products/category/${category.path.toLowerCase()}`);
+                      window.scrollTo(0, 0);
                     }}
                   >
                     <img

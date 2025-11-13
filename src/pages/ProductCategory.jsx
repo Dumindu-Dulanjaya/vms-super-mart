@@ -8,17 +8,24 @@ const ProductCategory = () => {
     const { products } = useAppContext();
     const { category } = useParams();
     const selectedCategory = categories.find((item) => item.path.toLowerCase() === category);
-    const filteredProducts = products.filter((product) => product.category.toLowerCase() === category);
+    
+    // Filter products by the category path (e.g., "Toys", "Kitchen")
+    const filteredProducts = products.filter((product) => 
+      product.category.toLowerCase() === selectedCategory?.path.toLowerCase()
+    );
   
     return (
     <div className='mt-16'>
         {selectedCategory && (
             <div className='flex flex-col'>
-              <div className='flex flex-col items-end w-max mb-8'>
-                <p className='text-2xl font-medium uppercase text-black'>{selectedCategory.text}</p>
-                <div className='w-16 h-0.5 bg-primary rounded-full'></div>
+              {/* Category Title - Left aligned */}
+              <div className='mb-8'>
+                <h1 className='text-3xl md:text-4xl font-bold uppercase text-gray-800'>
+                  {selectedCategory.text}
+                </h1>
               </div>
               
+              {/* Products Grid */}
               <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6'>
                 {filteredProducts.length > 0 ? (
                   filteredProducts.map((product) => (
