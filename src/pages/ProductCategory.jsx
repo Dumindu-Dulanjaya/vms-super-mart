@@ -13,6 +13,12 @@ const ProductCategory = () => {
     const filteredProducts = products.filter((product) => 
       product.category.toLowerCase() === selectedCategory?.path.toLowerCase()
     );
+    
+    // Get proper category display name
+    const getCategoryDisplayName = (path) => {
+      if (path.toLowerCase() === 'kitchen') return 'Kitchen Items';
+      return path; // For "Toys" or other categories
+    };
   
     return (
     <div className='mt-16'>
@@ -21,7 +27,7 @@ const ProductCategory = () => {
               {/* Category Title - Left aligned */}
               <div className='mb-8'>
                 <h1 className='text-3xl md:text-4xl font-bold uppercase text-gray-800'>
-                  {selectedCategory.path}
+                  {getCategoryDisplayName(selectedCategory.path)}
                 </h1>
               </div>
               
