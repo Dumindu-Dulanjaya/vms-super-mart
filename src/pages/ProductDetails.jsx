@@ -1,25 +1,16 @@
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
-import { useAppContext } from "../context/AppContext";
-import ProductCategory from "./ProductCategory";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { useAppContext } from "../context/useAppContext";
 
 const ProductDetails  = () => {
-    const{products,navigate,currency,addToCart}=useAppContext();
+    const { products, addToCart } = useAppContext();
     const { slug } = useParams();
-    const [relatedProducts,setrelatedProducts] = useState([]);
+    const navigate = useNavigate();
+    const currency = "Rs.";
     const [thumbnail, setThumbnail] = useState(null);
 
 
     const product = products.find((item) => item.slug === slug);
-
-    useEffect(() => {
-        if (product) {
-            let productsCopy = products.slice();
-            productsCopy = productsCopy.filter((item) => product.category === item.category);
-
-            setrelatedProducts(productsCopy.slice(0, 5));
-        }
-    }, [product, products]);
 
     useEffect(() => {
         if (product && product.image) {
@@ -27,12 +18,16 @@ const ProductDetails  = () => {
         }
     }, [product]);
 
-    return product && (
+    if (!product) {
+        return <div className="mt-12 text-center">Product not found</div>;
+    }
+
+    return (
         <div className="mt-12">
-            <p>
-                <Link to={"/"}>Home</Link> /
-                <Link to={"/products"}> Products</Link> /
-                <Link to={`/products/${product.category.toLowerCase()}`}> {product.category}</Link> /
+            <p className="text-sm text-gray-600 mb-4">
+                <Link to="/" className="hover:text-[#00FF33]">Home</Link> /
+                <Link to="/all-products" className="hover:text-[#00FF33]"> Products</Link> /
+                <Link to={`/products/category/${product.category.toLowerCase().replace(/\s+/g, '')}`} className="hover:text-[#00FF33]"> {product.category}</Link> /
                 <span className="text-indigo-500"> {product.name}</span>
             </p>
 

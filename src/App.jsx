@@ -30,7 +30,7 @@ const App = () => {
           <Route path='/' element={<Home />} />
           <Route path='/login' element={<Login />} />
           <Route path='/all-products' element={<AllProducts />} />
-          <Route path='/product/:id' element={<ProductDetails />} />
+          <Route path='/product/:slug' element={<ProductDetails />} />
           <Route path='/products/category/:category' element={<ProductCategory />} />
 
           {/* Later you can add seller routes here if needed */}

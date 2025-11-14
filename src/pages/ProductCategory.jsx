@@ -28,7 +28,7 @@ const ProductCategory = () => {
             <div className='flex flex-col'>
               {/* Category Title - Left aligned */}
               <div className='mb-8'>
-                <h1 className='text-3xl md:text-4xl font-bold uppercase text-gray-800'>
+                <h1 className='text-3xl md:text-4xl font-bold text-gray-800'>
                   {getCategoryDisplayName(selectedCategory.path)}
                 </h1>
               </div>
