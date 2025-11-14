@@ -7,7 +7,7 @@ const ProductCard = ({ product }) => {
 
   return (
     <div className="w-full border border-gray-200 rounded-xl shadow-sm bg-white overflow-hidden hover:shadow-lg transition-all duration-300">
-      <Link to={`/products/${product.category?.toLowerCase().replace(/\s+/g, '-')}/${product.slug}`}>
+      <Link to={`/product/${product.slug}`}>
         {/* Product Image */}
         <div className="bg-gray-50 p-6 flex items-center justify-center h-52">
           <img
@@ -22,7 +22,7 @@ const ProductCard = ({ product }) => {
       {/* Product Details */}
       <div className="p-4">
         <p className="text-gray-400 text-sm mb-1">{product.category}</p>
-        <Link to={`/products/${product.category?.toLowerCase().replace(/\s+/g, '-')}/${product.slug}`}>
+        <Link to={`/product/${product.slug}`}>
           <h3 className="text-gray-800 font-semibold text-base mb-2 hover:text-green-600 transition-colors">
             {product.name}
           </h3>
