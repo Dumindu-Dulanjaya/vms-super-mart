@@ -1,105 +1,154 @@
 import { useState, useEffect } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
-import { useAppContext } from "../context/useAppContext";
+import { useParams, Link } from "react-router-dom";
+import { useAppContext } from "../context/AppContext";
+import ProductCard from "../components/ProductCard";
 
 const ProductDetails  = () => {
-    const { products, addToCart } = useAppContext();
+    const{products,navigate,currency,addToCart}=useAppContext();
     const { slug } = useParams();
-    const navigate = useNavigate();
-    const currency = "Rs.";
     const [thumbnail, setThumbnail] = useState(null);
+    const [relatedProducts, setRelatedProducts] = useState([]);
 
+    console.log('ProductDetails - slug:', slug);
+    console.log('ProductDetails - products:', products.length);
 
     const product = products.find((item) => item.slug === slug);
+    console.log('ProductDetails - found product:', product);
 
     useEffect(() => {
         if (product && product.image) {
             setThumbnail(product.image);
         }
-    }, [product]);
+        
+        // Get related products from same category
+        if (product) {
+            const related = products
+                .filter(p => p.category === product.category && p.id !== product.id)
+                .slice(0, 3);
+            setRelatedProducts(related);
+        }
+    }, [product, products]);
 
     if (!product) {
-        return <div className="mt-12 text-center">Product not found</div>;
+        return (
+            <div className="mt-12 text-center py-16">
+                <h2 className="text-2xl text-gray-500">Product not found</h2>
+                <Link to="/products" className="text-indigo-600 hover:underline mt-4 inline-block">Back to Products</Link>
+            </div>
+        );
     }
 
     return (
-        <div className="mt-12">
+        <div className="container mx-auto px-4 py-8 max-w-7xl">
             {/* Breadcrumb */}
-            <p className="text-sm text-gray-600 mb-4">
-                <Link to="/" className="hover:text-[#00FF33]">Home</Link> /
-                <Link to="/all-products" className="hover:text-[#00FF33]"> Products</Link> /
-                <Link to={`/products/category/${product.category.toLowerCase().replace(/\s+/g, '')}`} className="hover:text-[#00FF33]"> {product.category}</Link> /
-                <span className="text-indigo-500"> {product.name}</span>
-            </p>
+            <div className="text-sm text-gray-500 mb-6">
+                <Link to="/" className="hover:text-gray-700">Home</Link>
+                <span className="mx-2">/</span>
+                <Link to="/products" className="hover:text-gray-700">Products</Link>
+                <span className="mx-2">/</span>
+                <Link to={`/products`} className="hover:text-gray-700">{product.category}</Link>
+                <span className="mx-2">/</span>
+                <span className="text-indigo-600 font-medium">{product.name}</span>
+            </div>
 
-            <div className="flex flex-col md:flex-row gap-8 mt-8">
-                {/* Left side - Image Gallery */}
-                <div className="flex flex-col-reverse md:flex-row gap-4 w-full md:w-1/2">
-                    {/* Thumbnail Images - Vertical on left */}
-                    <div className="flex flex-row md:flex-col gap-3 overflow-x-auto md:overflow-visible">
-                        {[product.image, product.image, product.image, product.image].map((img, index) => (
+            {/* Product Details Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
+                {/* Left: Product Images */}
+                <div className="flex flex-col md:flex-row gap-4">
+                    {/* Thumbnail Images (vertical on left) */}
+                    <div className="flex md:flex-col gap-3 order-2 md:order-1">
+                        {[product.image, product.image, product.image, product.image].slice(0, 4).map((img, index) => (
                             <div 
                                 key={index}
                                 onClick={() => setThumbnail(img)}
-                                className={`border-2 ${thumbnail === img || (thumbnail === null && index === 0) ? 'border-gray-800' : 'border-gray-300'} rounded-lg overflow-hidden cursor-pointer hover:border-gray-600 transition w-20 h-20 flex-shrink-0`}
+                                className={`w-20 h-20 border-2 rounded-lg overflow-hidden cursor-pointer transition-all ${
+                                    thumbnail === img ? 'border-indigo-500' : 'border-gray-200 hover:border-gray-300'
+                                }`}
                             >
                                 <img src={img} alt={`${product.name} view ${index + 1}`} className="w-full h-full object-cover" />
                             </div>
                         ))}
                     </div>
 
-                    {/* Main Image */}
-                    <div className="flex-1 border border-gray-300 rounded-lg overflow-hidden">
-                        <img src={thumbnail || product.image} alt={product.name} className="w-full h-full object-cover" />
+                    {/* Main Product Image */}
+                    <div className="flex-1 border border-gray-200 rounded-xl overflow-hidden bg-gray-50 p-8 order-1 md:order-2">
+                        <img 
+                            src={thumbnail || product.image} 
+                            alt={product.name} 
+                            className="w-full h-auto object-contain max-h-96"
+                        />
                     </div>
                 </div>
 
-                {/* Right side - Product Details */}
-                <div className="w-full md:w-1/2">
-                    <h1 className="text-3xl font-medium text-gray-800">{product.name}</h1>
+                {/* Right: Product Info */}
+                <div className="flex flex-col">
+                    <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-3">{product.name}</h1>
 
-                    {/* Star Rating */}
-                    <div className="flex items-center gap-1 mt-3">
-                        {Array(5).fill('').map((_, i) => (
-                            <span key={i} className={`text-lg ${i < product.rating ? 'text-yellow-400' : 'text-gray-300'}`}>★</span>
-                        ))}
-                        <p className="text-sm text-gray-600 ml-2">({product.reviews || 0})</p>
+                    {/* Rating */}
+                    <div className="flex items-center gap-2 mb-6">
+                        <div className="flex items-center gap-1">
+                            {Array(5).fill('').map((_, i) => (
+                                <span key={i} className={`text-lg ${i < product.rating ? 'text-yellow-400' : 'text-gray-300'}`}>★</span>
+                            ))}
+                        </div>
+                        <span className="text-gray-600">({product.reviews || 4})</span>
                     </div>
 
                     {/* Price */}
-                    <div className="mt-6">
-                        <p className="text-sm text-gray-500 line-through">MRP: {currency}{product.oldPrice}</p>
-                        <p className="text-3xl font-semibold text-gray-800 mt-1">MRP: {currency}{product.price}</p>
-                        <span className="text-sm text-gray-500">(inclusive of all taxes)</span>
+                    <div className="mb-6">
+                        <p className="text-gray-400 text-sm line-through mb-1">MRP: {currency}{product.oldPrice}</p>
+                        <p className="text-3xl font-bold text-gray-900">MRP: {currency}{product.price}</p>
+                        <p className="text-gray-500 text-sm mt-1">(Inclusive of all taxes)</p>
                     </div>
 
                     {/* About Product */}
-                    <div className="mt-8">
-                        <p className="text-lg font-semibold text-gray-800 mb-2">About Product</p>
-                        <ul className="text-sm text-gray-600 space-y-1 list-disc list-inside">
-                            <li>High-quality material</li>
-                            <li>Comfortable for everyday use</li>
-                            <li>Available in different sizes</li>
+                    <div className="mb-8">
+                        <h2 className="text-lg font-semibold text-gray-800 mb-3">About Product</h2>
+                        <ul className="space-y-2 text-gray-600">
+                            <li className="flex items-start">
+                                <span className="mr-2">•</span>
+                                <span>Fresh and high quality {product.category.toLowerCase()}</span>
+                            </li>
+                            <li className="flex items-start">
+                                <span className="mr-2">•</span>
+                                <span>Perfect for your daily needs</span>
+                            </li>
+                            <li className="flex items-start">
+                                <span className="mr-2">•</span>
+                                <span>Best value for money at VMS Super Mart</span>
+                            </li>
                         </ul>
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex items-center mt-10 gap-4">
+                    <div className="flex gap-4 mt-auto">
                         <button 
                             onClick={() => addToCart(product.id)} 
-                            className="flex-1 py-3.5 px-6 font-medium bg-gray-100 text-gray-800 hover:bg-gray-200 transition rounded-lg border border-gray-300"
+                            className="flex-1 py-4 px-6 bg-white border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition"
                         >
                             Add to Cart
                         </button>
                         <button 
-                            onClick={() => { addToCart(product.id); navigate("/cart"); }} 
-                            className="flex-1 py-3.5 px-6 font-medium bg-blue-600 text-white hover:bg-blue-700 transition rounded-lg"
+                            onClick={() => {addToCart(product.id); navigate("/cart");}} 
+                            className="flex-1 py-4 px-6 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition"
                         >
                             Buy now
                         </button>
                     </div>
                 </div>
             </div>
+
+            {/* Related Products Section */}
+            {relatedProducts.length > 0 && (
+                <div className="mt-16">
+                    <h2 className="text-2xl font-bold text-gray-800 mb-6">Related Products</h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                        {relatedProducts.map((relatedProduct) => (
+                            <ProductCard key={relatedProduct.id} product={relatedProduct} />
+                        ))}
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

@@ -12,7 +12,7 @@ const Login = ({ isOpen, onClose }) => {
     React.useEffect(() => {
         console.log("Login modal - isOpen:", isOpen);
         console.log("Login modal - onClose function:", typeof onClose);
-    }, [isOpen]);
+    }, [isOpen, onClose]);
 
     // Test: Force modal to show
     // React.useEffect(() => {

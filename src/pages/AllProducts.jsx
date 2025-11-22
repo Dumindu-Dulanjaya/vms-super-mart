@@ -3,8 +3,8 @@ import { useAppContext } from '../context/AppContext'
 import ProductCard from '../components/ProductCard'
 
 const AllProducts = () => {
-  const { products, searchQuery } = useAppContext();
-  const [filteredProducts, setFilteredProducts] = useState([]);
+  const { products, searchQuery} = useAppContext();
+  const[filteredProducts, setFilteredProducts] = useState([]);
 
   console.log('AllProducts - products from context:', products.length);
   console.log('AllProducts - searchQuery:', searchQuery);
@@ -12,8 +12,7 @@ const AllProducts = () => {
   useEffect(() => {
     if (searchQuery.length > 0) {
       const filtered = products.filter((product) =>
-        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.category.toLowerCase().includes(searchQuery.toLowerCase())
+        product.name.toLowerCase().includes(searchQuery.toLowerCase())
       );
       setFilteredProducts(filtered);
       console.log('AllProducts - filtered by search:', filtered.length);
@@ -30,13 +29,6 @@ const AllProducts = () => {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-2">ALL PRODUCTS</h1>
           <div className="w-20 h-1 bg-green-600 rounded-full"></div>
-          
-          {/* Search Results Info */}
-          {searchQuery && (
-            <p className="text-gray-600 text-sm mt-4">
-              Found {filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''} for "{searchQuery}"
-            </p>
-          )}
         </div>
 
         {/* Product grid: 5 columns on large screens */}
