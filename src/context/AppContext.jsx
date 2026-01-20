@@ -13,6 +13,7 @@ export const AppContextProvider = ({ children }) => {
   const [isSeller, setIsSeller] = useState(false);
   const [showUserLogin, setShowUserLogin] = useState(false);
   const [cartItems, setCartItems] = useState({});
+  const [wishlistItems, setWishlistItems] = useState([]);
   const [products, setProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -44,9 +45,8 @@ export const AppContextProvider = ({ children }) => {
 
   // ✅ Load products when app starts
   useEffect(() => {
-    console.log('Setting products:', dummyProducts.length, 'products');
     setProducts(dummyProducts);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Add product to cart
@@ -83,6 +83,29 @@ export const AppContextProvider = ({ children }) => {
     }
   };
 
+  // Add to wishlist
+  const addToWishlist = (itemId) => {
+    if (!wishlistItems.includes(itemId)) {
+      setWishlistItems([...wishlistItems, itemId]);
+      toast.success("Added to wishlist");
+    }
+  };
+
+  // Remove from wishlist
+  const removeFromWishlist = (itemId) => {
+    setWishlistItems(wishlistItems.filter(id => id !== itemId));
+    toast.success("Removed from wishlist");
+  };
+
+  // Toggle wishlist
+  const toggleWishlist = (itemId) => {
+    if (wishlistItems.includes(itemId)) {
+      removeFromWishlist(itemId);
+    } else {
+      addToWishlist(itemId);
+    }
+  };
+
   const value = {
     navigate,
     user,
@@ -95,10 +118,15 @@ export const AppContextProvider = ({ children }) => {
     cartItems,
     updateCartItem,
     removeFromCart,
+    wishlistItems,
+    addToWishlist,
+    removeFromWishlist,
+    toggleWishlist,
     searchQuery,
     setSearchQuery,
     showUserLogin,
     setShowUserLogin,
+    setCartItems,
   };
 
   return (

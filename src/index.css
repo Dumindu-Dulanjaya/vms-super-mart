@@ -11,3 +11,10 @@ font-family: "Outfit", sans-serif;
   --color-primary: #4fbf8b;
   --color-primary-dull: #44ae7c;
 }
+
+/* Custom container with larger max-width */
+@layer components {
+  .container {
+    max-width: 1400px !important;
+  }
+}

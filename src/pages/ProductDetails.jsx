@@ -6,14 +6,10 @@ import ProductCard from "../components/ProductCard";
 const ProductDetails  = () => {
     const{products,navigate,currency,addToCart}=useAppContext();
     const { slug } = useParams();
-    const [thumbnail, setThumbnail] = useState(null);
     const [relatedProducts, setRelatedProducts] = useState([]);
-
-    console.log('ProductDetails - slug:', slug);
-    console.log('ProductDetails - products:', products.length);
+    const [thumbnail, setThumbnail] = useState(null);
 
     const product = products.find((item) => item.slug === slug);
-    console.log('ProductDetails - found product:', product);
 
     useEffect(() => {
         if (product && product.image) {
@@ -28,6 +24,15 @@ const ProductDetails  = () => {
             setRelatedProducts(related);
         }
     }, [product, products]);
+
+    // Show loading if products haven't loaded yet
+    if (products.length === 0) {
+        return (
+            <div className="mt-12 text-center py-16">
+                <h2 className="text-2xl text-gray-500">Loading...</h2>
+            </div>
+        );
+    }
 
     if (!product) {
         return (
@@ -46,7 +51,7 @@ const ProductDetails  = () => {
                 <span className="mx-2">/</span>
                 <Link to="/products" className="hover:text-gray-700">Products</Link>
                 <span className="mx-2">/</span>
-                <Link to={`/products`} className="hover:text-gray-700">{product.category}</Link>
+                <Link to={`/products?category=${encodeURIComponent(product.category)}`} className="hover:text-gray-700">{product.category}</Link>
                 <span className="mx-2">/</span>
                 <span className="text-indigo-600 font-medium">{product.name}</span>
             </div>
