@@ -6,14 +6,21 @@ const Categories = () => {
   const navigate = useNavigate();
   const [expandedCategories, setExpandedCategories] = useState({});
 
-  // Manually define category groups based on path
-  const toysItems = categories.filter(item => item.path === 'Toys');
-  const kitchenItems = categories.filter(item => item.path === 'Kitchen');
-
-  const categoryGroups = [
-    { title: 'Toys', items: toysItems, key: 'toys' },
-    { title: 'Kitchen Items', items: kitchenItems, key: 'kitchen' }
-  ];
+  // Auto-group categories by path so newly added categories show without extra code changes.
+  const categoryGroups = Object.values(
+    categories.reduce((acc, item) => {
+      const groupKey = item.path.toLowerCase();
+      if (!acc[groupKey]) {
+        acc[groupKey] = {
+          title: item.type || item.path,
+          items: [],
+          key: groupKey
+        };
+      }
+      acc[groupKey].items.push(item);
+      return acc;
+    }, {})
+  );
 
   const toggleCategory = (categoryKey) => {
     setExpandedCategories(prev => ({
