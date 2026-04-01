@@ -1,5 +1,6 @@
 import React from 'react';
 import logo from '../assets/VMS logo.png';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
   return (
@@ -14,42 +15,42 @@ const Footer = () => {
 
         {/* Quick Links */}
         <div>
-          <h3 className="font-semibold mb-2 text-gray-900">Quick Links</h3>
+          <h3 className="font-semibold mb-2 text-gray-900 uppercase text-xs tracking-widest">Quick Links</h3>
           <ul className="text-gray-600 text-sm space-y-1">
-            <li><a href="#" className="hover:underline">Home</a></li>
-            <li><a href="#" className="hover:underline">Best Sellers</a></li>
-            <li><a href="#" className="hover:underline">Offers & Deals</a></li>
-            <li><a href="#" className="hover:underline">Contact Us</a></li>
-            <li><a href="#" className="hover:underline">FAQs</a></li>
+            <li><Link to="/" className="hover:text-[#00FF33] transition-colors">Home</Link></li>
+            <li><Link to="/all-products" className="hover:text-[#00FF33] transition-colors">Best Sellers</Link></li>
+            <li><Link to="/all-products" className="hover:text-[#00FF33] transition-colors">Offers & Deals</Link></li>
+            <li><Link to="/contact" className="hover:text-[#00FF33] transition-colors">Contact Us</Link></li>
+            <li><Link to="#" className="hover:text-[#00FF33] transition-colors">FAQs</Link></li>
           </ul>
         </div>
 
         {/* Need Help? */}
         <div>
-          <h3 className="font-semibold mb-2 text-gray-900">Need Help?</h3>
+          <h3 className="font-semibold mb-2 text-gray-900 uppercase text-xs tracking-widest">Need Help?</h3>
           <ul className="text-gray-600 text-sm space-y-1">
-            <li><a href="#" className="hover:underline">Delivery Information</a></li>
-            <li><a href="#" className="hover:underline">Return & Refund Policy</a></li>
-            <li><a href="#" className="hover:underline">Payment Methods</a></li>
-            <li><a href="#" className="hover:underline">Track your Order</a></li>
-            <li><a href="#" className="hover:underline">Contact Us</a></li>
+            <li><Link to="#" className="hover:text-[#00FF33] transition-colors">Delivery Information</Link></li>
+            <li><Link to="#" className="hover:text-[#00FF33] transition-colors">Return & Refund Policy</Link></li>
+            <li><Link to="#" className="hover:text-[#00FF33] transition-colors">Payment Methods</Link></li>
+            <li><Link to="#" className="hover:text-[#00FF33] transition-colors">Track your Order</Link></li>
+            <li><Link to="/contact" className="hover:text-[#00FF33] transition-colors">Contact Us</Link></li>
           </ul>
         </div>
 
         {/* Follow Us */}
         <div>
-          <h3 className="font-semibold mb-2 text-gray-900">Follow Us</h3>
+          <h3 className="font-semibold mb-2 text-gray-900 uppercase text-xs tracking-widest">Follow Us</h3>
           <ul className="text-gray-600 text-sm space-y-1">
-            <li><a href="#" className="hover:underline">Instagram</a></li>
-            <li><a href="#" className="hover:underline">Twitter</a></li>
-            <li><a href="#" className="hover:underline">Facebook</a></li>
-            <li><a href="#" className="hover:underline">YouTube</a></li>
+            <li><Link to="#" className="hover:text-[#00FF33] transition-colors">Instagram</Link></li>
+            <li><Link to="#" className="hover:text-[#00FF33] transition-colors">Twitter</Link></li>
+            <li><Link to="#" className="hover:text-[#00FF33] transition-colors">Facebook</Link></li>
+            <li><Link to="#" className="hover:text-[#00FF33] transition-colors">YouTube</Link></li>
           </ul>
         </div>
       </div>
 
-      <div className="w-full border-t border-gray-100 py-4 flex justify-center">
-        <span className="text-gray-400 text-xs text-center">Copyright 2025 © VMS Supermart All Right Reserved.</span>
+      <div className="w-full border-t border-gray-100 py-6 flex justify-center">
+        <span className="text-gray-400 text-[10px] text-center font-bold tracking-widest uppercase">Copyright 2025 © VMS Supermart All Right Reserved.</span>
       </div>
     </footer>
   );

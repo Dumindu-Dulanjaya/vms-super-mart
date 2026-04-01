@@ -7,6 +7,7 @@ import Footer from './components/Footer';
 
 // Pages
 import Home from './pages/Home';
+import Contact from './pages/Contact';
 import Login from './pages/Login';
 import AllProducts from './pages/AllProducts';
 import ProductCategory from './pages/ProductCategory';
@@ -39,6 +40,7 @@ const App = () => {
         <Routes>
           {/* Normal user routes */}
           <Route path='/' element={<Home />} />
+          <Route path='/contact' element={<Contact />} />
           <Route path='/login' element={<Login />} />
           <Route path='/all-products' element={<AllProducts />} />
           <Route path='/product/:slug' element={<ProductDetails />} />
