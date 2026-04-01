@@ -96,9 +96,57 @@ const Navbar = () => {
 
                 {/* Login Section */}
                 {!hideIcons && (
-                    <div className="relative">
+                    <div className="relative group">
                         {!user ? (
-                            <Link to="/login" className="cursor-pointer px-6 py-2 bg-[#00FF33] hover:bg-[#00CC29] transition text-white rounded-full font-medium">Login</Link>
+                            <div className="relative">
+                                {/* Trigger Button */}
+                                <button
+                                    className="cursor-pointer px-6 py-2 bg-[#00FF33] hover:bg-[#00CC29] transition-all text-white rounded-full font-bold flex items-center gap-2 shadow-lg shadow-green-100 active:scale-95 px-5"
+                                >
+                                    Login
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="group-hover:rotate-180 transition-transform duration-300 ml-1"><path d="m6 9 6 6 6-6"/></svg>
+                                </button>
+
+                                {/* Dropdown Menu */}
+                                <div className="absolute top-full right-0 mt-3 w-56 bg-white rounded-2xl shadow-2xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50 overflow-hidden">
+                                    <div className="p-2 space-y-1">
+                                        <Link 
+                                            to="/login"
+                                            className="flex items-center gap-3 px-4 py-3 hover:bg-green-50 text-gray-700 rounded-xl transition-colors group/item"
+                                        >
+                                            <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center text-green-600 group-hover/item:bg-[#00FF33] group-hover/item:text-white transition-colors">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            </div>
+                                            <div>
+                                                <p className="text-sm font-bold">Customer Login</p>
+                                                <p className="text-[10px] text-gray-400 font-medium tracking-tight">Shop & Order</p>
+                                            </div>
+                                        </Link>
+                                        
+                                        <div className="h-px bg-gray-50 mx-2 my-1"></div>
+
+                                        <Link 
+                                            to="/admin/login"
+                                            className="flex items-center gap-3 px-4 py-3 hover:bg-indigo-50 text-gray-700 rounded-xl transition-colors group/item"
+                                        >
+                                            <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 group-hover/item:bg-slate-900 group-hover/item:text-white transition-colors">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                            </div>
+                                            <div>
+                                                <p className="text-sm font-bold">Admin Portal</p>
+                                                <p className="text-[10px] text-gray-400 font-medium tracking-tight">Manage Inventory</p>
+                                            </div>
+                                        </Link>
+                                    </div>
+                                    <div className="bg-gray-50 px-4 py-2 flex items-center justify-between">
+                                        <span className="text-[9px] text-gray-400 font-black tracking-widest uppercase">VMS Secure Login</span>
+                                        <div className="flex gap-1">
+                                            <div className="w-1 h-1 bg-green-400 rounded-full animate-pulse"></div>
+                                            <div className="w-1 h-1 bg-green-400 rounded-full animate-pulse delay-75"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         ) : (
                             <div className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 px-3 py-2 rounded-lg transition">
                                 <img src={profileIcon} className="w-8 h-8 rounded-full border-2 border-gray-200" alt="Profile" />

@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 
 // Components
@@ -14,21 +14,28 @@ import ProductDetails from './pages/ProductDetails';
 import Cart from './pages/Cart';
 import Wishlist from './pages/Wishlist';
 import Checkout from './pages/Checkout';
+import AdminLayout from './pages/admin/AdminLayout';
+import AdminLogin from './pages/admin/AdminLogin';
+import { useAppContext } from './context/AppContext';
 
 import { Toaster } from 'react-hot-toast';
 
 const App = () => {
+  const { isAdminAuthenticated } = useAppContext();
   const location = useLocation();
+  const isAdminPath = location.pathname.startsWith("/admin");
   const isSellerPath = location.pathname.includes("seller");
 
+  const isFullLayoutPath = !isAdminPath && !isSellerPath;
+
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* If seller path → hide Navbar, else show Navbar */}
-      {isSellerPath ? null : <Navbar />}
+    <div className="min-h-screen flex flex-col bg-slate-50">
+      {/* If admin or seller path → hide Navbar, else show Navbar */}
+      {isFullLayoutPath && <Navbar />}
 
       <Toaster position="top-right" />
 
-      <div className={`${isSellerPath ? "p-6" : "px-6 md:px-16 lg:px-24 xl:px-32"} flex-1`}>
+      <div className={`${isFullLayoutPath ? "px-6 md:px-16 lg:px-24 xl:px-32 py-10" : "p-0"} flex-1`}>
         <Routes>
           {/* Normal user routes */}
           <Route path='/' element={<Home />} />
@@ -40,10 +47,12 @@ const App = () => {
           <Route path='/wishlist' element={<Wishlist />} />
           <Route path='/checkout' element={<Checkout />} />
 
-          {/* Later you can add seller routes here if needed */}
+          {/* Admin Routes */}
+          <Route path='/admin/login' element={<AdminLogin />} />
+          <Route path='/admin/*' element={isAdminAuthenticated ? <AdminLayout /> : <AdminLogin />} />
         </Routes>
       </div>
-      {!isSellerPath && <Footer />}
+      {isFullLayoutPath && <Footer />}
     </div>
   );
 };

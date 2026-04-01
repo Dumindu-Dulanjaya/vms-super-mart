@@ -16,6 +16,9 @@ export const AppContextProvider = ({ children }) => {
   const [wishlistItems, setWishlistItems] = useState([]);
   const [products, setProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(
+    localStorage.getItem('vms_admin_auth') === 'true'
+  );
 
   // Generate unique slug from name
   const generateSlug = (name) => {
@@ -45,9 +48,50 @@ export const AppContextProvider = ({ children }) => {
 
   // ✅ Load products when app starts
   useEffect(() => {
-    setProducts(dummyProducts);
+    const savedProducts = localStorage.getItem('vms_products');
+    if (savedProducts) {
+      setProducts(JSON.parse(savedProducts));
+    } else {
+      setProducts(dummyProducts);
+      localStorage.setItem('vms_products', JSON.stringify(dummyProducts));
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Add a new product
+  const addProduct = (newProduct) => {
+    const productWithId = {
+      ...newProduct,
+      id: products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1,
+      slug: generateSlug(newProduct.name),
+      rating: 4,
+      reviews: 0
+    };
+    
+    const updatedProducts = [productWithId, ...products];
+    setProducts(updatedProducts);
+    localStorage.setItem('vms_products', JSON.stringify(updatedProducts));
+    toast.success("Product added successfully!");
+  };
+
+  const adminLogin = (email, password) => {
+    if (email === 'admin@vms.com' && password === 'admin123') {
+        setIsAdminAuthenticated(true);
+        localStorage.setItem('vms_admin_auth', 'true');
+        toast.success("Admin access granted!");
+        return true;
+    } else {
+        toast.error("Invalid credentials!");
+        return false;
+    }
+  }
+
+  const adminLogout = () => {
+    setIsAdminAuthenticated(false);
+    localStorage.removeItem('vms_admin_auth');
+    toast.success("Logged out successfully!");
+    navigate('/admin/login');
+  }
 
   // Add product to cart
   const addToCart = (itemId) => {
@@ -127,6 +171,10 @@ export const AppContextProvider = ({ children }) => {
     showUserLogin,
     setShowUserLogin,
     setCartItems,
+    addProduct,
+    isAdminAuthenticated,
+    adminLogin,
+    adminLogout,
   };
 
   return (

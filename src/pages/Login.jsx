@@ -159,6 +159,19 @@ export default function Login() {
             {mode === 'login' ? 'Register' : 'Login'}
           </button>
         </p>
+
+        {/* New Admin Login Link */}
+        <div className="mt-8 pt-6 border-t border-gray-100 flex flex-col items-center gap-2">
+            <span className="text-[10px] text-gray-400 font-black tracking-widest uppercase">Management Portal</span>
+            <button 
+                type="button"
+                onClick={() => navigate('/admin/login')}
+                className="text-xs font-bold text-gray-400 hover:text-indigo-600 transition-colors flex items-center gap-1 group"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:rotate-12 transition-transform"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                Authorized Admin Login
+            </button>
+        </div>
       </form>
     </div>
   )
