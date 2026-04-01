@@ -22,7 +22,7 @@ const Contact = () => {
                 {/* Contact Info Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
                     {[
-                        { icon: <MapPin className="text-[#00FF33]" />, title: "Location", detail: "Wariyapola, Sri Lanka", subDetail: "Main Supermarket" },
+                        { icon: <MapPin className="text-[#00FF33]" />, title: "Location", detail: "Malapalla, Pannipitiya", subDetail: "Tuesday Pola Junction" },
                         { icon: <Phone className="text-[#00FF33]" />, title: "Phone", detail: "0766540131", subDetail: "Available 24/7" },
                         { icon: <Mail className="text-[#00FF33]" />, title: "Email", detail: "info@vms-supermart.com", subDetail: "Fast Response" },
                         { icon: <Clock className="text-[#00FF33]" />, title: "Working Hours", detail: "Mon - Sat: 8AM - 8PM", subDetail: "Sun: 9AM - 1PM" },
@@ -89,15 +89,15 @@ const Contact = () => {
                     {/* Google Map */}
                     <div className="h-full min-h-[500px] shadow-2xl relative border-8 border-white">
                         <iframe
-                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3954.1868310052!2d80.20790887588383!3d7.604642292410313!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ae28f73117565d7%3A0xe213b2ce21731671!2sVMS%20SuperMart%20-Wariyapola!5e0!3m2!1sen!2slk!4v1711964500000!5m2!1sen!2slk"
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3961.545196160534!2d79.9655194758778!3d6.841638219572791!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ae2517049c6818d%3A0x2d719c5866d8a244!2sVMS%20SUPER%20MART!5e0!3m2!1sen!2slk!4v1711973000000!5m2!1sen!2slk"
                             className="w-full h-full border-none grayscale hover:grayscale-0 transition-all duration-700"
                             allowFullScreen=""
                             loading="lazy"
                             referrerPolicy="no-referrer-when-downgrade"
-                            title="VMS Super Mart Location"
+                            title="VMS Super Mart Pannipitiya Location"
                         ></iframe>
                         <div className="absolute top-4 left-4 bg-slate-900 text-white p-4 font-black uppercase text-xs tracking-tighter">
-                            Tactical HQ - Kurunegala Rd
+                            Tactical HQ - Pannipitiya
                         </div>
                     </div>
                 </div>
