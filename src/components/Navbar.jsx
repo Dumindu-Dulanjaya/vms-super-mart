@@ -53,7 +53,7 @@ const Navbar = () => {
                 <Link to="/all-products" className="hover:text-[#00FF33] transition-colors">All Products</Link>
 
                 {!hideIcons && (
-                    <div className="hidden lg:flex items-center text-sm gap-2 border border-gray-300 px-4 py-2 rounded-full hover:border-[#00FF33] transition-colors bg-gray-50">
+                    <div className="hidden lg:flex items-center text-sm gap-2 border border-gray-300 px-4 py-2 rounded-none hover:border-[#00FF33] transition-colors bg-gray-50">
                         <Search size={18} className="text-gray-400" />
                         <input
                             className="py-1 w-64 bg-transparent outline-none placeholder-gray-500"
@@ -127,9 +127,9 @@ const Navbar = () => {
 
                                         <Link 
                                             to="/admin/login"
-                                            className="flex items-center gap-3 px-4 py-3 hover:bg-indigo-50 text-gray-700 rounded-xl transition-colors group/item"
+                                            className="flex items-center gap-3 px-4 py-3 hover:bg-indigo-50 text-gray-700 rounded-none transition-colors group/item"
                                         >
-                                            <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 group-hover/item:bg-slate-900 group-hover/item:text-white transition-colors">
+                                            <div className="w-8 h-8 rounded-none bg-indigo-50 flex items-center justify-center text-indigo-600 group-hover/item:bg-slate-900 group-hover/item:text-white transition-colors">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                                             </div>
                                             <div>
@@ -148,8 +148,8 @@ const Navbar = () => {
                                 </div>
                             </div>
                         ) : (
-                            <div className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 px-3 py-2 rounded-lg transition">
-                                <img src={profileIcon} className="w-8 h-8 rounded-full border-2 border-gray-200" alt="Profile" />
+                            <div className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 px-3 py-2 rounded-none transition">
+                                <img src={profileIcon} className="w-8 h-8 rounded-none border-2 border-gray-200" alt="Profile" />
                                 <span className="text-gray-700 font-medium">{user.name}</span>
                             </div>
                         )}
@@ -170,7 +170,7 @@ const Navbar = () => {
 
                 {/* Mobile Search */}
                 {!hideIcons && (
-                    <div className="flex items-center text-sm gap-2 border border-gray-300 px-3 py-2 rounded-full w-full mt-2">
+                    <div className="flex items-center text-sm gap-2 border border-gray-300 px-3 py-2 rounded-none w-full mt-2">
                         <Search size={16} className="text-gray-400" />
                         <input
                             className="py-1 w-full bg-transparent outline-none placeholder-gray-500 text-sm"
@@ -204,10 +204,10 @@ const Navbar = () => {
 
                 {!hideIcons && (
                     (!user ? (
-                        <Link to="/login" onClick={() => setOpen(false)} className="cursor-pointer px-6 py-2 mt-2 bg-[#00FF33] hover:bg-[#00CC29] transition text-white rounded-full text-sm w-full text-center">Login</Link>
+                        <Link to="/login" onClick={() => setOpen(false)} className="cursor-pointer px-6 py-2 mt-2 bg-[#00FF33] hover:bg-[#00CC29] transition text-white rounded-none text-sm w-full text-center">Login</Link>
                     ) : (
                         <div className="flex items-center gap-3 mt-2 py-2">
-                            <img src={profileIcon} className="w-8 h-8 rounded-full border-2 border-gray-200" alt="Profile" />
+                            <img src={profileIcon} className="w-8 h-8 rounded-none border-2 border-gray-200" alt="Profile" />
                             <span className="text-gray-700 font-medium">{user.name}</span>
                         </div>
                     ))
@@ -217,29 +217,29 @@ const Navbar = () => {
             {/* Login Modal */}
             {showUserLogin && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white p-8 rounded-lg shadow-lg w-96">
+                    <div className="bg-white p-8 rounded-none shadow-lg w-96">
                         <h2 className="text-2xl font-bold mb-4">Login</h2>
                         <div className="space-y-4">
                             <input
                                 type="email"
                                 placeholder="Email"
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00FF33]"
+                                className="w-full p-3 border border-gray-300 rounded-none focus:outline-none focus:ring-2 focus:ring-[#00FF33]"
                             />
                             <input
                                 type="password"
                                 placeholder="Password"
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00FF33]"
+                                className="w-full p-3 border border-gray-300 rounded-none focus:outline-none focus:ring-2 focus:ring-[#00FF33]"
                             />
                             <div className="flex gap-4">
                                 <button
                                     onClick={handleLogin}
-                                    className="flex-1 bg-[#00FF33] hover:bg-[#00CC29] text-white py-3 rounded-lg transition"
+                                    className="flex-1 bg-[#00FF33] hover:bg-[#00CC29] text-white py-3 rounded-none transition"
                                 >
                                     Login
                                 </button>
                                 <button
                                     onClick={() => setShowUserLogin(false)}
-                                    className="flex-1 border border-gray-300 hover:bg-gray-100 py-3 rounded-lg transition"
+                                    className="flex-1 border border-gray-300 hover:bg-gray-100 py-3 rounded-none transition"
                                 >
                                     Cancel
                                 </button>
