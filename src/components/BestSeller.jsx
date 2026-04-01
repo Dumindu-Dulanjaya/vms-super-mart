@@ -34,7 +34,7 @@ function ProductCard({ product }) {
   };
   
   return (
-    <div className="bg-white shadow rounded-2xl overflow-hidden hover:shadow-lg transition p-4 flex flex-col">
+    <div className="bg-white shadow rounded-none overflow-hidden hover:shadow-lg transition p-4 flex flex-col">
       {/* Product Image */}
       <div className="flex items-center justify-center h-40 overflow-hidden">
         <img
@@ -70,13 +70,13 @@ function ProductCard({ product }) {
       <div className="mt-4">
         {count === 0 ? (
           <button
-            className="w-full flex items-center justify-center gap-1 bg-indigo-100 border border-indigo-300 h-[36px] rounded text-indigo-600 font-medium hover:bg-indigo-200 transition"
+            className="w-full flex items-center justify-center gap-1 bg-indigo-100 border border-indigo-300 h-[36px] rounded-none text-indigo-600 font-medium hover:bg-indigo-200 transition"
             onClick={handleAdd}
           >
             Add to Cart
           </button>
         ) : (
-          <div className="flex items-center justify-between w-full h-[36px] bg-indigo-500/25 rounded select-none px-2">
+          <div className="flex items-center justify-between w-full h-[36px] bg-indigo-500/25 rounded-none select-none px-2">
             <button
               onClick={handleRemove}
               className="cursor-pointer text-md px-2 h-full"

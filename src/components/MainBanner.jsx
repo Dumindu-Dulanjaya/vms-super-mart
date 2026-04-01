@@ -58,7 +58,7 @@ const MainBanner = () => {
           <button
             key={index}
             onClick={() => setCurrentBannerIndex(index)}
-            className={`w-3 h-3 rounded-full transition-all ${
+            className={`w-3 h-3 rounded-none transition-all ${
               index === currentBannerIndex 
                 ? 'bg-white w-8' 
                 : 'bg-white/50 hover:bg-white/75'

@@ -100,13 +100,13 @@ const AllProducts = () => {
             <h1 className="text-3xl font-bold text-gray-800 mb-2">
               {categoryFilter ? categoryFilter.toUpperCase() : 'ALL PRODUCTS'}
             </h1>
-            <div className="w-20 h-1 bg-green-600 rounded-full"></div>
+            <div className="w-20 h-1 bg-green-600 rounded-none"></div>
           </div>
 
           {/* Mobile Filter Toggle */}
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="lg:hidden flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+            className="lg:hidden flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-none hover:bg-gray-50"
           >
             <SlidersHorizontal size={20} />
             Filters
@@ -116,7 +116,7 @@ const AllProducts = () => {
         <div className="flex gap-6">
           {/* Sidebar Filters */}
           <div className={`${showFilters ? 'block' : 'hidden'} lg:block fixed lg:static inset-0 z-50 lg:z-auto bg-black bg-opacity-50 lg:bg-transparent`}>
-            <div className="absolute lg:static left-0 top-0 bottom-0 w-80 lg:w-64 bg-white p-6 overflow-y-auto lg:border lg:border-gray-200 lg:rounded-lg">
+            <div className="absolute lg:static left-0 top-0 bottom-0 w-80 lg:w-64 bg-white p-6 overflow-y-auto lg:border lg:border-gray-200 lg:rounded-none">
               <div className="flex items-center justify-between mb-6 lg:hidden">
                 <h3 className="text-lg font-bold">Filters</h3>
                 <button onClick={() => setShowFilters(false)}>
@@ -130,7 +130,7 @@ const AllProducts = () => {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-none focus:outline-none focus:ring-2 focus:ring-green-500"
                 >
                   <option value="featured">Featured</option>
                   <option value="price-low">Price: Low to High</option>
@@ -146,12 +146,12 @@ const AllProducts = () => {
                   <h3 className="font-semibold text-gray-800 mb-3">Categories</h3>
                   <div className="space-y-2 max-h-48 overflow-y-auto">
                     {categories.map((category) => (
-                      <label key={category} className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                      <label key={category} className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded-none">
                         <input
                           type="checkbox"
                           checked={selectedCategories.includes(category)}
                           onChange={() => toggleCategory(category)}
-                          className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
+                          className="w-4 h-4 text-green-600 rounded-none focus:ring-green-500"
                         />
                         <span className="text-sm text-gray-700">{category}</span>
                       </label>
@@ -184,7 +184,7 @@ const AllProducts = () => {
                 <h3 className="font-semibold text-gray-800 mb-3">Rating</h3>
                 <div className="space-y-2">
                   {[4, 3, 2, 1].map((rating) => (
-                    <label key={rating} className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                    <label key={rating} className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded-none">
                       <input
                         type="radio"
                         name="rating"
@@ -206,7 +206,7 @@ const AllProducts = () => {
               {/* Clear Filters */}
               <button
                 onClick={clearFilters}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm font-medium transition-colors"
+                className="w-full px-4 py-2 border border-gray-300 rounded-none hover:bg-gray-50 text-sm font-medium transition-colors"
               >
                 Clear All Filters
               </button>

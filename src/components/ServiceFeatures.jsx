@@ -41,9 +41,9 @@ const ServiceFeatures = () => {
                     {features.map((feature, index) => (
                         <div
                             key={index}
-                            className="flex flex-col items-center text-center p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow"
+                            className="flex flex-col items-center text-center p-6 bg-white rounded-none shadow-sm hover:shadow-md transition-shadow"
                         >
-                            <div className={`${feature.bgColor} ${feature.color} p-4 rounded-full mb-4`}>
+                            <div className={`${feature.bgColor} ${feature.color} p-4 rounded-none mb-4`}>
                                 {feature.icon}
                             </div>
                             <h3 className="text-lg font-bold text-gray-800 mb-2">{feature.title}</h3>

@@ -4,82 +4,47 @@ import { useNavigate } from 'react-router-dom';
 
 const Categories = () => {
   const navigate = useNavigate();
-  const [expandedCategories, setExpandedCategories] = useState({});
-
-  // Auto-group categories by path so newly added categories show without extra code changes.
-  const categoryGroups = Object.values(
-    categories.reduce((acc, item) => {
-      const groupKey = item.path.toLowerCase();
-      if (!acc[groupKey]) {
-        acc[groupKey] = {
-          title: item.type || item.path,
-          items: [],
-          key: groupKey
-        };
-      }
-      acc[groupKey].items.push(item);
-      return acc;
-    }, {})
-  );
-
-  const toggleCategory = (categoryKey) => {
-    setExpandedCategories(prev => ({
-      ...prev,
-      [categoryKey]: !prev[categoryKey]
-    }));
-  };
 
   return (
     <div className="mt-16">
-      <div className="flex items-center justify-between mb-4">
-        <p className="text-2xl md:text-3xl font-medium">Categories</p>
+      <div className="flex items-center justify-between mb-8 border-l-4 border-[#00FF33] pl-4">
+        <h2 className="text-2xl md:text-4xl font-bold tracking-tight">Top Categories</h2>
+        <button 
+           onClick={() => navigate('/all-products')}
+           className="text-sm font-bold text-gray-400 hover:text-[#00FF33] transition-colors uppercase tracking-widest"
+        >
+           View All Categories
+        </button>
       </div>
       
-      <div className="flex flex-wrap gap-16 mt-4">
-        {categoryGroups.map((group, groupIndex) => (
-          group.items.length > 0 && (
-            <div key={groupIndex} className="flex flex-col">
-              <h3 className="text-xl font-semibold mb-4 text-gray-700">{group.title}</h3>
-              <div className="flex flex-wrap gap-4">
-                {(expandedCategories[group.key] ? group.items : group.items.slice(0, 1)).map((category, index) => (
-                  <div
-                    key={index}
-                    className="group cursor-pointer py-4 px-2 gap-2 rounded-lg flex flex-col justify-center items-center transition w-40"
-                    style={{ backgroundColor: category.bgColor }}
-                    onClick={() => {
-                      // Navigate to the category page to show products
-                      navigate(`/products/category/${category.path.toLowerCase()}`);
-                      window.scrollTo(0, 0);
-                    }}
-                  >
-                    <img
-                      src={category.image}
-                      alt={category.text}
-                      className="group-hover:scale-110 transition-transform max-w-20"
-                    />
-                    <p className="text-xs font-medium mt-2 text-center">{category.text}</p>
-                    {!expandedCategories[group.key] && index === 0 && group.items.length > 1 && (
-                      <p className="text-xs text-gray-600 mt-1">+{group.items.length - 1} more</p>
-                    )}
-                  </div>
-                ))}
-                
-                {expandedCategories[group.key] && group.items.length > 1 && (
-                  <div
-                    className="group cursor-pointer py-4 px-2 gap-2 rounded-lg flex flex-col justify-center items-center transition bg-gray-100 hover:bg-gray-200 w-40"
-                    onClick={() => toggleCategory(group.key)}
-                  >
-                    <div className="w-12 h-12 flex items-center justify-center">
-                      <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                      </svg>
-                    </div>
-                    <p className="text-xs font-medium mt-2 text-gray-600">Show Less</p>
-                  </div>
-                )}
-              </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+        {categories.map((item, index) => (
+          <div 
+            key={index}
+            onClick={() => {
+                navigate(`/products/category/${item.path?.toLowerCase() || item.text.toLowerCase()}`);
+                window.scrollTo(0, 0);
+            }}
+            className="group cursor-pointer bg-white border border-gray-100 p-6 flex flex-col items-center justify-center gap-4 transition-all hover:shadow-2xl hover:border-[#00FF33] rounded-none relative overflow-hidden"
+          >
+            <div 
+                className="w-20 h-20 rounded-none flex items-center justify-center p-4 transition-transform duration-500 group-hover:scale-110"
+                style={{ backgroundColor: item.bgColor || '#f9fafb' }}
+            >
+                <img 
+                    src={item.image} 
+                    alt={item.text} 
+                    className="w-full h-full object-contain"
+                />
             </div>
-          )
+            <div className="text-center">
+                <p className="text-sm font-bold text-gray-800 group-hover:text-[#00FF33] transition-colors">{item.text}</p>
+                <p className="text-[10px] text-gray-400 font-medium uppercase tracking-tighter mt-1">{item.type || 'Fresh Item'}</p>
+            </div>
+            
+            {/* Hover Indicator */}
+            <div className="absolute bottom-0 left-0 w-full h-1 bg-[#00FF33] transform translate-y-full group-hover:translate-y-0 transition-transform"></div>
+          </div>
         ))}
       </div>
     </div>

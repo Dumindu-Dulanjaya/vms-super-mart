@@ -50,7 +50,7 @@ const FlashSales = () => {
                 <div className="flex items-center justify-between mb-8">
                     <div className="flex items-center gap-4">
                         <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center animate-pulse">
+                            <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-none flex items-center justify-center animate-pulse">
                                 <Clock size={24} className="text-white" />
                             </div>
                             <div>
@@ -63,17 +63,17 @@ const FlashSales = () => {
                         <div className="flex items-center gap-2 ml-6">
                             <span className="text-gray-600 text-sm">Ending in:</span>
                             <div className="flex gap-2">
-                                <div className="bg-gradient-to-br from-orange-500 to-red-500 text-white px-3 py-2 rounded-lg font-bold min-w-[50px] text-center">
+                                <div className="bg-gradient-to-br from-orange-500 to-red-500 text-white px-3 py-2 rounded-none font-bold min-w-[50px] text-center">
                                     <div className="text-xl">{String(timeLeft.hours).padStart(2, '0')}</div>
                                     <div className="text-xs">Hours</div>
                                 </div>
                                 <div className="text-2xl font-bold text-gray-600">:</div>
-                                <div className="bg-gradient-to-br from-orange-500 to-red-500 text-white px-3 py-2 rounded-lg font-bold min-w-[50px] text-center">
+                                <div className="bg-gradient-to-br from-orange-500 to-red-500 text-white px-3 py-2 rounded-none font-bold min-w-[50px] text-center">
                                     <div className="text-xl">{String(timeLeft.minutes).padStart(2, '0')}</div>
                                     <div className="text-xs">Mins</div>
                                 </div>
                                 <div className="text-2xl font-bold text-gray-600">:</div>
-                                <div className="bg-gradient-to-br from-orange-500 to-red-500 text-white px-3 py-2 rounded-lg font-bold min-w-[50px] text-center">
+                                <div className="bg-gradient-to-br from-orange-500 to-red-500 text-white px-3 py-2 rounded-none font-bold min-w-[50px] text-center">
                                     <div className="text-xl">{String(timeLeft.seconds).padStart(2, '0')}</div>
                                     <div className="text-xs">Secs</div>
                                 </div>
@@ -95,7 +95,7 @@ const FlashSales = () => {
                     {flashSaleProducts.map((product) => (
                         <div key={product.id} className="relative">
                             {/* Discount Badge */}
-                            <div className="absolute top-2 left-2 z-10 bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
+                            <div className="absolute top-2 left-2 z-10 bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1 rounded-none text-sm font-bold shadow-lg">
                                 -{Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)}%
                             </div>
                             <ProductCard product={product} />

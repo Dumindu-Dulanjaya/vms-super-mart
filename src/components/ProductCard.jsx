@@ -9,14 +9,14 @@ const ProductCard = ({ product }) => {
   const cartQuantity = cartItems[product.id] || 0;
 
   return (
-    <div className="w-full border border-gray-200 rounded-xl shadow-sm bg-white overflow-hidden hover:shadow-lg transition-all duration-300 relative group">
+    <div className="w-full border border-gray-200 rounded-none shadow-sm bg-white overflow-hidden hover:shadow-lg transition-all duration-300 relative group">
       {/* Wishlist Heart Icon */}
       <button
         onClick={(e) => {
           e.preventDefault();
           toggleWishlist(product.id);
         }}
-        className="absolute top-3 right-3 z-10 bg-white rounded-full p-2 shadow-md hover:scale-110 transition-transform"
+        className="absolute top-3 right-3 z-10 bg-white rounded-none p-2 shadow-md hover:scale-110 transition-transform"
       >
         <Heart
           size={20}
@@ -73,13 +73,13 @@ const ProductCard = ({ product }) => {
         {cartQuantity === 0 ? (
           <button
             onClick={() => addToCart(product.id)}
-            className="w-full bg-green-50 hover:bg-green-600 text-green-600 hover:text-white border border-green-200 hover:border-green-600 px-4 py-2.5 rounded-lg flex items-center justify-center gap-2 transition-all duration-200 font-medium"
+            className="w-full bg-green-50 hover:bg-green-600 text-green-600 hover:text-white border border-green-200 hover:border-green-600 px-4 py-2.5 rounded-none flex items-center justify-center gap-2 transition-all duration-200 font-medium"
           >
             <ShoppingCart size={18} />
             <span>Add to Cart</span>
           </button>
         ) : (
-          <div className="w-full flex items-center justify-center gap-2 bg-green-100 px-3 py-2.5 rounded-lg border border-green-300">
+          <div className="w-full flex items-center justify-center gap-2 bg-green-100 px-3 py-2.5 rounded-none border border-green-300">
             <span className="text-green-800 font-semibold">{cartQuantity} in cart</span>
           </div>
         )}
