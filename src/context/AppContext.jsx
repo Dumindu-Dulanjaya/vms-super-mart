@@ -205,6 +205,70 @@ export const AppContextProvider = ({ children }) => {
     }
   };
 
+  const registerUser = async (userData) => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/users/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData)
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || 'Registration failed');
+      }
+
+      const data = await res.json();
+      if (data.accessToken) {
+        localStorage.setItem('userToken', data.accessToken);
+        setUser({
+          id: data.id,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          role: data.role,
+        });
+        toast.success('Account created successfully!');
+      }
+      return data;
+    } catch (e) {
+      toast.error(e.message || 'Registration failed');
+      throw e;
+    }
+  };
+
+  const userLogin = async (email, password) => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/users/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || 'Login failed');
+      }
+
+      const data = await res.json();
+      if (data.accessToken) {
+        localStorage.setItem('userToken', data.accessToken);
+        setUser({
+          id: data.id,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          role: data.role,
+        });
+        toast.success('Logged in successfully!');
+      }
+      return data;
+    } catch (e) {
+      toast.error(e.message || 'Login failed');
+      throw e;
+    }
+  };
+
   const value = {
     navigate,
     user,
@@ -230,6 +294,8 @@ export const AppContextProvider = ({ children }) => {
     isAdminAuthenticated,
     adminLogin,
     adminLogout,
+    registerUser,
+    userLogin,
     checkout: async (customerData, paymentMethod = 'card') => {
       // Build items from cartItems
       const items = Object.keys(cartItems).map(id => ({ productId: parseInt(id), quantity: cartItems[id] }));

@@ -1,5 +1,6 @@
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { OrderItem } from './order-item.entity';
+import { User } from './user.entity';
 
 @Entity('orders')
 export class Order {
@@ -8,6 +9,16 @@ export class Order {
 
   @Column({ default: 'placed' })
   status!: string;
+
+  @Column({ nullable: true })
+  userId!: number | null;
+
+  @ManyToOne(() => User, (user) => user.orders, {
+    onDelete: 'SET NULL',
+    nullable: true,
+  })
+  @JoinColumn({ name: 'userId' })
+  user!: User | null;
 
   @Column({ type: 'json', nullable: true })
   customer!: Record<string, any> | null;

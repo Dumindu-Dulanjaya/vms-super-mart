@@ -8,6 +8,7 @@ import { CategoriesModule } from './categories/categories.module';
 import { OrdersModule } from './orders/orders.module';
 import { ProductsModule } from './products/products.module';
 import { UploadModule } from './upload/upload.module';
+import { UsersModule } from './users/users.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 
@@ -34,6 +35,7 @@ import { join } from 'path';
     AuthModule,
     OrdersModule,
     UploadModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
