@@ -5,7 +5,7 @@ import { MapPin, CreditCard, Wallet, Check, Package } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const Checkout = () => {
-    const { cartItems, products, currency, setCartItems } = useAppContext();
+    const { cartItems, products, currency, setCartItems, checkout } = useAppContext();
     const navigate = useNavigate();
     const [cartData, setCartData] = useState([]);
     const [paymentMethod, setPaymentMethod] = useState('cod');
@@ -19,6 +19,7 @@ const Checkout = () => {
         postalCode: '',
         province: ''
     });
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
         const tempData = [];
@@ -51,7 +52,7 @@ const Checkout = () => {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         // Validation
@@ -63,12 +64,16 @@ const Checkout = () => {
             return;
         }
 
-        // Process order
-        toast.success('Order placed successfully!');
-        setCartItems({});
-        setTimeout(() => {
+        setIsSubmitting(true);
+        try {
+            const order = await checkout(formData, paymentMethod);
+            setCartItems({});
             navigate('/');
-        }, 2000);
+        } catch (err) {
+            // checkout will show toast on error
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     if (cartData.length === 0) {
@@ -319,9 +324,15 @@ const Checkout = () => {
                             {/* Place Order Button */}
                             <button
                                 onClick={handleSubmit}
-                                className="w-full bg-[#00FF33] hover:bg-[#00CC29] text-white py-4 rounded-lg font-semibold text-lg transition-colors"
+                                disabled={isSubmitting}
+                                className={`w-full bg-[#00FF33] hover:bg-[#00CC29] text-white py-4 rounded-lg font-semibold text-lg transition-colors flex items-center justify-center gap-2 ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
                             >
-                                Place Order
+                                {isSubmitting ? (
+                                    <>
+                                        <div className="w-5 h-5 border-b-2 border-white rounded-full animate-spin"></div>
+                                        Processing...
+                                    </>
+                                ) : 'Place Order'}
                             </button>
 
                             <p className="text-xs text-gray-500 text-center mt-4">

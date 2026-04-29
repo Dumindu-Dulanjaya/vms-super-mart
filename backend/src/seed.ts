@@ -95,6 +95,8 @@ async function run() {
       reviews: 12,
       instock: true,
       description: 'A sample product for the storefront.',
+      stock: 50,
+      lowStockThreshold: 5,
     },
     {
       name: 'Kids Teddy Bear',
@@ -107,6 +109,8 @@ async function run() {
       reviews: 8,
       instock: true,
       description: 'Soft toy example for product listings.',
+      stock: 3,
+      lowStockThreshold: 5,
     },
     {
       name: 'Kitchen Mug Set',
@@ -119,6 +123,8 @@ async function run() {
       reviews: 5,
       instock: true,
       description: 'Simple starter data for category pages.',
+      stock: 100,
+      lowStockThreshold: 10,
     },
   ];
 
@@ -140,6 +146,8 @@ async function run() {
           reviews: productSeed.reviews,
           instock: productSeed.instock,
           description: productSeed.description,
+          stock: productSeed.stock,
+          lowStockThreshold: productSeed.lowStockThreshold,
           category,
         }),
       );

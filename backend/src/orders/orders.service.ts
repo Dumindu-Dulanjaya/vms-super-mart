@@ -49,6 +49,15 @@ export class OrdersService {
       throw new BadRequestException('Checkout requires at least one item');
     }
 
+    // First, check stock availability for all items
+    for (const item of payload.items) {
+      const hasStock = await this.productsService.checkStockAvailability(item.productId, item.quantity);
+      if (!hasStock) {
+        const product = await this.productsService.findOne(item.productId);
+        throw new BadRequestException(`Insufficient stock for ${product.name}`);
+      }
+    }
+
     const lineItems = await Promise.all(
       payload.items.map(async (item) => {
         const product = await this.productsService.findOne(item.productId);
@@ -106,6 +115,12 @@ export class OrdersService {
     });
 
     const saved = await this.orderRepository.save(order);
+
+    // Deduct stock for each item after order is created
+    for (const item of payload.items) {
+      await this.productsService.decreaseStock(item.productId, item.quantity);
+    }
+
     return saved;
   }
 }

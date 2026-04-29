@@ -12,6 +12,7 @@ import {
   ChevronLeft
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 const AddProduct = () => {
   const { addProduct, categories, navigate } = useAppContext();
@@ -25,6 +26,9 @@ const AddProduct = () => {
   });
   
   const [preview, setPreview] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const onChange = (e) => {
     const { name, value } = e.target;
@@ -34,6 +38,7 @@ const AddProduct = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      setImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreview(reader.result);
@@ -43,19 +48,50 @@ const AddProduct = () => {
     }
   };
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
     if (!formData.name || !formData.price || !formData.category || !formData.image) {
+      toast.error('Please fill in all required fields');
       return;
     }
     
-    addProduct({
-      ...formData,
-      price: Number(formData.price),
-      oldPrice: Number(formData.oldPrice) || Number(formData.price) * 1.2,
-    });
-    
-    navigate('/admin/dashboard');
+    setIsSubmitting(true);
+    try {
+      let finalImageUrl = formData.image;
+      
+      // Upload actual file if selected
+      if (imageFile) {
+        const uploadData = new FormData();
+        uploadData.append('file', imageFile);
+        
+        const token = localStorage.getItem('vms_admin_token');
+        const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/upload`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` },
+          body: uploadData
+        });
+        
+        if (res.ok) {
+          const data = await res.json();
+          // API URL could be prepended if needed, but relative path works if proxying or backend is same host.
+          finalImageUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}${data.url}`;
+        } else {
+          toast.error('Failed to upload image. Using base64 preview.');
+        }
+      }
+
+      await addProduct({
+        ...formData,
+        image: finalImageUrl,
+        price: Number(formData.price),
+        oldPrice: Number(formData.oldPrice) || Number(formData.price) * 1.2,
+      });
+      navigate('/admin/dashboard');
+    } catch (err) {
+      toast.error('Failed to add product');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -157,10 +193,17 @@ const AddProduct = () => {
           <div className="flex gap-4">
                <button 
                 type="submit"
-                className="flex-1 bg-slate-900 group hover:shadow-2xl hover:shadow-indigo-200 text-white p-5 rounded-none font-black text-lg transition-all active:scale-95 flex items-center justify-center gap-3"
+                disabled={isSubmitting}
+                className={`flex-1 bg-slate-900 group hover:shadow-2xl hover:shadow-indigo-200 text-white p-5 rounded-none font-black text-lg transition-all flex items-center justify-center gap-3 ${isSubmitting ? 'opacity-70 cursor-not-allowed' : 'active:scale-95'}`}
               >
-                <Save className="w-6 h-6 text-green-400 group-hover:rotate-12 transition-transform" />
-                Publish Product
+                {isSubmitting ? (
+                  <div className="w-6 h-6 border-b-2 border-white rounded-full animate-spin"></div>
+                ) : (
+                  <>
+                    <Save className="w-6 h-6 text-green-400 group-hover:rotate-12 transition-transform" />
+                    Publish Product
+                  </>
+                )}
               </button>
           </div>
         </div>

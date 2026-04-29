@@ -13,6 +13,9 @@ import {
 } from 'lucide-react';
 import Dashboard from './Dashboard';
 import AddProduct from './AddProduct';
+import Inventory from './Inventory';
+import Orders from './Orders';
+import EditProduct from './EditProduct';
 import { useAppContext } from '../../context/AppContext';
 import vmsLogo from '../../assets/VMS logo.png';
 
@@ -97,8 +100,10 @@ const AdminLayout = () => {
             <Route index element={<Dashboard />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="add-product" element={<AddProduct />} />
-            <Route path="inventory" element={<div className="p-10 text-center text-slate-400 bg-white rounded-3xl border border-dashed border-slate-200">Inventory Management Coming Soon</div>} />
+            <Route path="inventory" element={<Inventory />} />
+            <Route path="inventory/edit/:id" element={<EditProduct />} />
             <Route path="customers" element={<div className="p-10 text-center text-slate-400 bg-white rounded-3xl border border-dashed border-slate-200">Customer Management Coming Soon</div>} />
+            <Route path="orders" element={<Orders />} />
           </Routes>
         </div>
       </div>

@@ -48,18 +48,59 @@ export const AppContextProvider = ({ children }) => {
 
   // ✅ Load products when app starts
   useEffect(() => {
-    const savedProducts = localStorage.getItem('vms_products');
-    if (savedProducts) {
-      setProducts(JSON.parse(savedProducts));
-    } else {
-      setProducts(dummyProducts);
-      localStorage.setItem('vms_products', JSON.stringify(dummyProducts));
-    }
+    // Try loading products from backend first
+    const load = async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/products`);
+        if (res.ok) {
+          const data = await res.json();
+          setProducts(data);
+          localStorage.setItem('vms_products', JSON.stringify(data));
+          return;
+        }
+      } catch (e) {
+        // ignore and fallback
+      }
+
+      const savedProducts = localStorage.getItem('vms_products');
+      if (savedProducts) {
+        setProducts(JSON.parse(savedProducts));
+      } else {
+        setProducts(dummyProducts);
+        localStorage.setItem('vms_products', JSON.stringify(dummyProducts));
+      }
+    };
+
+    load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Add a new product
-  const addProduct = (newProduct) => {
+  const addProduct = async (newProduct) => {
+    // If admin is authenticated, try creating product via backend
+    const token = localStorage.getItem('vms_admin_token');
+    if (isAdminAuthenticated && token) {
+      return fetch(`${import.meta.env.VITE_API_URL || ''}/api/products`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(newProduct)
+      })
+      .then(async (res) => {
+        if (!res.ok) throw new Error('Failed to create product');
+        const created = await res.json();
+        const updatedProducts = [created, ...products];
+        setProducts(updatedProducts);
+        localStorage.setItem('vms_products', JSON.stringify(updatedProducts));
+        toast.success('Product added successfully!');
+        return created;
+      })
+      .catch((err) => {
+        toast.error('Failed to add product via backend. Saved locally instead.');
+        // fallback to local
+      });
+    }
+
+    // fallback for local storage dev mode
     const productWithId = {
       ...newProduct,
       id: products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1,
@@ -72,23 +113,37 @@ export const AppContextProvider = ({ children }) => {
     setProducts(updatedProducts);
     localStorage.setItem('vms_products', JSON.stringify(updatedProducts));
     toast.success("Product added successfully!");
+    
+    // allow await addProduct(...) to resolve
+    return productWithId;
   };
 
   const adminLogin = (email, password) => {
-    if (email === 'admin@vms.com' && password === 'admin123') {
-        setIsAdminAuthenticated(true);
-        localStorage.setItem('vms_admin_auth', 'true');
-        toast.success("Admin access granted!");
-        return true;
-    } else {
-        toast.error("Invalid credentials!");
-        return false;
-    }
+    return fetch(`${import.meta.env.VITE_API_URL || ''}/api/auth/admin/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    })
+    .then(async (res) => {
+      if (!res.ok) throw new Error('Invalid credentials');
+      const body = await res.json();
+      setIsAdminAuthenticated(true);
+      localStorage.setItem('vms_admin_auth', 'true');
+      // store token if provided
+      if (body.accessToken) localStorage.setItem('vms_admin_token', body.accessToken);
+      toast.success('Admin access granted!');
+      return true;
+    })
+    .catch((err) => {
+      toast.error('Invalid credentials!');
+      return false;
+    });
   }
 
   const adminLogout = () => {
     setIsAdminAuthenticated(false);
     localStorage.removeItem('vms_admin_auth');
+    localStorage.removeItem('vms_admin_token');
     toast.success("Logged out successfully!");
     navigate('/admin/login');
   }
@@ -175,6 +230,36 @@ export const AppContextProvider = ({ children }) => {
     isAdminAuthenticated,
     adminLogin,
     adminLogout,
+    checkout: async (customerData, paymentMethod = 'card') => {
+      // Build items from cartItems
+      const items = Object.keys(cartItems).map(id => ({ productId: parseInt(id), quantity: cartItems[id] }));
+      const payload = {
+        items,
+        ...customerData,
+        paymentMethod,
+      };
+
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/orders/checkout`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.message || 'Checkout failed');
+        }
+
+        const order = await res.json();
+        setCartItems({});
+        toast.success('Order placed successfully!');
+        return order;
+      } catch (e) {
+        toast.error(e.message || 'Checkout failed');
+        throw e;
+      }
+    }
   };
 
   return (

@@ -40,6 +40,11 @@ class CreateProductDto {
   description!: string;
 }
 
+class UpdateStockDto {
+  @IsNumber()
+  quantity!: number;
+}
+
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
@@ -83,5 +88,34 @@ export class ProductsController {
   @Roles('admin')
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.productsService.remove(id);
+  }
+
+  // Inventory Management Endpoints
+  @Get('inventory/low-stock')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('admin')
+  getLowStockProducts() {
+    return this.productsService.getLowStockProducts();
+  }
+
+  @Put(':id/stock')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('admin')
+  updateStock(@Param('id', ParseIntPipe) id: number, @Body() updateStockDto: UpdateStockDto) {
+    return this.productsService.updateStock(id, updateStockDto.quantity);
+  }
+
+  @Post(':id/stock/increase')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('admin')
+  increaseStock(@Param('id', ParseIntPipe) id: number, @Body() updateStockDto: UpdateStockDto) {
+    return this.productsService.increaseStock(id, updateStockDto.quantity);
+  }
+
+  @Post(':id/stock/decrease')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('admin')
+  decreaseStock(@Param('id', ParseIntPipe) id: number, @Body() updateStockDto: UpdateStockDto) {
+    return this.productsService.decreaseStock(id, updateStockDto.quantity);
   }
 }

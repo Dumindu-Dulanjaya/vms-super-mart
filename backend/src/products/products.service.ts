@@ -168,4 +168,63 @@ export class ProductsService {
     await this.productRepository.remove(product);
     return { success: true };
   }
+
+  // Inventory Management Methods
+  async updateStock(id: number, quantity: number) {
+    const product = await this.productRepository.findOne({ where: { id }, relations: ['category'] });
+    if (!product) throw new NotFoundException(`Product with id ${id} not found`);
+
+    product.stock = Math.max(0, quantity);
+    product.instock = product.stock > 0;
+    
+    const saved = await this.productRepository.save(product);
+    return this.toResponse(saved);
+  }
+
+  async decreaseStock(id: number, quantity: number) {
+    const product = await this.productRepository.findOne({ where: { id }, relations: ['category'] });
+    if (!product) throw new NotFoundException(`Product with id ${id} not found`);
+
+    if (product.stock < quantity) {
+      throw new Error(`Insufficient stock for product ${product.name}. Available: ${product.stock}, Requested: ${quantity}`);
+    }
+
+    product.stock -= quantity;
+    product.instock = product.stock > 0;
+    
+    const saved = await this.productRepository.save(product);
+    return this.toResponse(saved);
+  }
+
+  async increaseStock(id: number, quantity: number) {
+    const product = await this.productRepository.findOne({ where: { id }, relations: ['category'] });
+    if (!product) throw new NotFoundException(`Product with id ${id} not found`);
+
+    product.stock += quantity;
+    product.instock = product.stock > 0;
+    
+    const saved = await this.productRepository.save(product);
+    return this.toResponse(saved);
+  }
+
+  async checkStockAvailability(id: number, quantity: number): Promise<boolean> {
+    const product = await this.productRepository.findOne({ where: { id } });
+    if (!product) return false;
+    return product.stock >= quantity;
+  }
+
+  async getLowStockProducts() {
+    const products = await this.productRepository
+      .createQueryBuilder('product')
+      .leftJoinAndSelect('product.category', 'category')
+      .where('product.stock <= product.lowStockThreshold')
+      .orderBy('product.stock', 'ASC')
+      .getMany();
+
+    return products.map((product) => ({
+      ...this.toResponse(product),
+      stock: product.stock,
+      lowStockThreshold: product.lowStockThreshold,
+    }));
+  }
 }
