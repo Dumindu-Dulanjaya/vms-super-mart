@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ProductsService } from '../products/products.service';
+import { EmailService } from '../email/email.service';
 import { Order } from '../entities/order.entity';
 import { OrderItem } from '../entities/order-item.entity';
 
@@ -27,6 +28,7 @@ type CheckoutPayload = {
 export class OrdersService {
   constructor(
     private readonly productsService: ProductsService,
+    private readonly emailService: EmailService,
     @InjectRepository(Order)
     private readonly orderRepository: Repository<Order>,
     @InjectRepository(OrderItem)
@@ -120,6 +122,22 @@ export class OrdersService {
     for (const item of payload.items) {
       await this.productsService.decreaseStock(item.productId, item.quantity);
     }
+
+    // Send order confirmation email
+    await this.emailService.sendOrderConfirmation({
+      orderId: saved.id,
+      customerName: `${payload.firstName} ${payload.lastName}`,
+      customerEmail: payload.email,
+      items: lineItems,
+      subtotal: saved.summary?.subtotal || 0,
+      discount: saved.summary?.discount || 0,
+      shipping: saved.summary?.shipping || 0,
+      total: saved.summary?.total || 0,
+      address: payload.address,
+      city: payload.city,
+      province: payload.province,
+      postalCode: payload.postalCode,
+    });
 
     return saved;
   }

@@ -9,7 +9,9 @@ import {
   FileText,
   Save,
   Trash2,
-  ChevronLeft
+  ChevronLeft,
+  X,
+  Plus
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -27,6 +29,8 @@ const AddProduct = () => {
   
   const [preview, setPreview] = useState(null);
   const [imageFile, setImageFile] = useState(null);
+  const [galleryImages, setGalleryImages] = useState([]); // Array for 4-5 gallery images
+  const [galleryPreviews, setGalleryPreviews] = useState([]); // Previews for gallery images
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -48,6 +52,31 @@ const AddProduct = () => {
     }
   };
 
+  // Handle gallery image uploads (up to 5 images)
+  const handleGalleryImageChange = (e) => {
+    const files = Array.from(e.target.files);
+    const remainingSlots = 5 - galleryImages.length;
+    
+    if (files.length > remainingSlots) {
+      toast.error(`You can only add ${remainingSlots} more images (max 5 total)`);
+      return;
+    }
+
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setGalleryImages(prev => [...prev, file]);
+        setGalleryPreviews(prev => [...prev, reader.result]);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const removeGalleryImage = (index) => {
+    setGalleryImages(prev => prev.filter((_, i) => i !== index));
+    setGalleryPreviews(prev => prev.filter((_, i) => i !== index));
+  };
+
   const onSubmit = async (e) => {
     e.preventDefault();
     if (!formData.name || !formData.price || !formData.category || !formData.image) {
@@ -58,8 +87,9 @@ const AddProduct = () => {
     setIsSubmitting(true);
     try {
       let finalImageUrl = formData.image;
+      let galleryUrls = [];
       
-      // Upload actual file if selected
+      // Upload main image
       if (imageFile) {
         const uploadData = new FormData();
         uploadData.append('file', imageFile);
@@ -73,16 +103,39 @@ const AddProduct = () => {
         
         if (res.ok) {
           const data = await res.json();
-          // API URL could be prepended if needed, but relative path works if proxying or backend is same host.
           finalImageUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}${data.url}`;
         } else {
-          toast.error('Failed to upload image. Using base64 preview.');
+          toast.error('Failed to upload main image');
+        }
+      }
+
+      // Upload gallery images (4-5 additional images)
+      if (galleryImages.length > 0) {
+        const token = localStorage.getItem('vms_admin_token');
+        
+        for (const galleryFile of galleryImages) {
+          const uploadData = new FormData();
+          uploadData.append('file', galleryFile);
+          
+          const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/upload`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` },
+            body: uploadData
+          });
+          
+          if (res.ok) {
+            const data = await res.json();
+            galleryUrls.push(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}${data.url}`);
+          } else {
+            toast.warning('Some gallery images failed to upload');
+          }
         }
       }
 
       await addProduct({
         ...formData,
         image: finalImageUrl,
+        images: galleryUrls, // Add gallery images array
         price: Number(formData.price),
         oldPrice: Number(formData.oldPrice) || Number(formData.price) * 1.2,
       });
@@ -180,11 +233,19 @@ const AddProduct = () => {
                   required
                 >
                   <option value="">Select Category</option>
+                  <option value="Toys">Toys</option>
+                  <option value="Kitchen Items">Kitchen Items</option>
+                  <option value="School Items">School Items</option>
+                  <option value="Home Items">Home Items</option>
+                  <option value="Electronics">Electronics</option>
+                  <option value="Beauty & Personal Care">Beauty & Personal Care</option>
+                  <option value="Sports items">Sports Items</option>
+                  <option value="Baby Items">Baby Items</option>
+                  <option value="Pet Supplies">Pet Supplies</option>
+                  <option value="Clothing & Fashion">Clothing & Fashion</option>
                   <option value="Vegetables">Vegetables</option>
                   <option value="Fruits">Fruits</option>
-                  <option value="Electronics">Electronics</option>
                   <option value="Bakery">Bakery</option>
-                  <option value="Home">Home Items</option>
                 </select>
               </div>
             </div>
@@ -242,6 +303,74 @@ const AddProduct = () => {
                     💡 High-quality images (1:1 ratio) attract 40% more customers.
                   </p>
                </div>
+            </div>
+          </div>
+
+          {/* Gallery Images Section */}
+          <div className="bg-white rounded-none p-8 border border-slate-100 shadow-sm">
+            <label className="block text-sm font-black text-slate-400 tracking-widest uppercase mb-4 text-center">
+              Product Gallery (4-5 High-Res Images)
+            </label>
+            
+            <div className="space-y-4 mb-6">
+              <div className="relative bg-slate-50 border-2 border-dashed border-slate-200 rounded-none overflow-hidden group hover:border-indigo-400 transition-colors">
+                <label className="flex flex-col items-center justify-center p-8 cursor-pointer aspect-auto">
+                  <div className="w-16 h-16 bg-white rounded-none flex items-center justify-center text-slate-400 group-hover:text-indigo-500 shadow-sm transition-colors mb-4">
+                    <Plus className="w-8 h-8" />
+                  </div>
+                  <span className="text-slate-400 font-bold text-sm">Add Gallery Images</span>
+                  <p className="text-[10px] text-slate-300 mt-1 uppercase font-black tracking-widest">Up to 5 images • 4K/5K recommended</p>
+                  <input 
+                    type="file" 
+                    className="hidden" 
+                    onChange={handleGalleryImageChange}
+                    accept="image/*"
+                    multiple
+                  />
+                </label>
+              </div>
+
+              {/* Gallery Image Previews */}
+              {galleryPreviews.length > 0 && (
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  {galleryPreviews.map((preview, index) => (
+                    <div key={index} className="relative group">
+                      <img 
+                        src={preview} 
+                        alt={`Gallery ${index + 1}`}
+                        className="w-full h-32 object-cover rounded-none border border-slate-200"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeGalleryImage(index)}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-none">
+                        <span className="text-white font-bold text-xs">Image {index + 1}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-slate-400 font-semibold">
+                  {galleryImages.length}/5 images selected
+                </span>
+                {galleryImages.length < 5 && (
+                  <span className="text-indigo-600 font-semibold">
+                    Add {5 - galleryImages.length} more
+                  </span>
+                )}
+              </div>
+
+              <div className="p-4 bg-blue-50 rounded-none border border-blue-100">
+                <p className="text-xs text-blue-700 font-medium leading-relaxed">
+                  📸 Add 4-5 high-resolution product images (4K or 5K) to showcase different angles and details. Better images = more customer interest!
+                </p>
+              </div>
             </div>
           </div>
         </div>

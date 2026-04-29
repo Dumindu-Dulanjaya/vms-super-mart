@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards, Put, Delete } from '@nestjs/common';
-import { IsString, IsNumber, IsOptional, IsBoolean } from 'class-validator';
+import { IsString, IsNumber, IsOptional, IsBoolean, IsArray } from 'class-validator';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from '../auth/roles.decorator';
 import { RolesGuard } from '../auth/roles.guard';
@@ -22,6 +22,9 @@ class CreateProductDto {
   @IsOptional()
   @IsString()
   image!: string;
+
+  @IsOptional()
+  images?: string[]; // Array of high-resolution gallery images
 
   @IsOptional()
   @IsNumber()

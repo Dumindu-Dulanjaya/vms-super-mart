@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../entities/user.entity';
+import { EmailService } from '../email/email.service';
 
 export class CreateUserDto {
   firstName!: string;
@@ -38,6 +39,7 @@ export class UsersService {
     @InjectRepository(User)
     private usersRepository: Repository<User>,
     private jwtService: JwtService,
+    private emailService: EmailService,
   ) {}
 
   async registerUser(createUserDto: CreateUserDto) {
@@ -60,6 +62,9 @@ export class UsersService {
     });
 
     const savedUser = await this.usersRepository.save(user);
+
+    // Send welcome email
+    await this.emailService.sendWelcomeEmail(savedUser.email, savedUser.firstName);
 
     // Generate JWT token
     const token = this.jwtService.sign({

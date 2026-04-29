@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
 import { Admin } from './entities/admin.entity';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -9,11 +10,16 @@ import { OrdersModule } from './orders/orders.module';
 import { ProductsModule } from './products/products.module';
 import { UploadModule } from './upload/upload.module';
 import { UsersModule } from './users/users.module';
+import { EmailModule } from './email/email.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
       serveRoot: '/', // This serves /public/uploads as /uploads if configured correctly
@@ -36,6 +42,7 @@ import { join } from 'path';
     OrdersModule,
     UploadModule,
     UsersModule,
+    EmailModule,
   ],
   controllers: [AppController],
   providers: [AppService],
