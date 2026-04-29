@@ -54,11 +54,12 @@ const Inventory = () => {
                 <th className="px-6 py-3">Product</th>
                 <th className="px-6 py-3">Category</th>
                 <th className="px-6 py-3">Price</th>
+                <th className="px-6 py-3">Stock</th>
                 <th className="px-6 py-3">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {loading && <tr><td colSpan={4} className="p-6">Loading...</td></tr>}
+              {loading && <tr><td colSpan={5} className="p-6">Loading...</td></tr>}
               {!loading && products.map(p => (
                 <tr key={p.id} className="hover:bg-slate-50 transition-colors">
                   <td className="px-6 py-4 flex items-center gap-4">
@@ -73,12 +74,21 @@ const Inventory = () => {
                   <td className="px-6 py-4"><span className="px-2 py-1 bg-slate-100 rounded-none text-slate-600 text-xs">{p.category}</span></td>
                   <td className="px-6 py-4">${p.price}</td>
                   <td className="px-6 py-4">
+                    {(p.stock || 0) === 0 ? (
+                      <span className="px-2 py-1 bg-red-50 text-red-600 rounded-none text-xs font-semibold">Out of stock</span>
+                    ) : (p.stock || 0) < (p.lowStockThreshold ?? 5) ? (
+                      <span className="px-2 py-1 bg-yellow-50 text-yellow-700 rounded-none text-xs font-semibold">Only {p.stock} left</span>
+                    ) : (
+                      <span className="px-2 py-1 bg-green-50 text-green-700 rounded-none text-xs font-semibold">{p.stock} in stock</span>
+                    )}
+                  </td>
+                  <td className="px-6 py-4">
                     <button onClick={() => navigate(`/admin/inventory/edit/${p.id}`)} className="mr-2 text-slate-500 hover:text-slate-900"><Edit /></button>
                     <button onClick={() => handleDelete(p.id)} className="text-red-500 hover:text-red-700"><Trash2 /></button>
                   </td>
                 </tr>
               ))}
-              {!loading && products.length === 0 && (<tr><td colSpan={4} className="p-6 text-center text-slate-400">No products</td></tr>)}
+              {!loading && products.length === 0 && (<tr><td colSpan={5} className="p-6 text-center text-slate-400">No products</td></tr>)}
             </tbody>
           </table>
         </div>
