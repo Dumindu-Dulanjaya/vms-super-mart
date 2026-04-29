@@ -11,7 +11,8 @@ import {
   Trash2,
   ChevronLeft,
   X,
-  Plus
+  Plus,
+  Package
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -25,6 +26,7 @@ const AddProduct = () => {
     oldPrice: '',
     category: '',
     image: '',
+    stock: '0',
   });
   
   const [preview, setPreview] = useState(null);
@@ -138,6 +140,8 @@ const AddProduct = () => {
         images: galleryUrls, // Add gallery images array
         price: Number(formData.price),
         oldPrice: Number(formData.oldPrice) || Number(formData.price) * 1.2,
+        stock: Number(formData.stock) || 0,
+        instock: Number(formData.stock) > 0, // Set instock based on stock quantity
       });
       navigate('/admin/dashboard');
     } catch (err) {
@@ -183,7 +187,7 @@ const AddProduct = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-black text-slate-400 tracking-widest uppercase mb-2">Price ($)</label>
                 <div className="relative group">
@@ -214,6 +218,23 @@ const AddProduct = () => {
                     onChange={onChange}
                     placeholder="30.00"
                     className="w-full pl-12 pr-4 py-4 bg-slate-50 border-none rounded-none focus:ring-2 focus:ring-indigo-500 transition-all font-semibold text-slate-400 placeholder-slate-200"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-black text-slate-400 tracking-widest uppercase mb-2">Stock Qty</label>
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <Package className="h-5 w-5 text-slate-300 group-focus-within:text-blue-500 transition-colors" />
+                  </div>
+                  <input 
+                    type="number" 
+                    name="stock"
+                    value={formData.stock}
+                    onChange={onChange}
+                    placeholder="100"
+                    min="0"
+                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border-none rounded-none focus:ring-2 focus:ring-indigo-500 transition-all font-semibold text-slate-800 placeholder-slate-300"
                   />
                 </div>
               </div>

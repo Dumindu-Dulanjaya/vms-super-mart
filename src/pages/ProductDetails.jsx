@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useAppContext } from "../context/useAppContext";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, AlertCircle, CheckCircle } from "lucide-react";
 
 const ProductDetails  = () => {
     const { products, addToCart } = useAppContext();
@@ -111,10 +111,39 @@ const ProductDetails  = () => {
                     </div>
 
                     {/* Price */}
-                    <div className="mt-6">
+                    <div className="mt-6 mb-6">
                         <p className="text-sm text-gray-500 line-through">MRP: {currency}{product.oldPrice}</p>
                         <p className="text-3xl font-semibold text-gray-800 mt-1">MRP: {currency}{product.price}</p>
                         <span className="text-sm text-gray-500">(inclusive of all taxes)</span>
+                    </div>
+
+                    {/* Stock Status */}
+                    <div className="mb-6">
+                        {(product.stock || 0) === 0 ? (
+                            <div className="bg-red-50 border-2 border-red-200 rounded-lg px-4 py-3 flex items-center gap-3">
+                                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+                                <div>
+                                    <p className="text-red-700 font-semibold">Out of Stock</p>
+                                    <p className="text-red-600 text-sm">This item is currently unavailable</p>
+                                </div>
+                            </div>
+                        ) : (product.stock || 0) < 5 ? (
+                            <div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg px-4 py-3 flex items-center gap-3">
+                                <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0" />
+                                <div>
+                                    <p className="text-yellow-700 font-semibold">Limited Stock</p>
+                                    <p className="text-yellow-600 text-sm">Only {product.stock} items available</p>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="bg-green-50 border-2 border-green-200 rounded-lg px-4 py-3 flex items-center gap-3">
+                                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+                                <div>
+                                    <p className="text-green-700 font-semibold">In Stock</p>
+                                    <p className="text-green-600 text-sm">{product.stock} items available</p>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {/* About Product */}
@@ -130,16 +159,26 @@ const ProductDetails  = () => {
                     {/* Action Buttons */}
                     <div className="flex items-center mt-10 gap-4">
                         <button 
-                            onClick={() => addToCart(product.id)} 
-                            className="flex-1 py-3.5 px-6 font-medium bg-gray-100 text-gray-800 hover:bg-gray-200 transition rounded-lg border border-gray-300"
+                            onClick={() => addToCart(product.id)}
+                            disabled={(product.stock || 0) === 0}
+                            className={`flex-1 py-3.5 px-6 font-medium rounded-lg border transition ${
+                                (product.stock || 0) === 0
+                                    ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                                    : 'bg-gray-100 text-gray-800 hover:bg-gray-200 border-gray-300'
+                            }`}
                         >
-                            Add to Cart
+                            {(product.stock || 0) === 0 ? 'Out of Stock' : 'Add to Cart'}
                         </button>
                         <button 
-                            onClick={() => { addToCart(product.id); navigate("/cart"); }} 
-                            className="flex-1 py-3.5 px-6 font-medium bg-blue-600 text-white hover:bg-blue-700 transition rounded-lg"
+                            onClick={() => { addToCart(product.id); navigate("/cart"); }}
+                            disabled={(product.stock || 0) === 0}
+                            className={`flex-1 py-3.5 px-6 font-medium rounded-lg transition ${
+                                (product.stock || 0) === 0
+                                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                            }`}
                         >
-                            Buy now
+                            {(product.stock || 0) === 0 ? 'Unavailable' : 'Buy now'}
                         </button>
                     </div>
                 </div>
