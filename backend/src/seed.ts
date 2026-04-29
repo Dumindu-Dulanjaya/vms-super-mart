@@ -1,0 +1,188 @@
+import 'dotenv/config';
+import { DataSource } from 'typeorm';
+import * as bcrypt from 'bcryptjs';
+import { Admin } from './entities/admin.entity';
+import { Category } from './entities/category.entity';
+import { Product } from './entities/product.entity';
+import { Order } from './entities/order.entity';
+import { OrderItem } from './entities/order-item.entity';
+import mysql from 'mysql2/promise';
+
+async function ensureDatabaseExists() {
+  const host = process.env.DB_HOST || '127.0.0.1';
+  const port = Number(process.env.DB_PORT) || 3306;
+  const user = process.env.DB_USERNAME || 'root';
+  const password = process.env.DB_PASSWORD || '';
+  const dbName = process.env.DB_NAME || 'vms_db';
+
+  const conn = await mysql.createConnection({ host, port, user, password });
+  await conn.query(`CREATE DATABASE IF NOT EXISTS \`${dbName}\`;`);
+  await conn.end();
+  console.log('Ensured database exists:', dbName);
+}
+
+async function run() {
+  await ensureDatabaseExists();
+
+  const dataSource = new DataSource({
+    type: 'mysql',
+    host: process.env.DB_HOST || '127.0.0.1',
+    port: Number(process.env.DB_PORT) || 3306,
+    username: process.env.DB_USERNAME || 'root',
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_NAME || 'vms_db',
+    entities: [Admin, Category, Product, Order, OrderItem],
+    synchronize: process.env.DB_SYNC === 'true',
+  });
+
+  await dataSource.initialize();
+  console.log('DB connected for seeding');
+
+  const adminRepo = dataSource.getRepository(Admin);
+  const categoryRepo = dataSource.getRepository(Category);
+  const productRepo = dataSource.getRepository(Product);
+  const adminEmail = process.env.ADMIN_EMAIL || 'admin@vms.com';
+  const adminName = process.env.ADMIN_NAME || 'Admin';
+  const adminPassword = process.env.ADMIN_PASSWORD || process.env.SUPERADMIN_PASSWORD || 'admin123';
+
+  const existing = await adminRepo.findOne({ where: { email: adminEmail } });
+  if (existing) {
+    console.log('Admin already exists:', existing.email);
+  } else {
+    const hashed = await bcrypt.hash(adminPassword, 10);
+
+    const admin = adminRepo.create({
+      name: adminName,
+      email: adminEmail,
+      password: hashed,
+      role: 'admin',
+    });
+
+    await adminRepo.save(admin);
+    console.log('Admin created:', admin.email);
+  }
+
+  const categorySeeds = [
+    { slug: 'electronics', label: 'Electronics' },
+    { slug: 'toys', label: 'Toys' },
+    { slug: 'kitchen', label: 'Kitchen' },
+    { slug: 'fashion', label: 'Fashion' },
+    { slug: 'sports', label: 'Sports' },
+  ];
+
+  for (const categorySeed of categorySeeds) {
+    const existingCategory = await categoryRepo.findOne({
+      where: { slug: categorySeed.slug },
+    });
+
+    if (!existingCategory) {
+      await categoryRepo.save(categoryRepo.create(categorySeed));
+    }
+  }
+
+  const categories = await categoryRepo.find();
+  const bySlug = new Map(categories.map((category) => [category.slug, category]));
+
+  const productSeeds = [
+    {
+      name: 'Classic Headphone',
+      price: 1299,
+      oldPrice: 1599,
+      category: 'electronics',
+      image: '/products/headphone.jpg',
+      slug: 'classic-headphone',
+      rating: 4,
+      reviews: 12,
+      instock: true,
+      description: 'A sample product for the storefront.',
+    },
+    {
+      name: 'Kids Teddy Bear',
+      price: 899,
+      oldPrice: 1099,
+      category: 'toys',
+      image: '/products/teddy.jpg',
+      slug: 'kids-teddy-bear',
+      rating: 5,
+      reviews: 8,
+      instock: true,
+      description: 'Soft toy example for product listings.',
+    },
+    {
+      name: 'Kitchen Mug Set',
+      price: 499,
+      oldPrice: 699,
+      category: 'kitchen',
+      image: '/products/mugs.jpg',
+      slug: 'kitchen-mug-set',
+      rating: 4,
+      reviews: 5,
+      instock: true,
+      description: 'Simple starter data for category pages.',
+    },
+  ];
+
+  for (const productSeed of productSeeds) {
+    const existingProduct = await productRepo.findOne({
+      where: { slug: productSeed.slug },
+    });
+
+    if (!existingProduct) {
+      const category = bySlug.get(productSeed.category) ?? null;
+      await productRepo.save(
+        productRepo.create({
+          name: productSeed.name,
+          price: productSeed.price,
+          oldPrice: productSeed.oldPrice,
+          image: productSeed.image,
+          slug: productSeed.slug,
+          rating: productSeed.rating,
+          reviews: productSeed.reviews,
+          instock: productSeed.instock,
+          description: productSeed.description,
+          category,
+        }),
+      );
+    }
+  }
+  console.log('Categories and products seeded');
+
+  // Seed a sample order if none exist
+  const orderRepo = dataSource.getRepository(Order);
+  const orderItemRepo = dataSource.getRepository(OrderItem);
+  const existingOrders = await orderRepo.count();
+  if (existingOrders === 0) {
+    const prod = await productRepo.findOne({ where: { slug: 'classic-headphone' } });
+    if (prod) {
+      const item = orderItemRepo.create({
+        productId: prod.id,
+        name: prod.name,
+        price: prod.price,
+        quantity: 1,
+        total: prod.price,
+      });
+
+      const order = orderRepo.create({
+        id: `ord_${Date.now()}`,
+        status: 'placed',
+        customer: {
+          firstName: 'Seed',
+          lastName: 'User',
+          email: 'seed@example.com',
+        },
+        paymentMethod: 'card',
+        summary: { subtotal: prod.price, discount: 0, shipping: 0, total: prod.price },
+        items: [item],
+      });
+
+      await orderRepo.save(order);
+      console.log('Sample order seeded:', order.id);
+    }
+  }
+  await dataSource.destroy();
+}
+
+run().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
