@@ -39,6 +39,14 @@ class CreateProductDto {
   instock!: boolean;
 
   @IsOptional()
+  @IsNumber()
+  stock?: number;
+
+  @IsOptional()
+  @IsNumber()
+  lowStockThreshold?: number;
+
+  @IsOptional()
   @IsString()
   description!: string;
 }

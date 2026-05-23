@@ -9,7 +9,7 @@ const EditProduct = () => {
   const { isAdminAuthenticated } = useAppContext();
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
-    name: '', price: '', oldPrice: '', category: '', image: '', description: ''
+    name: '', price: '', oldPrice: '', category: '', image: '', description: '', stock: '0'
   });
 
   useEffect(() => {
@@ -23,7 +23,8 @@ const EditProduct = () => {
           oldPrice: data.oldPrice || data.price || '',
           category: data.category || '',
           image: data.image || '',
-          description: data.description || ''
+          description: data.description || '',
+          stock: data.stock !== undefined ? data.stock : '0'
         });
       } catch (e) {
         console.error(e);
@@ -50,6 +51,7 @@ const EditProduct = () => {
           category: formData.category,
           image: formData.image,
           description: formData.description,
+          stock: Number(formData.stock) || 0
         })
       });
       if (!res.ok) throw new Error('Update failed');
@@ -76,9 +78,19 @@ const EditProduct = () => {
             <label className="block text-sm font-medium">Name</label>
             <input name="name" value={formData.name} onChange={onChange} className="w-full p-3 border mt-2" />
 
-            <div className="grid grid-cols-2 gap-4 mt-4">
-              <input name="price" type="number" value={formData.price} onChange={onChange} className="w-full p-3 border" />
-              <input name="oldPrice" type="number" value={formData.oldPrice} onChange={onChange} className="w-full p-3 border" />
+            <div className="grid grid-cols-3 gap-4 mt-4">
+              <div>
+                <label className="block text-sm font-medium">Price (Rs.)</label>
+                <input name="price" type="number" value={formData.price} onChange={onChange} className="w-full p-3 border mt-2" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium">Regular Price (Rs.)</label>
+                <input name="oldPrice" type="number" value={formData.oldPrice} onChange={onChange} className="w-full p-3 border mt-2" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium">Stock Qty</label>
+                <input name="stock" type="number" value={formData.stock} onChange={onChange} className="w-full p-3 border mt-2" min="0" />
+              </div>
             </div>
 
             <label className="block text-sm font-medium mt-4">Category</label>

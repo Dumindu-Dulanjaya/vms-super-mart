@@ -12,11 +12,11 @@ import {
 import { Link } from 'react-router-dom';
 
 const Dashboard = () => {
-  const { products } = useAppContext();
+  const { products, currency } = useAppContext();
 
   const stats = [
     { name: 'Total Products', icon: Package, value: products.length, trend: '+12%', color: 'from-blue-500 to-indigo-600' },
-    { name: 'Monthly Sales', icon: BarChart3, value: '$12,480', trend: '+18.4%', color: 'from-emerald-500 to-teal-600' },
+    { name: 'Monthly Sales', icon: BarChart3, value: 'Rs. 12,480', trend: '+18.4%', color: 'from-emerald-500 to-teal-600' },
     { name: 'Total Orders', icon: ShoppingCart, value: '842', trend: '+14.2%', color: 'from-amber-500 to-orange-600' },
     { name: 'Customers', icon: Users, value: '15.2k', trend: '+7.6%', color: 'from-rose-500 to-pink-600' },
   ];
@@ -88,7 +88,7 @@ const Dashboard = () => {
                                 <span className="px-3 py-1 bg-slate-100 text-slate-600 text-[10px] font-black rounded-none uppercase tracking-wider">{p.category}</span>
                             </td>
                             <td className="px-8 py-4">
-                                <p className="font-black text-slate-900 text-sm">${p.price}</p>
+                                <p className="font-black text-slate-900 text-sm">{currency}{p.price}</p>
                             </td>
                             <td className="px-8 py-4">
                                 <button className="text-xs font-bold text-slate-400 hover:text-slate-900 transition-colors">Manage</button>

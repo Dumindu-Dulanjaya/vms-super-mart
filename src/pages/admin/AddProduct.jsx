@@ -189,34 +189,34 @@ const AddProduct = () => {
 
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-black text-slate-400 tracking-widest uppercase mb-2">Price ($)</label>
+                <label className="block text-sm font-black text-slate-400 tracking-widest uppercase mb-2">Price (Rs.)</label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <DollarSign className="h-5 w-5 text-slate-300 group-focus-within:text-emerald-500 transition-colors" />
+                    <span className="h-5 w-5 text-slate-400 font-extrabold text-[11px] flex items-center justify-center">Rs.</span>
                   </div>
                   <input 
                     type="number" 
                     name="price"
                     value={formData.price}
                     onChange={onChange}
-                    placeholder="25.00"
+                    placeholder="1500"
                     className="w-full pl-12 pr-4 py-4 bg-slate-50 border-none rounded-none focus:ring-2 focus:ring-indigo-500 transition-all font-semibold text-slate-800 placeholder-slate-300"
                     required
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-black text-slate-400 tracking-widest uppercase mb-2">Regular Price ($)</label>
+                <label className="block text-sm font-black text-slate-400 tracking-widest uppercase mb-2">Regular Price (Rs.)</label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Trash2 className="h-5 w-5 text-slate-200 group-focus-within:text-slate-400 transition-colors" />
+                    <span className="h-5 w-5 text-slate-400 font-extrabold text-[11px] flex items-center justify-center">Rs.</span>
                   </div>
                   <input 
                     type="number" 
                     name="oldPrice"
                     value={formData.oldPrice}
                     onChange={onChange}
-                    placeholder="30.00"
+                    placeholder="1800"
                     className="w-full pl-12 pr-4 py-4 bg-slate-50 border-none rounded-none focus:ring-2 focus:ring-indigo-500 transition-all font-semibold text-slate-400 placeholder-slate-200"
                   />
                 </div>

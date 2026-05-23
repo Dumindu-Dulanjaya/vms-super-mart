@@ -16,6 +16,8 @@ type ProductResponse = {
   reviews: number;
   instock: boolean;
   description: string | null;
+  stock: number;
+  lowStockThreshold: number;
 };
 
 type CreateProductInput = {
@@ -29,6 +31,8 @@ type CreateProductInput = {
   instock: boolean;
   description: string;
   slug?: string;
+  stock?: number;
+  lowStockThreshold?: number;
 };
 
 @Injectable()
@@ -53,6 +57,8 @@ export class ProductsService {
       reviews: product.reviews,
       instock: product.instock,
       description: product.description,
+      stock: product.stock,
+      lowStockThreshold: product.lowStockThreshold,
     };
   }
 
@@ -122,6 +128,9 @@ export class ProductsService {
       category = await this.categoryRepository.save(category);
     }
 
+    const stockVal = productInput.stock !== undefined ? Number(productInput.stock) : 0;
+    const lowStockVal = productInput.lowStockThreshold !== undefined ? Number(productInput.lowStockThreshold) : 5;
+
     const product = this.productRepository.create({
       name: productInput.name,
       slug,
@@ -130,7 +139,9 @@ export class ProductsService {
       image: productInput.image,
       rating: productInput.rating,
       reviews: productInput.reviews,
-      instock: productInput.instock,
+      instock: stockVal > 0,
+      stock: stockVal,
+      lowStockThreshold: lowStockVal,
       description: productInput.description,
       category,
     });
@@ -156,6 +167,14 @@ export class ProductsService {
         category = await this.categoryRepository.save(category);
       }
       product.category = category;
+    }
+
+    if (updateInput.stock !== undefined) {
+      product.stock = Number(updateInput.stock);
+      product.instock = product.stock > 0;
+    }
+    if (updateInput.lowStockThreshold !== undefined) {
+      product.lowStockThreshold = Number(updateInput.lowStockThreshold);
     }
 
     const saved = await this.productRepository.save(product);

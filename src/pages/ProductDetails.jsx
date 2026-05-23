@@ -20,9 +20,11 @@ const ProductDetails  = () => {
     const product = products.find((item) => item.slug === slug);
 
     // Get all images (main + gallery)
-    const allImages = product?.images && product.images.length > 0 
-        ? [product.image, ...product.images]
-        : [product.image, product.image, product.image, product.image];
+    const allImages = product
+        ? (product.images && product.images.length > 0 
+            ? [product.image, ...product.images]
+            : [product.image, product.image, product.image, product.image])
+        : [];
 
     useEffect(() => {
         if (product) {

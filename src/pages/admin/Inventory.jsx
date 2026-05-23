@@ -4,7 +4,7 @@ import { Edit, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Inventory = () => {
-  const { isAdminAuthenticated } = useAppContext();
+  const { isAdminAuthenticated, currency } = useAppContext();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -72,7 +72,7 @@ const Inventory = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4"><span className="px-2 py-1 bg-slate-100 rounded-none text-slate-600 text-xs">{p.category}</span></td>
-                  <td className="px-6 py-4">${p.price}</td>
+                  <td className="px-6 py-4">{currency}{p.price}</td>
                   <td className="px-6 py-4">
                     {(p.stock || 0) === 0 ? (
                       <span className="px-2 py-1 bg-red-50 text-red-600 rounded-none text-xs font-semibold">Out of stock</span>
