@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards, Put, Delete } from '@nestjs/common';
-import { IsString, IsNumber, IsOptional, IsBoolean, IsArray } from 'class-validator';
+import { IsString, IsNumber, IsOptional, IsBoolean, IsArray, IsInt, Min, Max } from 'class-validator';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from '../auth/roles.decorator';
 import { RolesGuard } from '../auth/roles.guard';
@@ -46,6 +46,13 @@ class CreateProductDto {
 class UpdateStockDto {
   @IsNumber()
   quantity!: number;
+}
+
+class RateProductDto {
+  @IsInt()
+  @Min(1)
+  @Max(5)
+  score!: number;
 }
 
 @Controller('products')
@@ -120,5 +127,10 @@ export class ProductsController {
   @Roles('admin')
   decreaseStock(@Param('id', ParseIntPipe) id: number, @Body() updateStockDto: UpdateStockDto) {
     return this.productsService.decreaseStock(id, updateStockDto.quantity);
+  }
+
+  @Post(':id/rate')
+  rateProduct(@Param('id', ParseIntPipe) id: number, @Body() rateDto: RateProductDto) {
+    return this.productsService.rate(id, rateDto.score);
   }
 }

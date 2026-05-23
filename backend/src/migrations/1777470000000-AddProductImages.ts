@@ -8,7 +8,7 @@ export class AddProductImages1777470000000 implements MigrationInterface {
         name: 'images',
         type: 'json',
         isNullable: true,
-        default: '[]',
+        // Remove default array literal — some MySQL versions don't accept JSON defaults
         comment: 'Array of high-resolution product images (4-5 images per product)',
       }),
     );

@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { bestSellers, categories } from "../assets/assets";
+// import { bestSellers, categories } from "../assets/assets";
 
 export const AppContext = createContext();
 
@@ -27,8 +27,8 @@ export const AppContextProvider = ({ children }) => {
     return `${nameSlug}-${uniqueId}`;
   };
 
-  // Use packaged assets' sample products so images resolve correctly
-  // Combine bestSellers and categories into one products list so "All Products" shows everything
+  // Static fallback products have been commented out to ensure only backend-served database products are displayed.
+  /*
   const categoryProducts = categories.map((c, idx) => ({
     id: bestSellers.length + idx + 1,
     name: c.text,
@@ -45,6 +45,9 @@ export const AppContextProvider = ({ children }) => {
     ...p,
     slug: generateSlug(p.name)
   })), ...categoryProducts];
+  */
+
+  const dummyProducts = [];
 
   // ✅ Load products when app starts
   useEffect(() => {
@@ -323,6 +326,32 @@ export const AppContextProvider = ({ children }) => {
         return order;
       } catch (e) {
         toast.error(e.message || 'Checkout failed');
+        throw e;
+      }
+    },
+    rateProduct: async (productId, score) => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/products/${productId}/rate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ score })
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.message || 'Failed to submit rating');
+        }
+
+        const updatedProduct = await res.json();
+        
+        // Update local state list of products in AppContext
+        const updatedProducts = products.map((p) => p.id === productId ? updatedProduct : p);
+        setProducts(updatedProducts);
+        localStorage.setItem('vms_products', JSON.stringify(updatedProducts));
+        
+        return updatedProduct;
+      } catch (e) {
+        toast.error(e.message || 'Failed to submit rating');
         throw e;
       }
     }

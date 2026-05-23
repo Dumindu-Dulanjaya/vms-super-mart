@@ -6,6 +6,7 @@ import { Category } from './entities/category.entity';
 import { Product } from './entities/product.entity';
 import { Order } from './entities/order.entity';
 import { OrderItem } from './entities/order-item.entity';
+import { User } from './entities/user.entity';
 import mysql from 'mysql2/promise';
 
 async function ensureDatabaseExists() {
@@ -31,7 +32,7 @@ async function run() {
     username: process.env.DB_USERNAME || 'root',
     password: process.env.DB_PASSWORD || '',
     database: process.env.DB_NAME || 'vms_db',
-    entities: [Admin, Category, Product, Order, OrderItem],
+    entities: [Admin, Category, Product, Order, OrderItem, User],
     synchronize: process.env.DB_SYNC === 'true',
   });
 

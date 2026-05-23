@@ -2,14 +2,20 @@ import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useAppContext } from "../context/useAppContext";
 import { ChevronLeft, ChevronRight, AlertCircle, CheckCircle } from "lucide-react";
+import toast from "react-hot-toast";
 
 const ProductDetails  = () => {
-    const { products, addToCart } = useAppContext();
+    const { products, addToCart, rateProduct } = useAppContext();
     const { slug } = useParams();
     const navigate = useNavigate();
     const currency = "Rs.";
     const [thumbnail, setThumbnail] = useState(null);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+    const [ratingScore, setRatingScore] = useState(0);
+    const [hoverScore, setHoverScore] = useState(0);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [hasRated, setHasRated] = useState(false);
 
     const product = products.find((item) => item.slug === slug);
 
@@ -19,11 +25,39 @@ const ProductDetails  = () => {
         : [product.image, product.image, product.image, product.image];
 
     useEffect(() => {
+        if (product) {
+            const rated = localStorage.getItem(`vms_rated_prod_${product.id}`) === 'true';
+            setHasRated(rated);
+            setRatingScore(0);
+            setHoverScore(0);
+        }
+    }, [product]);
+
+    useEffect(() => {
         if (product && product.image) {
             setThumbnail(product.image);
             setCurrentImageIndex(0);
         }
     }, [product]);
+
+    const handleSubmitRating = async () => {
+        if (ratingScore === 0) {
+            toast.error("Please select a rating star first!");
+            return;
+        }
+
+        setIsSubmitting(true);
+        try {
+            await rateProduct(product.id, ratingScore);
+            localStorage.setItem(`vms_rated_prod_${product.id}`, 'true');
+            setHasRated(true);
+            toast.success("Thank you for your rating! ⭐");
+        } catch (e) {
+            // Error toast handled in context
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     const handlePrevImage = () => {
         const newIndex = currentImageIndex === 0 ? allImages.length - 1 : currentImageIndex - 1;
@@ -181,11 +215,69 @@ const ProductDetails  = () => {
                             {(product.stock || 0) === 0 ? 'Unavailable' : 'Buy now'}
                         </button>
                     </div>
+
+                    {/* Interactive Ratings Card */}
+                    <div className="mt-10 p-6 bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-2xl shadow-sm transition-all hover:shadow-md">
+                        <h3 className="text-lg font-bold text-gray-800 tracking-tight">Rate this Product</h3>
+                        <p className="text-xs text-gray-500 mt-1 mb-4">Share your feedback to help other shoppers make better decisions.</p>
+
+                        {hasRated ? (
+                            <div className="flex items-center gap-3 bg-green-50/60 border border-green-200 p-4 rounded-xl text-green-800 transition-all duration-500 animate-fadeIn">
+                                <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0" />
+                                <div>
+                                    <p className="font-semibold text-sm">Thank you for your feedback!</p>
+                                    <p className="text-xs text-green-600">Your rating has been successfully submitted.</p>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="flex flex-col gap-4">
+                                {/* Interactive Star Picker */}
+                                <div className="flex items-center gap-2">
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                        <button
+                                            key={star}
+                                            type="button"
+                                            onClick={() => setRatingScore(star)}
+                                            onMouseEnter={() => setHoverScore(star)}
+                                            onMouseLeave={() => setHoverScore(0)}
+                                            className="text-3xl transition-transform duration-150 hover:scale-125 focus:outline-none"
+                                        >
+                                            <span 
+                                                className={`transition-colors duration-150 ${
+                                                    star <= (hoverScore || ratingScore)
+                                                        ? 'text-yellow-400 drop-shadow-sm'
+                                                        : 'text-gray-300'
+                                                }`}
+                                            >
+                                                ★
+                                            </span>
+                                        </button>
+                                    ))}
+                                    {ratingScore > 0 && (
+                                        <span className="text-sm font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md animate-fadeIn">
+                                            {ratingScore} / 5
+                                        </span>
+                                    )}
+                                </div>
+
+                                <button
+                                    onClick={handleSubmitRating}
+                                    disabled={ratingScore === 0 || isSubmitting}
+                                    className={`py-2.5 px-5 text-sm font-semibold rounded-xl tracking-wide transition-all ${
+                                        ratingScore === 0 || isSubmitting
+                                            ? 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
+                                            : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-md shadow-indigo-600/10 hover:shadow-indigo-600/20 active:scale-95'
+                                    }`}
+                                >
+                                    {isSubmitting ? "Submitting..." : "Submit Rating"}
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
     );
 };
 
-
-export default ProductDetails;
+export default ProductDetails;

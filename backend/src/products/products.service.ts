@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Product } from '../entities/product.entity';
@@ -226,5 +226,27 @@ export class ProductsService {
       stock: product.stock,
       lowStockThreshold: product.lowStockThreshold,
     }));
+  }
+
+  async rate(id: number, score: number) {
+    const product = await this.productRepository.findOne({ where: { id }, relations: ['category'] });
+    if (!product) throw new NotFoundException(`Product with id ${id} not found`);
+
+    if (score < 1 || score > 5) {
+      throw new BadRequestException('Rating must be between 1 and 5');
+    }
+
+    const currentRating = product.rating || 0;
+    const currentReviews = product.reviews || 0;
+    const newReviews = currentReviews + 1;
+    
+    // Calculate new average rating, rounded to nearest integer
+    const newRating = Math.round(((currentRating * currentReviews) + score) / newReviews);
+
+    product.reviews = newReviews;
+    product.rating = newRating;
+
+    const saved = await this.productRepository.save(product);
+    return this.toResponse(saved);
   }
 }
