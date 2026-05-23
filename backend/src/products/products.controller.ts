@@ -24,6 +24,8 @@ class CreateProductDto {
   image!: string;
 
   @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
   images?: string[]; // Array of high-resolution gallery images
 
   @IsOptional()

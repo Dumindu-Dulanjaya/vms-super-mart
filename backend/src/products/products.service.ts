@@ -11,6 +11,7 @@ type ProductResponse = {
   oldPrice: number;
   category: string;
   image: string;
+  images?: string[];
   slug: string;
   rating: number;
   reviews: number;
@@ -26,6 +27,7 @@ type CreateProductInput = {
   oldPrice: number;
   category: string;
   image: string;
+  images?: string[];
   rating: number;
   reviews: number;
   instock: boolean;
@@ -52,6 +54,7 @@ export class ProductsService {
       oldPrice: Number(product.oldPrice),
       category: product.category?.slug ?? '',
       image: product.image,
+      images: product.images,
       slug: product.slug,
       rating: product.rating,
       reviews: product.reviews,
@@ -137,6 +140,7 @@ export class ProductsService {
       price: productInput.price,
       oldPrice: productInput.oldPrice,
       image: productInput.image,
+      images: productInput.images || [],
       rating: productInput.rating,
       reviews: productInput.reviews,
       instock: stockVal > 0,
@@ -158,6 +162,7 @@ export class ProductsService {
     if (updateInput.price !== undefined) product.price = updateInput.price as any;
     if (updateInput.oldPrice !== undefined) product.oldPrice = updateInput.oldPrice as any;
     if (updateInput.image !== undefined) product.image = updateInput.image;
+    if (updateInput.images !== undefined) product.images = updateInput.images;
     if (updateInput.description !== undefined) product.description = updateInput.description;
     if (updateInput.category) {
       const categorySlug = updateInput.category.toLowerCase();
