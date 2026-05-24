@@ -141,4 +141,76 @@ export class OrdersService {
 
     return saved;
   }
+
+  async generateSalesReport(type: 'daily' | 'monthly', startDate?: string, endDate?: string) {
+    const query = this.orderRepository.createQueryBuilder('order')
+      .leftJoinAndSelect('order.items', 'items')
+      .orderBy('order.createdAt', 'ASC');
+
+    if (startDate) {
+      query.andWhere('order.createdAt >= :startDate', { startDate: new Date(startDate) });
+    }
+    if (endDate) {
+      query.andWhere('order.createdAt <= :endDate', { endDate: new Date(endDate) });
+    }
+
+    const orders = await query.getMany();
+
+    // Group and aggregate in memory to support complex JSON column parsing
+    const groups: { [key: string]: {
+      period: string;
+      ordersCount: number;
+      grossSales: number;
+      discounts: number;
+      netSales: number;
+      itemsCount: number;
+    }} = {};
+
+    for (const order of orders) {
+      // Group key based on type
+      const date = new Date(order.createdAt);
+      let key = '';
+      if (type === 'daily') {
+        key = date.toISOString().split('T')[0];
+      } else {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        key = `${year}-${month}`;
+      }
+
+      const orderTotal = Number(order.summary?.total || 0);
+      const orderDiscount = Number(order.summary?.discount || 0);
+      const orderSubtotal = Number(order.summary?.subtotal || 0);
+      const orderShipping = Number(order.summary?.shipping || 0);
+      const orderItemsCount = order.items?.reduce((sum, item) => sum + (item.quantity || 0), 0) || 0;
+
+      if (!groups[key]) {
+        groups[key] = {
+          period: key,
+          ordersCount: 0,
+          grossSales: 0,
+          discounts: 0,
+          netSales: 0,
+          itemsCount: 0,
+        };
+      }
+
+      const group = groups[key];
+      group.ordersCount += 1;
+      group.grossSales += (orderSubtotal + orderShipping);
+      group.discounts += orderDiscount;
+      group.netSales += orderTotal;
+      group.itemsCount += orderItemsCount;
+    }
+
+    const reportData = Object.values(groups).map(g => ({
+      ...g,
+      averageOrderValue: g.ordersCount > 0 ? Math.round((g.netSales / g.ordersCount) * 100) / 100 : 0,
+      grossSales: Math.round(g.grossSales * 100) / 100,
+      discounts: Math.round(g.discounts * 100) / 100,
+      netSales: Math.round(g.netSales * 100) / 100,
+    })).sort((a, b) => a.period.localeCompare(b.period));
+
+    return reportData;
+  }
 }

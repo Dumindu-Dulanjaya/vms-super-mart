@@ -9,13 +9,15 @@ import {
   LogOut,
   ChevronRight,
   TrendingUp,
-  ShoppingCart
+  ShoppingCart,
+  BarChart3
 } from 'lucide-react';
 import Dashboard from './Dashboard';
 import AddProduct from './AddProduct';
 import Inventory from './Inventory';
 import Orders from './Orders';
 import EditProduct from './EditProduct';
+import Reports from './Reports';
 import { useAppContext } from '../../context/AppContext';
 import vmsLogo from '../../assets/VMS logo.png';
 
@@ -28,6 +30,7 @@ const AdminSidebar = () => {
     { name: 'Add Product', path: '/admin/add-product', icon: PlusCircle },
     { name: 'Inventory', path: '/admin/inventory', icon: Package },
     { name: 'Orders', path: '/admin/orders', icon: ShoppingCart },
+    { name: 'Reports', path: '/admin/reports', icon: BarChart3 },
     { name: 'Customers', path: '/admin/customers', icon: Users },
   ];
 
@@ -144,6 +147,7 @@ const AdminLayout = () => {
             <Route path="inventory/edit/:id" element={<EditProduct />} />
             <Route path="customers" element={<div className="p-10 text-center text-slate-400 bg-white rounded-3xl border border-dashed border-slate-200">Customer Management Coming Soon</div>} />
             <Route path="orders" element={<Orders />} />
+            <Route path="reports" element={<Reports />} />
           </Routes>
         </div>
       </div>
