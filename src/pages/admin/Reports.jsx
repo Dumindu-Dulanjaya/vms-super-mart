@@ -28,7 +28,11 @@ const Reports = () => {
       const token = localStorage.getItem('vms_admin_token');
       let url = `${import.meta.env.VITE_API_URL || ''}/api/orders/reports/sales?type=${type}`;
       if (startDate) url += `&startDate=${startDate}`;
-      if (endDate) url += `&endDate=${endDate}`;
+      if (type === 'daily' && startDate) {
+        url += `&endDate=${startDate}`;
+      } else if (endDate) {
+        url += `&endDate=${endDate}`;
+      }
 
       const res = await fetch(url, {
         headers: { Authorization: `Bearer ${token}` }
@@ -269,6 +273,11 @@ const Reports = () => {
           .dark-chart-box circle {
             stroke: #E2E8F0 !important;
           }
+          /* Expand primary chart to fill the full width on A4 print */
+          .lg\\:col-span-2 {
+            grid-column: span 3 / span 3 !important;
+            width: 100% !important;
+          }
         }
       `}</style>
 
@@ -314,7 +323,7 @@ const Reports = () => {
       {/* Filter toolbar Box (Non-printable) */}
       <div className="bg-white p-6 border border-slate-200/60 shadow-sm non-printable filter-box space-y-4">
         <h3 className="text-xs font-black text-slate-400 tracking-widest uppercase">Report Filtering Controls</h3>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+        <div className={`grid grid-cols-1 ${type === 'daily' ? 'md:grid-cols-3' : 'md:grid-cols-4'} gap-4 items-end`}>
           {/* Type Select */}
           <div className="space-y-2">
             <label className="block text-[10px] font-black text-slate-400 tracking-widest uppercase">Report Type</label>
@@ -328,11 +337,11 @@ const Reports = () => {
             </select>
           </div>
 
-          {/* Start Date */}
+          {/* Date Selector */}
           <div className="space-y-2">
             <label className="block text-[10px] font-black text-slate-400 tracking-widest uppercase flex items-center gap-1">
               <Calendar className="w-3 h-3 text-slate-400" />
-              Start Date
+              {type === 'daily' ? 'Select Date' : 'Start Date'}
             </label>
             <input 
               type="date" 
@@ -342,26 +351,28 @@ const Reports = () => {
             />
           </div>
 
-          {/* End Date */}
-          <div className="space-y-2">
-            <label className="block text-[10px] font-black text-slate-400 tracking-widest uppercase flex items-center gap-1">
-              <Calendar className="w-3 h-3 text-slate-400" />
-              End Date
-            </label>
-            <input 
-              type="date" 
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="w-full px-4 py-3 bg-slate-50 border-none font-semibold text-slate-800 text-xs focus:ring-2 focus:ring-indigo-500"
-            />
-          </div>
+          {/* End Date - Only shown for Monthly Summary */}
+          {type !== 'daily' && (
+            <div className="space-y-2">
+              <label className="block text-[10px] font-black text-slate-400 tracking-widest uppercase flex items-center gap-1">
+                <Calendar className="w-3 h-3 text-slate-400" />
+                End Date
+              </label>
+              <input 
+                type="date" 
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="w-full px-4 py-3 bg-slate-50 border-none font-semibold text-slate-800 text-xs focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+          )}
 
-          {/* Fetch Action & Presets */}
+          {/* Fetch Action */}
           <div className="flex gap-2">
             <button 
               onClick={fetchReport}
               disabled={loading}
-              className="flex-1 px-4 py-3.5 bg-slate-900 text-white text-xs font-black uppercase tracking-wider hover:bg-slate-800 transition-colors flex items-center justify-center gap-2"
+              className="w-full px-4 py-3.5 bg-slate-900 text-white text-xs font-black uppercase tracking-wider hover:bg-slate-800 transition-colors flex items-center justify-center gap-2"
             >
               {loading ? <RefreshCw className="w-4 h-4 animate-spin text-green-400" /> : <Search className="w-4 h-4 text-green-400" />}
               Generate
@@ -694,7 +705,7 @@ const Reports = () => {
         </div>
 
         {/* Secondary Chart: Cyberpunk Target Velocity Circular Gauge (1/3 width) */}
-        <div className="bg-slate-950 text-white p-6 border border-slate-900 shadow-2xl flex flex-col justify-between dark-chart-box relative overflow-hidden">
+        <div className="bg-slate-950 text-white p-6 border border-slate-900 shadow-2xl flex flex-col justify-between dark-chart-box relative overflow-hidden non-printable">
           {/* Neon Top Trim */}
           <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500" />
           

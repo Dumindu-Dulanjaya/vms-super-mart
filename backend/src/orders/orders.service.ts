@@ -148,10 +148,14 @@ export class OrdersService {
       .orderBy('order.createdAt', 'ASC');
 
     if (startDate) {
-      query.andWhere('order.createdAt >= :startDate', { startDate: new Date(startDate) });
+      const start = new Date(startDate);
+      start.setHours(0, 0, 0, 0);
+      query.andWhere('order.createdAt >= :startDate', { startDate: start });
     }
     if (endDate) {
-      query.andWhere('order.createdAt <= :endDate', { endDate: new Date(endDate) });
+      const end = new Date(endDate);
+      end.setHours(23, 59, 59, 999);
+      query.andWhere('order.createdAt <= :endDate', { endDate: end });
     }
 
     const orders = await query.getMany();
