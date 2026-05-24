@@ -87,27 +87,80 @@ const Reports = () => {
       toast.error('No report data available to export');
       return;
     }
-    const headers = ["Period", "Orders Placed", "Items Sold", "Avg Order Value (Rs.)", "Discounts (Rs.)", "Net Revenue (Rs.)"];
+
+    // Professional Business Metadata Header Block
+    const docTitle = "VMS SUPER MART - OFFICIAL SALES & REVENUE REPORT";
+    const reportType = `Report Type: ${type === 'daily' ? 'Daily Sales Summary' : 'Monthly Sales Summary'}`;
+    const dateRange = `Date Range: ${startDate || 'All Time'} to ${endDate || 'Today'}`;
+    const generatedAt = `Generated At: ${new Date().toLocaleString()}`;
+    const gap = "";
+
+    // Aggregates for the Total Summary row at the bottom
+    const totalRevenue = reportData.reduce((sum, r) => sum + r.netSales, 0);
+    const totalOrdersCount = reportData.reduce((sum, r) => sum + r.ordersCount, 0);
+    const totalItemsCount = reportData.reduce((sum, r) => sum + r.itemsCount, 0);
+    const totalDiscountsCount = reportData.reduce((sum, r) => sum + r.discounts, 0);
+    const totalGrossRevenue = reportData.reduce((sum, r) => sum + r.grossSales, 0);
+    const overallAOV = totalOrdersCount > 0 ? Math.round(totalRevenue / totalOrdersCount) : 0;
+
+    // Headers with detailed columns
+    const headers = [
+      "Period", 
+      "Orders Placed", 
+      "Items Sold", 
+      "Average Order Value (Rs.)", 
+      "Total Discounts (Rs.)", 
+      "Gross Sales (Rs.)", 
+      "Net Sales Revenue (Rs.)"
+    ];
+
+    // Data rows
     const rows = reportData.map(d => [
       d.period,
       d.ordersCount,
       d.itemsCount,
       d.averageOrderValue,
       d.discounts,
+      d.grossSales,
       d.netSales
     ]);
+
+    // Totals / Averages row
+    const totalsRow = [
+      "TOTALS / OVERALL",
+      totalOrdersCount,
+      totalItemsCount,
+      overallAOV,
+      totalDiscountsCount,
+      totalGrossRevenue,
+      totalRevenue
+    ];
+
+    // Build standard CSV grid text content (enclosing strings in quotes to handle any special commas)
+    const csvContentRows = [
+      `"${docTitle}"`,
+      `"${reportType}"`,
+      `"${dateRange}"`,
+      `"${generatedAt}"`,
+      gap, // Empty separator row
+      headers.map(h => `"${h}"`).join(','),
+      ...rows.map(r => r.map(cell => typeof cell === 'string' ? `"${cell}"` : cell).join(',')),
+      gap, // Empty separator before summary totals
+      totalsRow.map(cell => typeof cell === 'string' ? `"${cell}"` : cell).join(',')
+    ];
+
+    const csvContentString = csvContentRows.join('\n');
     
-    // Construct CSV text content
-    const csvRows = [headers.join(','), ...rows.map(r => r.join(','))];
-    const csvContent = "data:text/csv;charset=utf-8," + csvRows.join('\n');
-    const encodedUri = encodeURI(csvContent);
+    // Create UTF-8 CSV blob to correctly support symbols and formatting
+    const blob = new Blob([csvContentString], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `sales_report_${type}_${Date.now()}.csv`);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `VMS_Sales_Report_${type}_${Date.now()}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    toast.success('CSV downloaded successfully!');
+    toast.success('Professional CSV exported successfully!');
   };
 
   const handlePrint = () => {
