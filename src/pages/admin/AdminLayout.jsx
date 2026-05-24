@@ -32,43 +32,46 @@ const AdminSidebar = () => {
   ];
 
   return (
-    <div className="w-64 bg-white border-r border-slate-200 flex flex-col h-screen h-sticky overflow-y-auto">
-      <div className="p-6 border-b border-slate-100 flex flex-col items-start gap-4">
-        <div className="h-30 w-auto overflow-hidden">
-          <img src={vmsLogo} alt="VMS Logo" className="h-full w-auto object-contain" />
+    <div className="w-64 bg-slate-900 border-r border-slate-800 flex flex-col h-screen sticky top-0 overflow-y-auto">
+      {/* Brand Header */}
+      <div className="p-6 border-b border-slate-800/80 flex flex-col items-start gap-4">
+        <div className="h-20 w-auto overflow-hidden">
+          <img src={vmsLogo} alt="VMS Logo" className="h-full w-auto object-contain hover:scale-105 transition-transform duration-300" />
         </div>
         <div>
-          <h1 className="font-bold text-slate-800 text-sm tracking-tight uppercase">Admin Console</h1>
-          <p className="text-[10px] text-green-500 font-black tracking-widest uppercase mt-0.5">Control Center</p>
+          <h1 className="font-black text-white text-xs tracking-widest uppercase">Admin Console</h1>
+          <p className="text-[9px] text-green-400 font-black tracking-widest uppercase mt-0.5">Control Center</p>
         </div>
       </div>
 
-      <nav className="flex-1 p-4 space-y-1">
+      {/* Nav Menu */}
+      <nav className="flex-1 p-4 space-y-1.5 mt-4">
         {menuItems.map((item) => {
           const isActive = pathname === item.path;
           return (
             <Link
               key={item.name}
               to={item.path}
-              className={`flex items-center gap-3 px-4 py-3 rounded-none transition-all duration-200 text-sm font-medium ${isActive
-                ? "bg-slate-900 text-white shadow-xl shadow-slate-200"
-                : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+              className={`flex items-center gap-3 px-4 py-3 rounded-none transition-all duration-200 text-xs font-black uppercase tracking-wider ${isActive
+                ? "bg-slate-800 text-white border-l-4 border-green-500 shadow-md shadow-black/10"
+                : "text-slate-400 hover:bg-slate-800/50 hover:text-white"
                 }`}
             >
-              <item.icon className={`w-5 h-5 ${isActive ? "text-green-400" : ""}`} />
+              <item.icon className={`w-4.5 h-4.5 transition-colors ${isActive ? "text-green-400" : "text-slate-500 group-hover:text-white"}`} />
               {item.name}
-              {isActive && <ChevronRight className="ml-auto w-4 h-4 text-slate-400" />}
+              {isActive && <ChevronRight className="ml-auto w-3.5 h-3.5 text-green-400" />}
             </Link>
           );
         })}
       </nav>
 
-      <div className="p-4 mt-auto border-t border-slate-100">
+      {/* Logout Footer */}
+      <div className="p-4 mt-auto border-t border-slate-800/80">
         <button
           onClick={adminLogout}
-          className="flex items-center gap-3 w-full px-4 py-3 text-slate-500 text-sm font-medium rounded-none hover:bg-red-50 hover:text-red-600 transition-all font-bold group"
+          className="flex items-center gap-3 w-full px-4 py-3 text-slate-400 text-xs font-black uppercase tracking-wider rounded-none hover:bg-red-500/10 hover:text-red-400 transition-all group"
         >
-          <LogOut className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+          <LogOut className="w-4.5 h-4.5 text-red-500/70 group-hover:-translate-x-1 transition-transform" />
           Log Out
         </button>
       </div>

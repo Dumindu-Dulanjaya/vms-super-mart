@@ -1,28 +1,56 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAppContext } from '../../context/AppContext';
 import { 
   BarChart3, 
   Package, 
   ShoppingCart, 
   Users, 
-  TrendingUp, 
   ArrowUpRight,
   Plus
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
   const { products, currency } = useAppContext();
+  const [orders, setOrders] = useState([]);
+  const [loadingOrders, setLoadingOrders] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      setLoadingOrders(true);
+      try {
+        const token = localStorage.getItem('vms_admin_token');
+        const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/orders`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setOrders(data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch orders for dashboard:', err);
+      } finally {
+        setLoadingOrders(false);
+      }
+    };
+    fetchOrders();
+  }, []);
+
+  // Compute stats dynamically from active database products and orders
+  const totalSales = orders.reduce((sum, o) => sum + Number(o.summary?.total || 0), 0);
+  const uniqueEmails = new Set(orders.map(o => o.customer?.email?.toLowerCase()).filter(Boolean));
+  const totalCustomers = uniqueEmails.size;
 
   const stats = [
-    { name: 'Total Products', icon: Package, value: products.length, trend: '+12%', color: 'from-blue-500 to-indigo-600' },
-    { name: 'Monthly Sales', icon: BarChart3, value: 'Rs. 12,480', trend: '+18.4%', color: 'from-emerald-500 to-teal-600' },
-    { name: 'Total Orders', icon: ShoppingCart, value: '842', trend: '+14.2%', color: 'from-amber-500 to-orange-600' },
-    { name: 'Customers', icon: Users, value: '15.2k', trend: '+7.6%', color: 'from-rose-500 to-pink-600' },
+    { name: 'Total Products', icon: Package, value: products.length, label: 'Active', color: 'from-blue-500 to-indigo-600' },
+    { name: 'Total Sales', icon: BarChart3, value: `${currency}${totalSales.toLocaleString()}`, label: 'Total', color: 'from-emerald-500 to-teal-600' },
+    { name: 'Total Orders', icon: ShoppingCart, value: orders.length, label: 'Placed', color: 'from-amber-500 to-orange-600' },
+    { name: 'Customers', icon: Users, value: totalCustomers, label: 'Shoppers', color: 'from-rose-500 to-pink-600' },
   ];
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-10 animate-fadeIn">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Overview Dashboard</h1>
@@ -37,7 +65,7 @@ const Dashboard = () => {
         </Link>
       </div>
 
-      {/* Stats Cards */}
+      {/* Dynamic Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat) => (
           <div key={stat.name} className="bg-white rounded-none p-6 border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
@@ -45,13 +73,19 @@ const Dashboard = () => {
               <div className={`w-12 h-12 rounded-none bg-gradient-to-br ${stat.color} flex items-center justify-center text-white shadow-lg shadow-indigo-100`}>
                 <stat.icon className="w-6 h-6" />
               </div>
-              <div className="flex items-center gap-1 text-emerald-500 font-bold text-sm bg-emerald-50 px-2 py-1 rounded-none">
-                <ArrowUpRight className="w-4 h-4" />
-                {stat.trend}
+              <div className="flex items-center gap-1 text-emerald-600 font-black text-[10px] tracking-wider uppercase bg-emerald-50 px-2 py-1 rounded-none">
+                <ArrowUpRight className="w-3.5 h-3.5 text-emerald-500" />
+                {stat.label}
               </div>
             </div>
             <p className="text-slate-400 text-sm font-semibold tracking-wide uppercase">{stat.name}</p>
-            <h3 className="text-3xl font-black text-slate-900 mt-1">{stat.value}</h3>
+            <h3 className="text-3xl font-black text-slate-900 mt-1">
+              {loadingOrders && stat.name !== 'Total Products' ? (
+                <span className="inline-block w-12 h-6 bg-slate-100 animate-pulse"></span>
+              ) : (
+                stat.value
+              )}
+            </h3>
           </div>
         ))}
       </div>
@@ -91,7 +125,12 @@ const Dashboard = () => {
                                 <p className="font-black text-slate-900 text-sm">{currency}{p.price}</p>
                             </td>
                             <td className="px-8 py-4">
-                                <button className="text-xs font-bold text-slate-400 hover:text-slate-900 transition-colors">Manage</button>
+                                <button 
+                                  onClick={() => navigate(`/admin/inventory/edit/${p.id}`)}
+                                  className="text-xs font-bold text-indigo-600 hover:text-indigo-900 transition-colors underline underline-offset-2 decoration-2"
+                                >
+                                  Manage
+                                </button>
                             </td>
                         </tr>
                     ))}
