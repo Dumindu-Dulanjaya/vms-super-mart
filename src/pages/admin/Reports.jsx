@@ -19,6 +19,7 @@ const Reports = () => {
   const [endDate, setEndDate] = useState('');
   const [reportData, setReportData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [hoveredIndex, setHoveredIndex] = useState(null);
   const currency = "Rs.";
 
   const fetchReport = async () => {
@@ -122,6 +123,55 @@ const Reports = () => {
   const plotWidth = chartWidth - paddingX * 2;
   const plotHeight = chartHeight - paddingY * 2;
 
+  // Spline points for primary glowing trend line
+  const linePoints = reportData.map((d, index) => {
+    const count = reportData.length;
+    const barSpacing = plotWidth / count;
+    const barWidth = Math.max(8, barSpacing * 0.5);
+    const xVal = paddingX + index * barSpacing + (barSpacing - barWidth) / 2;
+    const centerX = xVal + barWidth / 2;
+    const rawBarHeight = maxNetSales > 0 ? (d.netSales / maxNetSales) * plotHeight : 0;
+    const barHeight = Math.max(4, rawBarHeight);
+    const centerY = paddingY + plotHeight - barHeight;
+    return { x: centerX, y: centerY };
+  });
+
+  const getBezierPath = (pts) => {
+    if (pts.length === 0) return '';
+    if (pts.length === 1) return `M ${pts[0].x} ${pts[0].y}`;
+    let path = `M ${pts[0].x} ${pts[0].y}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const curr = pts[i];
+      const next = pts[i + 1];
+      const cpX1 = curr.x + (next.x - curr.x) / 3;
+      const cpY1 = curr.y;
+      const cpX2 = curr.x + 2 * (next.x - curr.x) / 3;
+      const cpY2 = next.y;
+      path += ` C ${cpX1} ${cpY1}, ${cpX2} ${cpY2}, ${next.x} ${next.y}`;
+    }
+    return path;
+  };
+
+  const splinePath = getBezierPath(linePoints);
+  const areaPath = linePoints.length > 0
+    ? `${splinePath} L ${linePoints[linePoints.length - 1].x} ${chartHeight - paddingY} L ${linePoints[0].x} ${chartHeight - paddingY} Z`
+    : '';
+
+  // Calculate target milestone dynamically based on total net revenue
+  const getTargetMilestone = (revenue) => {
+    if (revenue <= 0) return 20000;
+    if (revenue < 5000) return 5000;
+    if (revenue < 10000) return 10000;
+    if (revenue < 25000) return 25000;
+    if (revenue < 50000) return 50000;
+    if (revenue < 100000) return 100000;
+    if (revenue < 250000) return 250000;
+    return Math.ceil(revenue / 100000) * 100000;
+  };
+
+  const targetMilestone = getTargetMilestone(totalNetRevenue);
+  const targetPercent = Math.min(100, Math.round((totalNetRevenue / targetMilestone) * 100));
+
   return (
     <div className="space-y-8 animate-fadeIn printable-area">
       {/* CSS overrides for print media */}
@@ -149,6 +199,22 @@ const Reports = () => {
           .bg-white {
             border: none !important;
             box-shadow: none !important;
+          }
+          /* Clean print overrides for dark premium visual boxes */
+          .dark-chart-box {
+            background: white !important;
+            color: black !important;
+            border: 1px solid #E2E8F0 !important;
+            box-shadow: none !important;
+          }
+          .dark-chart-box text {
+            fill: #334155 !important;
+          }
+          .dark-chart-box line {
+            stroke: #E2E8F0 !important;
+          }
+          .dark-chart-box circle {
+            stroke: #E2E8F0 !important;
           }
         }
       `}</style>
@@ -288,127 +354,380 @@ const Reports = () => {
         </div>
       </div>
 
-      {/* Dynamic Vector Trend Chart (SVG) */}
-      <div className="bg-white p-6 border border-slate-200/60 shadow-sm">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xs font-black text-slate-400 tracking-widest uppercase">Sales Revenue Trend (Rs.)</h3>
-          <span className="px-2 py-1 bg-emerald-50 text-emerald-700 text-[9px] font-black uppercase tracking-widest border border-emerald-100">
-            Live Database Data
-          </span>
-        </div>
+      {/* Premium Unique & Modern Analytics Dashboard Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        {reportData.length > 0 && maxNetSales > 0 ? (
-          <div className="w-full overflow-x-auto">
-            <svg 
-              viewBox={`0 0 ${chartWidth} ${chartHeight}`} 
-              className="w-full h-auto min-w-[600px] select-none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              {/* SVG Defs for Gradients */}
-              <defs>
-                <linearGradient id="barGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stopColor="#10B981" />
-                  <stop offset="100%" stopColor="#059669" />
-                </linearGradient>
-              </defs>
+        {/* Primary Chart: Cyberpunk Neon Trend Spline & Bar Hybrid Dashboard (2/3 width) */}
+        <div className="lg:col-span-2 bg-slate-950 text-white p-6 border border-slate-900 shadow-2xl relative flex flex-col dark-chart-box overflow-hidden group">
+          {/* Subtle Cyberpunk Neon Top Trim */}
+          <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-emerald-500 via-cyan-500 to-indigo-500" />
+          
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h3 className="text-xs font-black text-slate-400 tracking-widest uppercase">Revenue & Volume Analytics</h3>
+              <p className="text-[9px] text-cyan-400 font-bold uppercase tracking-wider mt-0.5 font-mono">Dynamic Spline-Bar Cockpit</p>
+            </div>
+            <span className="px-2.5 py-1 bg-cyan-950/80 text-cyan-400 text-[8px] font-black uppercase tracking-widest border border-cyan-800/50 font-mono">
+              Live DB Sync
+            </span>
+          </div>
 
-              {/* Grid Lines */}
-              {[0, 0.25, 0.5, 0.75, 1].map((ratio, index) => {
-                const yVal = paddingY + plotHeight * (1 - ratio);
-                const gridLabel = Math.round(maxNetSales * ratio);
-                return (
-                  <g key={index}>
-                    <line 
-                      x1={paddingX} 
-                      y1={yVal} 
-                      x2={chartWidth - paddingX} 
-                      y2={yVal} 
-                      stroke="#F1F5F9" 
-                      strokeWidth="1.5"
-                    />
-                    <text 
-                      x={paddingX - 10} 
-                      y={yVal + 4} 
-                      fill="#94A3B8" 
-                      fontSize="9" 
-                      fontWeight="bold"
-                      textAnchor="end"
-                    >
-                      {currency}{gridLabel >= 1000 ? `${(gridLabel / 1000).toFixed(1)}k` : gridLabel}
-                    </text>
-                  </g>
-                );
-              })}
+          {reportData.length > 0 && maxNetSales > 0 ? (
+            <div className="w-full relative">
+              {/* Responsive SVG */}
+              <svg 
+                viewBox={`0 0 ${chartWidth} ${chartHeight}`} 
+                className="w-full h-auto min-w-[500px] select-none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                {/* Defs block for stunning gradients & filter glows */}
+                <defs>
+                  {/* Cyber Bar Gradient */}
+                  <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#06B6D4" stopOpacity="0.85" />
+                    <stop offset="100%" stopColor="#10B981" stopOpacity="0.1" />
+                  </linearGradient>
+                  
+                  {/* Neon Spline Gradient */}
+                  <linearGradient id="splineGrad" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#EC4899" />
+                    <stop offset="50%" stopColor="#8B5CF6" />
+                    <stop offset="100%" stopColor="#06B6D4" />
+                  </linearGradient>
 
-              {/* Bar Elements */}
-              {reportData.map((d, index) => {
-                const count = reportData.length;
-                const barSpacing = plotWidth / count;
-                const barWidth = Math.max(8, barSpacing * 0.5);
-                const xVal = paddingX + index * barSpacing + (barSpacing - barWidth) / 2;
-                
-                const rawBarHeight = maxNetSales > 0 ? (d.netSales / maxNetSales) * plotHeight : 0;
-                const barHeight = Math.max(4, rawBarHeight); // Ensure minimum visible height
-                const yVal = paddingY + plotHeight - barHeight;
+                  {/* Area Fill Gradient under Spline */}
+                  <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#8B5CF6" stopOpacity="0.25" />
+                    <stop offset="100%" stopColor="#8B5CF6" stopOpacity="0" />
+                  </linearGradient>
 
-                return (
-                  <g key={d.period} className="group cursor-pointer">
-                    <title>{`${d.period}: ${currency}${d.netSales.toLocaleString()} (${d.ordersCount} orders)`}</title>
-                    {/* Active Bar Rectangle */}
-                    <rect 
-                      x={xVal} 
-                      y={yVal} 
-                      width={barWidth} 
-                      height={barHeight} 
-                      fill="url(#barGradient)"
-                      rx="1"
-                      className="transition-all hover:fill-indigo-500 duration-200"
-                    />
-                    {/* Micro-label on top of bar on hover */}
-                    <text
-                      x={xVal + barWidth / 2}
-                      y={yVal - 6}
-                      fill="#475569"
-                      fontSize="8"
-                      fontWeight="black"
-                      textAnchor="middle"
-                      className="opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      {currency}{d.netSales}
-                    </text>
-                    {/* X-Axis Date label */}
-                    {index % Math.ceil(count / 12) === 0 && (
+                  {/* Spline Filter Shadow for Glow Effect */}
+                  <filter id="splineGlow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="#8B5CF6" floodOpacity="0.6" />
+                  </filter>
+
+                  {/* Bar Glow Filter */}
+                  <filter id="barGlow" x="-10%" y="-10%" width="120%" height="120%">
+                    <feDropShadow dx="0" dy="2" stdDeviation="2" floodColor="#06B6D4" floodOpacity="0.3" />
+                  </filter>
+                </defs>
+
+                {/* Laser Dashed Grid Guides */}
+                {[0, 0.25, 0.5, 0.75, 1].map((ratio, index) => {
+                  const yVal = paddingY + plotHeight * (1 - ratio);
+                  const gridLabel = Math.round(maxNetSales * ratio);
+                  return (
+                    <g key={index}>
+                      <line 
+                        x1={paddingX} 
+                        y1={yVal} 
+                        x2={chartWidth - paddingX} 
+                        y2={yVal} 
+                        stroke="#334155" 
+                        strokeWidth="1"
+                        strokeDasharray="4 4"
+                        opacity="0.2"
+                      />
                       <text 
-                        x={xVal + barWidth / 2} 
-                        y={chartHeight - paddingY + 16} 
-                        fill="#94A3B8" 
+                        x={paddingX - 12} 
+                        y={yVal + 3} 
+                        fill="#64748B" 
                         fontSize="8" 
-                        fontWeight="black"
-                        textAnchor="middle"
+                        fontWeight="bold"
+                        fontFamily="monospace"
+                        textAnchor="end"
                       >
-                        {d.period.substring(d.period.indexOf('-') + 1)}
+                        {currency}{gridLabel >= 1000 ? `${(gridLabel / 1000).toFixed(0)}k` : gridLabel}
                       </text>
-                    )}
-                  </g>
-                );
-              })}
+                    </g>
+                  );
+                })}
 
-              {/* Bottom Base Line */}
-              <line 
-                x1={paddingX} 
-                y1={chartHeight - paddingY} 
-                x2={chartWidth - paddingX} 
-                y2={chartHeight - paddingY} 
-                stroke="#E2E8F0" 
-                strokeWidth="2"
-              />
-            </svg>
+                {/* Cyber Glassmorphic Bars */}
+                {reportData.map((d, index) => {
+                  const count = reportData.length;
+                  const barSpacing = plotWidth / count;
+                  const barWidth = Math.max(12, barSpacing * 0.45);
+                  const xVal = paddingX + index * barSpacing + (barSpacing - barWidth) / 2;
+                  
+                  const rawBarHeight = maxNetSales > 0 ? (d.netSales / maxNetSales) * plotHeight : 0;
+                  const barHeight = Math.max(6, rawBarHeight);
+                  const yVal = paddingY + plotHeight - barHeight;
+
+                  const isHovered = hoveredIndex === index;
+
+                  return (
+                    <g 
+                      key={d.period} 
+                      onMouseEnter={() => setHoveredIndex(index)}
+                      onMouseLeave={() => setHoveredIndex(null)}
+                      className="cursor-pointer"
+                    >
+                      {/* Interactive Hover Backdrop Guide Column */}
+                      <rect
+                        x={xVal - barSpacing * 0.25}
+                        y={paddingY}
+                        width={barWidth + barSpacing * 0.5}
+                        height={plotHeight}
+                        fill="white"
+                        fillOpacity={isHovered ? 0.03 : 0}
+                        className="transition-all duration-150"
+                      />
+
+                      {/* Glowing Bar */}
+                      <rect 
+                        x={xVal} 
+                        y={yVal} 
+                        width={barWidth} 
+                        height={barHeight} 
+                        fill="url(#barGrad)"
+                        stroke={isHovered ? "#22D3EE" : "#0D9488"}
+                        strokeWidth={isHovered ? 1.5 : 1}
+                        rx="2"
+                        className="transition-all duration-200"
+                        style={{ filter: 'url(#barGlow)' }}
+                      />
+
+                      {/* Animated Laser Vertical Guide when hovered */}
+                      {isHovered && (
+                        <line
+                          x1={xVal + barWidth / 2}
+                          y1={paddingY}
+                          x2={xVal + barWidth / 2}
+                          y2={chartHeight - paddingY}
+                          stroke="#22D3EE"
+                          strokeWidth="1.5"
+                          strokeDasharray="3 3"
+                          className="animate-pulse"
+                        />
+                      )}
+
+                      {/* X-Axis Label */}
+                      {index % Math.ceil(count / 12) === 0 && (
+                        <text 
+                          x={xVal + barWidth / 2} 
+                          y={chartHeight - paddingY + 16} 
+                          fill={isHovered ? "#22D3EE" : "#64748B"} 
+                          fontSize="8" 
+                          fontWeight="black"
+                          fontFamily="monospace"
+                          textAnchor="middle"
+                        >
+                          {d.period.substring(d.period.indexOf('-') + 1)}
+                        </text>
+                      )}
+                    </g>
+                  );
+                })}
+
+                {/* Shaded Area under spline path */}
+                {areaPath && (
+                  <path 
+                    d={areaPath} 
+                    fill="url(#areaGrad)" 
+                    className="transition-all duration-500 ease-out"
+                  />
+                )}
+
+                {/* Neon Glowing Spline Line */}
+                {splinePath && (
+                  <path 
+                    d={splinePath} 
+                    fill="none" 
+                    stroke="url(#splineGrad)" 
+                    strokeWidth="3.5" 
+                    strokeLinecap="round"
+                    style={{ filter: 'url(#splineGlow)' }}
+                    className="transition-all duration-500 ease-out"
+                  />
+                )}
+
+                {/* Spline Nodes (Pulsing Cyber Dots) */}
+                {linePoints.map((pt, idx) => {
+                  const isHovered = hoveredIndex === idx;
+                  return (
+                    <g 
+                      key={idx}
+                      onMouseEnter={() => setHoveredIndex(idx)}
+                      onMouseLeave={() => setHoveredIndex(null)}
+                      className="cursor-pointer"
+                    >
+                      {/* Transparent hit area */}
+                      <circle cx={pt.x} cy={pt.y} r="12" fill="transparent" />
+                      
+                      {/* Pulsing ring outer */}
+                      <circle 
+                        cx={pt.x} 
+                        cy={pt.y} 
+                        r={isHovered ? 7 : 4} 
+                        fill="none" 
+                        stroke={isHovered ? "#EC4899" : "#C084FC"} 
+                        strokeWidth="1.5"
+                        className="transition-all duration-200"
+                      />
+                      
+                      {/* Inner dot */}
+                      <circle 
+                        cx={pt.x} 
+                        cy={pt.y} 
+                        r={isHovered ? 4 : 2} 
+                        fill={isHovered ? "#FFFFFF" : "#8B5CF6"} 
+                        className="transition-all duration-200"
+                      />
+                    </g>
+                  );
+                })}
+
+                {/* Baseline Guide */}
+                <line 
+                  x1={paddingX} 
+                  y1={chartHeight - paddingY} 
+                  x2={chartWidth - paddingX} 
+                  y2={chartHeight - paddingY} 
+                  stroke="#334155" 
+                  strokeWidth="1.5"
+                />
+              </svg>
+
+              {/* Dynamic Absolute Glassmorphic Hover Tooltip */}
+              {hoveredIndex !== null && reportData[hoveredIndex] && (
+                <div 
+                  className="absolute z-10 bg-slate-950/95 backdrop-blur-md border border-slate-800 p-4 shadow-2xl rounded-none text-left pointer-events-none transition-all duration-150 text-xs text-slate-300 w-52"
+                  style={{
+                    left: `${((paddingX + hoveredIndex * (plotWidth / reportData.length) + (plotWidth / reportData.length) / 2) / chartWidth) * 100}%`,
+                    transform: 'translateX(-50%)',
+                    bottom: '70px',
+                  }}
+                >
+                  {/* Top neon indicator */}
+                  <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-pink-500 to-violet-500" />
+                  
+                  <p className="text-[10px] font-black tracking-widest text-cyan-400 uppercase mb-2 font-mono flex items-center justify-between">
+                    <span>PERIOD STATS</span>
+                    <span>{reportData[hoveredIndex].period}</span>
+                  </p>
+                  
+                  <div className="space-y-1.5 font-mono text-[10px]">
+                    <div className="flex justify-between border-b border-slate-900 pb-1">
+                      <span className="text-slate-400">Net Revenue:</span>
+                      <span className="font-bold text-white">Rs.{reportData[hoveredIndex].netSales.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-slate-900 pb-1">
+                      <span className="text-slate-400">Orders:</span>
+                      <span className="font-bold text-white">{reportData[hoveredIndex].ordersCount}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-slate-900 pb-1">
+                      <span className="text-slate-400">Avg Value (AOV):</span>
+                      <span className="font-bold text-white">Rs.{reportData[hoveredIndex].averageOrderValue.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-slate-900 pb-1">
+                      <span className="text-slate-400">Items Sold:</span>
+                      <span className="font-bold text-white">{reportData[hoveredIndex].itemsCount}</span>
+                    </div>
+                    <div className="flex justify-between text-pink-400">
+                      <span>Total Discounts:</span>
+                      <span className="font-bold">-Rs.{reportData[hoveredIndex].discounts.toLocaleString()}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="py-20 flex flex-col items-center justify-center text-slate-500 text-xs font-bold uppercase tracking-widest">
+              <TrendingUp className="w-8 h-8 text-slate-700 mb-3 animate-pulse" />
+              <span>No transactions recorded to map trend splines.</span>
+            </div>
+          )}
+        </div>
+
+        {/* Secondary Chart: Cyberpunk Target Velocity Circular Gauge (1/3 width) */}
+        <div className="bg-slate-950 text-white p-6 border border-slate-900 shadow-2xl flex flex-col justify-between dark-chart-box relative overflow-hidden">
+          {/* Neon Top Trim */}
+          <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500" />
+          
+          <div>
+            <h3 className="text-xs font-black text-slate-400 tracking-widest uppercase">Target Performance</h3>
+            <p className="text-[9px] text-purple-400 font-bold uppercase tracking-wider mt-0.5 font-mono">Store Milestone Progress</p>
           </div>
-        ) : (
-          <div className="py-12 text-center text-slate-400 text-xs font-bold uppercase tracking-widest">
-            No sales records in selected period to map trends.
+
+          {/* Radial Circular Gauge */}
+          <div className="py-6 flex flex-col items-center justify-center">
+            <div className="relative w-36 h-36 flex items-center justify-center">
+              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
+                <defs>
+                  {/* Ring glow linear gradient */}
+                  <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#10B981" />
+                    <stop offset="50%" stopColor="#06B6D4" />
+                    <stop offset="100%" stopColor="#8B5CF6" />
+                  </linearGradient>
+                  
+                  {/* Gauge filter drop-glow */}
+                  <filter id="gaugeGlow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feDropShadow dx="0" dy="0" stdDeviation="5" floodColor="#06B6D4" floodOpacity="0.6" />
+                  </filter>
+                </defs>
+
+                {/* Back Outer Base Ring */}
+                <circle 
+                  cx="60" 
+                  cy="60" 
+                  r="50" 
+                  fill="transparent" 
+                  stroke="#1E293B" 
+                  strokeWidth="8" 
+                  opacity="0.3"
+                />
+
+                {/* Glowing Progress Arc */}
+                <circle 
+                  cx="60" 
+                  cy="60" 
+                  r="50" 
+                  fill="transparent" 
+                  stroke="url(#gaugeGrad)" 
+                  strokeWidth="8" 
+                  strokeDasharray="314.16" 
+                  strokeDashoffset={314.16 - (314.16 * targetPercent) / 100} 
+                  strokeLinecap="round"
+                  className="transition-all duration-1000 ease-out"
+                  style={{ filter: 'url(#gaugeGlow)' }}
+                />
+              </svg>
+
+              {/* Centered Percentage HUD */}
+              <div className="absolute flex flex-col items-center justify-center">
+                <span className="text-3xl font-black text-white font-mono tracking-tighter drop-shadow">{targetPercent}%</span>
+                <span className="text-[8px] text-slate-400 font-bold uppercase tracking-widest font-mono mt-0.5">Velocity</span>
+              </div>
+            </div>
+
+            {/* Target Details Badge */}
+            <div className="mt-4 px-3 py-1 bg-slate-900 border border-slate-800 rounded-none text-center font-mono">
+              <span className="text-[10px] text-slate-500 font-bold">Milestone Milestone: </span>
+              <span className="text-[11px] text-cyan-400 font-black">Rs.{targetMilestone.toLocaleString()}</span>
+            </div>
           </div>
-        )}
+
+          {/* Micro HUD breakdown */}
+          <div className="space-y-2 border-t border-slate-900 pt-4 font-mono text-[10px]">
+            <div className="flex justify-between text-slate-400">
+              <span>Total Revenue:</span>
+              <span className="font-bold text-white">Rs.{totalNetRevenue.toLocaleString()}</span>
+            </div>
+            {targetPercent < 100 ? (
+              <div className="flex justify-between text-slate-400">
+                <span>Remaining to Goal:</span>
+                <span className="font-bold text-emerald-400">Rs.{Math.max(0, targetMilestone - totalNetRevenue).toLocaleString()}</span>
+              </div>
+            ) : (
+              <div className="text-center text-emerald-400 font-black tracking-widest uppercase animate-bounce pt-1">
+                🏆 Milestone Milestone Smashed!
+              </div>
+            )}
+          </div>
+        </div>
+
       </div>
 
       {/* Aggregate Report Grid Table */}
