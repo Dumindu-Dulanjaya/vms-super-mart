@@ -4,6 +4,7 @@ import { Routes, Route, useLocation } from 'react-router-dom';
 // Components
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import ChatbotWidget from './components/ChatbotWidget';
 
 // Pages
 import Home from './pages/Home';
@@ -36,6 +37,9 @@ const App = () => {
       {isFullLayoutPath && <Navbar />}
 
       <Toaster position="top-right" />
+
+      {/* Dynamic Floating AI Chatbot Assistant for Shoppers */}
+      {isFullLayoutPath && <ChatbotWidget />}
 
       <div className={`${isFullLayoutPath ? "px-6 md:px-16 lg:px-24 xl:px-32 py-10" : "p-0"} flex-1`}>
         <Routes>
