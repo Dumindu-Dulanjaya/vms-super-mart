@@ -8,11 +8,10 @@ import { Heart, ShoppingCart, Search, Menu, X } from 'lucide-react'
 const Navbar = () => {
     const [open, setOpen] = React.useState(false)
     const [showUserLogin, setShowUserLogin] = React.useState(false)
-    const [user, setUser] = React.useState(null)
     const location = useLocation()
     const navigate = useNavigate()
     const hideIcons = location && location.pathname === '/login'
-    const { searchQuery, setSearchQuery, cartItems, wishlistItems = [] } = useAppContext()
+    const { searchQuery, setSearchQuery, cartItems, wishlistItems = [], user, userLogout } = useAppContext()
 
     // Calculate total cart items
     const getCartCount = () => {
@@ -27,11 +26,6 @@ const Navbar = () => {
 
     const handleLogoClick = () => {
         window.location.href = '/'
-    }
-
-    const handleLogin = () => {
-        setUser({ name: "John Doe", email: "john@example.com" })
-        setShowUserLogin(false)
     }
 
     return (
@@ -99,9 +93,9 @@ const Navbar = () => {
 
                     {/* Login Section */}
                     {!hideIcons && (
-                        <div className="relative group">
+                        <div className="flex items-center">
                             {!user ? (
-                                <div className="relative">
+                                <div className="relative group">
                                     {/* Trigger Button */}
                                     <button
                                         className="cursor-pointer px-6 py-2 bg-[#00FF33] hover:bg-[#00CC29] transition-all text-slate-900 rounded-none font-black text-xs uppercase tracking-tighter flex items-center gap-2 active:scale-95 shadow-[0_0_15px_rgba(0,255,51,0.2)] px-5"
@@ -151,9 +145,45 @@ const Navbar = () => {
                                     </div>
                                 </div>
                             ) : (
-                                <div className="flex items-center gap-3 cursor-pointer hover:bg-slate-800 px-3 py-2 rounded-none transition border border-slate-800">
-                                    <img src={profileIcon} className="w-8 h-8 rounded-none border border-slate-700" alt="Profile" />
-                                    <span className="text-slate-300 font-black text-xs uppercase tracking-tight">{user.name}</span>
+                                <div className="relative group">
+                                    <div className="flex items-center gap-3 cursor-pointer hover:bg-slate-800 px-3 py-2 rounded-none transition border border-slate-800">
+                                        <img src={profileIcon} className="w-8 h-8 rounded-none border border-slate-700" alt="Profile" />
+                                        <span className="text-slate-300 font-black text-xs uppercase tracking-tight">{user.firstName} {user.lastName}</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="group-hover:rotate-180 transition-transform duration-300 text-slate-400"><path d="m6 9 6 6 6-6" /></svg>
+                                    </div>
+                                    <div className="absolute top-full right-0 mt-3 w-56 bg-slate-900 rounded-none shadow-[0_10px_40px_rgba(0,0,0,0.5)] border border-slate-800 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50 overflow-hidden">
+                                        <div className="p-4 border-b border-slate-800 bg-slate-950">
+                                            <p className="text-xs font-black uppercase text-[#00FF33] tracking-wider mb-0.5">Welcome,</p>
+                                            <p className="text-sm font-bold text-white truncate">{user.firstName} {user.lastName}</p>
+                                            <p className="text-[10px] text-slate-500 font-medium truncate">{user.email}</p>
+                                        </div>
+                                        <div className="p-2 space-y-1">
+                                            <Link
+                                                to="/my-orders"
+                                                className="flex items-center gap-3 px-4 py-3 hover:bg-slate-800 text-slate-300 rounded-none transition-colors group/item"
+                                            >
+                                                <div className="w-8 h-8 rounded-none bg-slate-800 flex items-center justify-center text-[#00FF33] group-hover/item:bg-[#00FF33] group-hover/item:text-slate-900 transition-colors">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm font-black uppercase tracking-tight text-white">My Orders</p>
+                                                    <p className="text-[10px] text-slate-500 font-bold tracking-tight">Order History</p>
+                                                </div>
+                                            </Link>
+                                            <button
+                                                onClick={userLogout}
+                                                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-950/40 text-red-400 rounded-none transition-colors group/item text-left border-none bg-transparent cursor-pointer"
+                                            >
+                                                <div className="w-8 h-8 rounded-none bg-slate-800 flex items-center justify-center text-red-400 group-hover/item:bg-red-500 group-hover/item:text-white transition-colors">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm font-black uppercase tracking-tight">Sign Out</p>
+                                                    <p className="text-[10px] text-slate-500 font-bold tracking-tight">End Session</p>
+                                                </div>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -210,9 +240,30 @@ const Navbar = () => {
                     (!user ? (
                         <Link to="/login" onClick={() => setOpen(false)} className="cursor-pointer px-6 py-4 mt-2 bg-[#00FF33] hover:bg-[#00CC29] transition text-slate-900 rounded-none font-black uppercase text-center w-full tracking-[0.2em]">Login</Link>
                     ) : (
-                        <div className="flex items-center gap-4 mt-2 py-4 w-full border-t border-slate-800">
-                            <img src={profileIcon} className="w-10 h-10 rounded-none border border-slate-700" alt="Profile" />
-                            <span className="text-white font-black uppercase tracking-tight">{user.name}</span>
+                        <div className="w-full mt-2 pt-4 border-t border-slate-800 space-y-3">
+                            <div className="flex items-center gap-4 py-2">
+                                <img src={profileIcon} className="w-10 h-10 rounded-none border border-slate-700" alt="Profile" />
+                                <div>
+                                    <p className="text-white font-black uppercase tracking-tight">{user.firstName} {user.lastName}</p>
+                                    <p className="text-[10px] text-[#00FF33] font-bold">{user.email}</p>
+                                </div>
+                            </div>
+                            <Link 
+                                to="/my-orders" 
+                                onClick={() => setOpen(false)}
+                                className="block bg-slate-800 text-white font-black uppercase text-xs text-center py-3 w-full border border-slate-700 hover:border-[#00FF33] transition"
+                            >
+                                My Orders
+                            </Link>
+                            <button
+                                onClick={() => {
+                                    setOpen(false);
+                                    userLogout();
+                                }}
+                                className="block w-full bg-red-600 hover:bg-red-700 text-white font-black uppercase text-xs text-center py-3 border-none cursor-pointer"
+                            >
+                                Log Out
+                            </button>
                         </div>
                     ))
                 )}

@@ -18,7 +18,8 @@ describe('Navbar Component', () => {
   it('should render navigation links', () => {
     renderNavbar();
 
-    expect(screen.getByText(/home|categories|products/i)).toBeInTheDocument();
+    const links = screen.queryAllByText(/home|categories|products/i);
+    expect(links.length).toBeGreaterThan(0);
   });
 
   it('should render cart icon', () => {
@@ -33,8 +34,8 @@ describe('Navbar Component', () => {
   it('should render search functionality', () => {
     renderNavbar();
 
-    const searchInput = screen.queryByPlaceholderText(/search/i);
-    expect(searchInput || document.querySelector('input[type="search"]')).toBeTruthy();
+    const searchInputs = screen.queryAllByPlaceholderText(/search/i);
+    expect(searchInputs.length > 0 || document.querySelector('input[type="search"]')).toBeTruthy();
   });
 
   it('should have links to different pages', () => {

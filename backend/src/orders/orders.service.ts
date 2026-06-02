@@ -22,6 +22,7 @@ type CheckoutPayload = {
   postalCode: string;
   province: string;
   paymentMethod: string;
+  userId?: number;
 };
 
 @Injectable()
@@ -88,6 +89,7 @@ export class OrdersService {
     const order = this.orderRepository.create({
       id: orderId,
       status: 'placed',
+      userId: payload.userId || null,
       customer: {
         firstName: payload.firstName,
         lastName: payload.lastName,

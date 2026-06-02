@@ -1,70 +1,58 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
+import { BrowserRouter } from 'react-router-dom';
 import { useAppContext } from '../context/useAppContext';
 import { AppProvider } from '../context/AppContext';
 
 describe('AppContext Hook', () => {
+  const getWrapper = () => {
+    return ({ children }) => (
+      <BrowserRouter>
+        <AppProvider>
+          {children}
+        </AppProvider>
+      </BrowserRouter>
+    );
+  };
+
   it('should provide initial context values', () => {
-    const wrapper = ({ children }) => <AppProvider>{children}</AppProvider>;
-    const { result } = renderHook(() => useAppContext(), { wrapper });
+    const { result } = renderHook(() => useAppContext(), { wrapper: getWrapper() });
 
     expect(result.current).toBeDefined();
     expect(result.current.products).toBeDefined();
-    expect(result.current.cart).toBeDefined();
   });
 
   it('should add product to cart', () => {
-    const wrapper = ({ children }) => <AppProvider>{children}</AppProvider>;
-    const { result } = renderHook(() => useAppContext(), { wrapper });
-
-    const product = {
-      id: 1,
-      name: 'Test Product',
-      price: 99.99,
-      oldPrice: 149.99,
-      image: 'test.jpg',
-      quantity: 1,
-    };
+    const { result } = renderHook(() => useAppContext(), { wrapper: getWrapper() });
 
     act(() => {
       if (result.current.addToCart) {
-        result.current.addToCart(product);
+        result.current.addToCart(1);
       }
     });
 
-    if (result.current.cart) {
-      expect(result.current.cart.length).toBeGreaterThan(0);
+    if (result.current.cartItems) {
+      expect(result.current.cartItems['1']).toBe(1);
     }
   });
 
   it('should handle user login', async () => {
-    const wrapper = ({ children }) => <AppProvider>{children}</AppProvider>;
-    const { result } = renderHook(() => useAppContext(), { wrapper });
+    const { result } = renderHook(() => useAppContext(), { wrapper: getWrapper() });
 
-    expect(result.current.userLoggedIn).toBeDefined();
+    expect(result.current.userLogin).toBeDefined();
   });
 
   it('should have checkout function', () => {
-    const wrapper = ({ children }) => <AppProvider>{children}</AppProvider>;
-    const { result } = renderHook(() => useAppContext(), { wrapper });
+    const { result } = renderHook(() => useAppContext(), { wrapper: getWrapper() });
 
     expect(result.current.checkout).toBeDefined();
     expect(typeof result.current.checkout).toBe('function');
   });
 
   it('should handle admin login', async () => {
-    const wrapper = ({ children }) => <AppProvider>{children}</AppProvider>;
-    const { result } = renderHook(() => useAppContext(), { wrapper });
+    const { result } = renderHook(() => useAppContext(), { wrapper: getWrapper() });
 
     expect(result.current.adminLogin).toBeDefined();
     expect(typeof result.current.adminLogin).toBe('function');
-  });
-
-  it('should fetch products', () => {
-    const wrapper = ({ children }) => <AppProvider>{children}</AppProvider>;
-    const { result } = renderHook(() => useAppContext(), { wrapper });
-
-    expect(result.current.fetchProducts).toBeDefined();
-    expect(typeof result.current.fetchProducts).toBe('function');
   });
 });

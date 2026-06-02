@@ -160,4 +160,70 @@ export class UsersService {
 
     return user.orders;
   }
+
+  async googleLogin(idToken: string) {
+    if (!idToken) {
+      throw new BadRequestException('ID Token is required');
+    }
+
+    try {
+      const response = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${idToken}`);
+      if (!response.ok) {
+        throw new Error('Failed to verify token with Google');
+      }
+
+      const googlePayload: any = await response.json();
+      const email = googlePayload.email;
+      const firstName = googlePayload.given_name || 'Google';
+      const lastName = googlePayload.family_name || 'User';
+
+      if (!email) {
+        throw new BadRequestException('Email not provided in Google profile');
+      }
+
+      let user = await this.usersRepository.findOne({ where: { email } });
+
+      if (!user) {
+        const randomPassword = Math.random().toString(36).substring(2, 15);
+        const hashedPassword = await bcrypt.hash(randomPassword, 10);
+        user = this.usersRepository.create({
+          firstName,
+          lastName,
+          email,
+          password: hashedPassword,
+          isActive: true,
+          role: 'user',
+        });
+        user = await this.usersRepository.save(user);
+
+        try {
+          await this.emailService.sendWelcomeEmail(user.email, user.firstName);
+        } catch (e) {
+          // ignore email errors in local/dev
+        }
+      }
+
+      const token = this.jwtService.sign({
+        sub: user.id,
+        email: user.email,
+        role: user.role,
+      });
+
+      return {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role,
+        phone: user.phone || '',
+        address: user.address || '',
+        city: user.city || '',
+        postalCode: user.postalCode || '',
+        province: user.province || '',
+        accessToken: token,
+      };
+    } catch (err: any) {
+      throw new BadRequestException(`Google login failed: ${err.message}`);
+    }
+  }
 }

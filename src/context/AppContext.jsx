@@ -53,29 +53,75 @@ export const AppContextProvider = ({ children }) => {
   useEffect(() => {
     // Try loading products from backend first
     const load = async () => {
+      if (typeof localStorage === 'undefined') return;
       try {
         const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/products`);
         if (res.ok) {
           const data = await res.json();
           setProducts(data);
-          localStorage.setItem('vms_products', JSON.stringify(data));
+          if (typeof localStorage !== 'undefined') {
+            localStorage.setItem('vms_products', JSON.stringify(data));
+          }
           return;
         }
       } catch (e) {
         // ignore and fallback
       }
 
+      if (typeof localStorage === 'undefined') return;
       const savedProducts = localStorage.getItem('vms_products');
       if (savedProducts) {
         setProducts(JSON.parse(savedProducts));
       } else {
         setProducts(dummyProducts);
-        localStorage.setItem('vms_products', JSON.stringify(dummyProducts));
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem('vms_products', JSON.stringify(dummyProducts));
+        }
       }
     };
 
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const fetchAndSetProfile = async (token) => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/users/profile`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const profile = {
+          id: data.id,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          role: data.role,
+          phone: data.phone || '',
+          address: data.address || '',
+          city: data.city || '',
+          postalCode: data.postalCode || '',
+          province: data.province || ''
+        };
+        setUser(profile);
+        return profile;
+      } else {
+        localStorage.removeItem('userToken');
+        setUser(null);
+      }
+    } catch (e) {
+      console.error('Failed to load user profile', e);
+    }
+  };
+
+  // ✅ Auto-load user profile if token is present on app load
+  useEffect(() => {
+    const token = localStorage.getItem('userToken');
+    if (token) {
+      fetchAndSetProfile(token);
+    }
   }, []);
 
   // Add a new product
@@ -224,13 +270,7 @@ export const AppContextProvider = ({ children }) => {
       const data = await res.json();
       if (data.accessToken) {
         localStorage.setItem('userToken', data.accessToken);
-        setUser({
-          id: data.id,
-          firstName: data.firstName,
-          lastName: data.lastName,
-          email: data.email,
-          role: data.role,
-        });
+        await fetchAndSetProfile(data.accessToken);
         toast.success('Account created successfully!');
       }
       return data;
@@ -256,13 +296,7 @@ export const AppContextProvider = ({ children }) => {
       const data = await res.json();
       if (data.accessToken) {
         localStorage.setItem('userToken', data.accessToken);
-        setUser({
-          id: data.id,
-          firstName: data.firstName,
-          lastName: data.lastName,
-          email: data.email,
-          role: data.role,
-        });
+        await fetchAndSetProfile(data.accessToken);
         toast.success('Logged in successfully!');
       }
       return data;
@@ -270,6 +304,39 @@ export const AppContextProvider = ({ children }) => {
       toast.error(e.message || 'Login failed');
       throw e;
     }
+  };
+
+  const googleLogin = async (idToken) => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/users/google-login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idToken })
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || 'Google login failed');
+      }
+
+      const data = await res.json();
+      if (data.accessToken) {
+        localStorage.setItem('userToken', data.accessToken);
+        await fetchAndSetProfile(data.accessToken);
+        toast.success('Logged in with Google successfully!');
+      }
+      return data;
+    } catch (e) {
+      toast.error(e.message || 'Google login failed');
+      throw e;
+    }
+  };
+
+  const userLogout = () => {
+    setUser(null);
+    localStorage.removeItem('userToken');
+    toast.success('Logged out successfully!');
+    navigate('/');
   };
 
   const value = {
@@ -299,6 +366,8 @@ export const AppContextProvider = ({ children }) => {
     adminLogout,
     registerUser,
     userLogin,
+    googleLogin,
+    userLogout,
     checkout: async (customerData, paymentMethod = 'card') => {
       // Build items from cartItems
       const items = Object.keys(cartItems).map(id => ({ productId: parseInt(id), quantity: cartItems[id] }));
@@ -306,6 +375,7 @@ export const AppContextProvider = ({ children }) => {
         items,
         ...customerData,
         paymentMethod,
+        userId: user ? user.id : null,
       };
 
       try {
@@ -367,3 +437,5 @@ export const AppContextProvider = ({ children }) => {
 export const useAppContext = () => {
   return useContext(AppContext);
 };
+
+export { AppContextProvider as AppProvider };

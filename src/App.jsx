@@ -17,6 +17,7 @@ import ProductDetails from './pages/ProductDetails';
 import Cart from './pages/Cart';
 import Wishlist from './pages/Wishlist';
 import Checkout from './pages/Checkout';
+import MyOrders from './pages/MyOrders';
 import AdminLayout from './pages/admin/AdminLayout';
 import AdminLogin from './pages/admin/AdminLogin';
 import { useAppContext } from './context/AppContext';
@@ -54,6 +55,7 @@ const App = () => {
           <Route path='/cart' element={<Cart />} />
           <Route path='/wishlist' element={<Wishlist />} />
           <Route path='/checkout' element={<Checkout />} />
+          <Route path='/my-orders' element={<MyOrders />} />
 
           {/* Admin Routes */}
           <Route path='/admin/login' element={<AdminLogin />} />

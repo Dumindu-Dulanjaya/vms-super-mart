@@ -5,7 +5,7 @@ import { MapPin, CreditCard, Wallet, Check, Package } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const Checkout = () => {
-    const { cartItems, products, currency, setCartItems, checkout } = useAppContext();
+    const { cartItems, products, currency, setCartItems, checkout, user } = useAppContext();
     const navigate = useNavigate();
     const [cartData, setCartData] = useState([]);
     const [paymentMethod, setPaymentMethod] = useState('cod');
@@ -20,6 +20,21 @@ const Checkout = () => {
         province: ''
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    useEffect(() => {
+        if (user) {
+            setFormData({
+                firstName: user.firstName || '',
+                lastName: user.lastName || '',
+                email: user.email || '',
+                phone: user.phone || '',
+                address: user.address || '',
+                city: user.city || '',
+                postalCode: user.postalCode || '',
+                province: user.province || ''
+            });
+        }
+    }, [user]);
 
     useEffect(() => {
         const tempData = [];

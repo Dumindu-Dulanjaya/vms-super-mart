@@ -34,7 +34,7 @@ export class UsersController {
   @Get('profile')
   @UseGuards(JwtAuthGuard)
   async getUserProfile(@Request() req: any) {
-    return this.usersService.getUserById(req.user.sub);
+    return this.usersService.getUserById(req.user.userId);
   }
 
   @Get(':id')
@@ -46,12 +46,17 @@ export class UsersController {
   @Put('profile')
   @UseGuards(JwtAuthGuard)
   async updateUserProfile(@Request() req: any, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.updateUserProfile(req.user.sub, updateUserDto);
+    return this.usersService.updateUserProfile(req.user.userId, updateUserDto);
   }
 
   @Get(':id/orders')
   @UseGuards(JwtAuthGuard)
   async getUserOrders(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.getUserOrders(id);
+  }
+
+  @Post('google-login')
+  async googleLogin(@Body('idToken') idToken: string) {
+    return this.usersService.googleLogin(idToken);
   }
 }

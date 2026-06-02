@@ -3,7 +3,7 @@ import { OrdersService } from './orders.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from '../auth/roles.decorator';
 import { RolesGuard } from '../auth/roles.guard';
-import { IsInt, Min, IsArray, ValidateNested, ArrayMinSize, IsString, IsEmail } from 'class-validator';
+import { IsInt, Min, IsArray, ValidateNested, ArrayMinSize, IsString, IsEmail, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 
 class CheckoutItemDto {
@@ -48,6 +48,10 @@ class CreateOrderDto {
 
   @IsString()
   paymentMethod!: string;
+
+  @IsOptional()
+  @IsInt()
+  userId?: number;
 }
 
 @Controller('orders')
