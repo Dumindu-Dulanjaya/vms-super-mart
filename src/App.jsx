@@ -31,6 +31,7 @@ const App = () => {
   const isSellerPath = location.pathname.includes("seller");
 
   const isFullLayoutPath = !isAdminPath && !isSellerPath;
+  const isHomePage = location.pathname === "/";
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
@@ -42,7 +43,7 @@ const App = () => {
       {/* Dynamic Floating AI Chatbot Assistant for Shoppers */}
       {isFullLayoutPath && <ChatbotWidget />}
 
-      <div className={`${isFullLayoutPath ? "px-6 md:px-16 lg:px-24 xl:px-32 py-10" : "p-0"} flex-1`}>
+      <div className={`${isFullLayoutPath ? (isHomePage ? "p-0" : "px-6 md:px-16 lg:px-24 xl:px-32 py-10") : "p-0"} flex-1`}>
         <Routes>
           {/* Normal user routes */}
           <Route path='/' element={<Home />} />

@@ -9,14 +9,17 @@ import ServiceFeatures from '../components/ServiceFeatures';
 
 const Home = () => {
   return (
-    <div className="mt-10">
+    <div className="flex flex-col gap-10 md:gap-16">
       <MainBanner />
-      <ServiceFeatures />
-      <FlashSales />
-      <Categories />
-      <BestSeller />
-      <BottomBanner />
-      <NewsLetter />
+      
+      <div className="px-6 md:px-16 lg:px-24 xl:px-32 pb-16 flex flex-col gap-10 md:gap-16">
+        <ServiceFeatures />
+        <FlashSales />
+        <Categories />
+        <BestSeller />
+        <BottomBanner />
+        <NewsLetter />
+      </div>
     </div>
   );
 };
