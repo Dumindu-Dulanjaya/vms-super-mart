@@ -169,7 +169,7 @@ describe('UsersService', () => {
       expect(result).toBeDefined();
       expect(result.firstName).toBe(mockUser.firstName);
       expect(result.email).toBe(mockUser.email);
-      expect(mockUserRepository.findOne).toHaveBeenCalledWith({ where: { id: 1 } });
+      expect(mockUserRepository.findOne).toHaveBeenCalledWith({ where: { id: 1 }, relations: ['orders'] });
     });
   });
 });

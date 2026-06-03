@@ -65,6 +65,30 @@ class RateProductDto {
   score!: number;
 }
 
+class CreateBatchDto {
+  @IsOptional()
+  @IsString()
+  batchNumber?: string;
+
+  @IsNumber()
+  quantity!: number;
+
+  @IsNumber()
+  purchasePrice!: number;
+
+  @IsOptional()
+  @IsString()
+  receivedAt?: string;
+
+  @IsOptional()
+  @IsString()
+  expiryDate?: string;
+
+  @IsOptional()
+  @IsNumber()
+  newPrice?: number;
+}
+
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
@@ -137,6 +161,28 @@ export class ProductsController {
   @Roles('admin')
   decreaseStock(@Param('id', ParseIntPipe) id: number, @Body() updateStockDto: UpdateStockDto) {
     return this.productsService.decreaseStock(id, updateStockDto.quantity);
+  }
+
+  // Batch Inventory Endpoints
+  @Get(':id/batches')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('admin')
+  getBatches(@Param('id', ParseIntPipe) id: number) {
+    return this.productsService.getBatches(id);
+  }
+
+  @Post(':id/batches')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('admin')
+  addBatch(@Param('id', ParseIntPipe) id: number, @Body() createBatchDto: CreateBatchDto) {
+    return this.productsService.addBatch(id, createBatchDto);
+  }
+
+  @Delete('batches/:batchId')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('admin')
+  deleteBatch(@Param('batchId', ParseIntPipe) batchId: number) {
+    return this.productsService.deleteBatch(batchId);
   }
 
   @Post(':id/rate')

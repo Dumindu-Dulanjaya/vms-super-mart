@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Product } from '../entities/product.entity';
 import { Category } from '../entities/category.entity';
+import { InventoryBatch } from '../entities/inventory-batch.entity';
 
 type ProductResponse = {
   id: number;
@@ -44,6 +45,8 @@ export class ProductsService {
     private readonly productRepository: Repository<Product>,
     @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
+    @InjectRepository(InventoryBatch)
+    private readonly batchRepository: Repository<InventoryBatch>,
   ) {}
 
   private toResponse(product: Product): ProductResponse {
@@ -151,6 +154,17 @@ export class ProductsService {
     });
 
     const saved = await this.productRepository.save(product);
+    if (stockVal > 0) {
+      const initialBatch = this.batchRepository.create({
+        batchNumber: `BATCH-INIT-${Date.now()}`,
+        initialQuantity: stockVal,
+        quantity: stockVal,
+        purchasePrice: Number(productInput.price) * 0.7,
+        receivedAt: new Date(),
+        product: saved,
+      });
+      await this.batchRepository.save(initialBatch);
+    }
     return this.toResponse(saved);
   }
 
@@ -175,7 +189,9 @@ export class ProductsService {
     }
 
     if (updateInput.stock !== undefined) {
-      product.stock = Number(updateInput.stock);
+      await this.syncStockBatches(id, Number(updateInput.stock), Number(product.price));
+      const batches = await this.batchRepository.find({ where: { productId: id } });
+      product.stock = batches.reduce((sum, b) => sum + Math.max(0, b.quantity), 0);
       product.instock = product.stock > 0;
     }
     if (updateInput.lowStockThreshold !== undefined) {
@@ -193,48 +209,156 @@ export class ProductsService {
     return { success: true };
   }
 
+  // Helper to recalculate total stock from active batches
+  async recalculateProductStock(productId: number) {
+    const product = await this.productRepository.findOne({ where: { id: productId } });
+    if (!product) return;
+
+    const batches = await this.batchRepository.find({ where: { productId } });
+    const totalStock = batches.reduce((sum, b) => sum + Math.max(0, b.quantity), 0);
+
+    product.stock = totalStock;
+    product.instock = totalStock > 0;
+    await this.productRepository.save(product);
+  }
+
+  // Helper to sync stock adjustments with batches
+  private async syncStockBatches(productId: number, targetStock: number, price: number) {
+    const batches = await this.batchRepository.find({ where: { productId } });
+    const currentStock = batches.reduce((sum, b) => sum + Math.max(0, b.quantity), 0);
+
+    if (targetStock > currentStock) {
+      const initialBatch = this.batchRepository.create({
+        batchNumber: `BATCH-ADJ-${Date.now()}`,
+        initialQuantity: targetStock - currentStock,
+        quantity: targetStock - currentStock,
+        purchasePrice: price * 0.7,
+        receivedAt: new Date(),
+        productId,
+      });
+      await this.batchRepository.save(initialBatch);
+    } else if (targetStock < currentStock) {
+      let remainingToDeduct = currentStock - targetStock;
+      const activeBatches = batches.filter(b => b.quantity > 0).sort((a, b) => new Date(a.receivedAt).getTime() - new Date(b.receivedAt).getTime());
+      
+      for (const batch of activeBatches) {
+        if (remainingToDeduct <= 0) break;
+        if (batch.quantity >= remainingToDeduct) {
+          batch.quantity -= remainingToDeduct;
+          remainingToDeduct = 0;
+          await this.batchRepository.save(batch);
+        } else {
+          remainingToDeduct -= batch.quantity;
+          batch.quantity = 0;
+          await this.batchRepository.save(batch);
+        }
+      }
+    }
+  }
+
+  // Inventory Batch Operations
+  async getBatches(productId: number) {
+    return this.batchRepository.find({
+      where: { productId },
+      order: { receivedAt: 'ASC' },
+    });
+  }
+
+  async addBatch(productId: number, batchData: { batchNumber?: string; quantity: number; purchasePrice: number; receivedAt?: Date | string; expiryDate?: Date | string | null; newPrice?: number }) {
+    const product = await this.productRepository.findOne({ where: { id: productId } });
+    if (!product) throw new NotFoundException(`Product with id ${productId} not found`);
+
+    if (batchData.newPrice !== undefined && batchData.newPrice !== null && Number(batchData.newPrice) > 0) {
+      product.oldPrice = product.price;
+      product.price = Number(batchData.newPrice);
+      await this.productRepository.save(product);
+    }
+
+    const batch = this.batchRepository.create({
+      batchNumber: batchData.batchNumber || `BATCH-${Date.now()}`,
+      initialQuantity: Number(batchData.quantity),
+      quantity: Number(batchData.quantity),
+      purchasePrice: Number(batchData.purchasePrice) || 0,
+      receivedAt: batchData.receivedAt ? new Date(batchData.receivedAt) : new Date(),
+      expiryDate: batchData.expiryDate ? new Date(batchData.expiryDate) : null,
+      product,
+    });
+
+    await this.batchRepository.save(batch);
+    await this.recalculateProductStock(productId);
+    return batch;
+  }
+
+  async deleteBatch(batchId: number) {
+    const batch = await this.batchRepository.findOne({ where: { id: batchId } });
+    if (!batch) throw new NotFoundException(`Batch with id ${batchId} not found`);
+
+    const productId = batch.productId;
+    await this.batchRepository.remove(batch);
+    await this.recalculateProductStock(productId);
+    return { success: true };
+  }
+
   // Inventory Management Methods
   async updateStock(id: number, quantity: number) {
+    await this.syncStockBatches(id, quantity, 0);
+    await this.recalculateProductStock(id);
     const product = await this.productRepository.findOne({ where: { id }, relations: ['category'] });
-    if (!product) throw new NotFoundException(`Product with id ${id} not found`);
-
-    product.stock = Math.max(0, quantity);
-    product.instock = product.stock > 0;
-    
-    const saved = await this.productRepository.save(product);
-    return this.toResponse(saved);
+    return this.toResponse(product!);
   }
 
   async decreaseStock(id: number, quantity: number) {
-    const product = await this.productRepository.findOne({ where: { id }, relations: ['category'] });
+    const product = await this.productRepository.findOne({ where: { id } });
     if (!product) throw new NotFoundException(`Product with id ${id} not found`);
 
-    if (product.stock < quantity) {
-      throw new Error(`Insufficient stock for product ${product.name}. Available: ${product.stock}, Requested: ${quantity}`);
+    const batches = await this.batchRepository.find({
+      where: { productId: id },
+      order: { receivedAt: 'ASC' }, // FIFO - oldest first
+    });
+
+    const activeBatches = batches.filter(b => b.quantity > 0);
+    const totalAvailable = activeBatches.reduce((sum, b) => sum + b.quantity, 0);
+
+    if (totalAvailable < quantity) {
+      throw new BadRequestException(`Insufficient stock for product ${product.name}. Available: ${totalAvailable}, Requested: ${quantity}`);
     }
 
-    product.stock -= quantity;
-    product.instock = product.stock > 0;
-    
-    const saved = await this.productRepository.save(product);
-    return this.toResponse(saved);
+    let remainingToDeduct = quantity;
+    for (const batch of activeBatches) {
+      if (remainingToDeduct <= 0) break;
+
+      if (batch.quantity >= remainingToDeduct) {
+        batch.quantity -= remainingToDeduct;
+        remainingToDeduct = 0;
+        await this.batchRepository.save(batch);
+      } else {
+        remainingToDeduct -= batch.quantity;
+        batch.quantity = 0;
+        await this.batchRepository.save(batch);
+      }
+    }
+
+    await this.recalculateProductStock(id);
+    const updated = await this.productRepository.findOne({ where: { id }, relations: ['category'] });
+    return this.toResponse(updated!);
   }
 
   async increaseStock(id: number, quantity: number) {
-    const product = await this.productRepository.findOne({ where: { id }, relations: ['category'] });
+    const product = await this.productRepository.findOne({ where: { id } });
     if (!product) throw new NotFoundException(`Product with id ${id} not found`);
-
-    product.stock += quantity;
-    product.instock = product.stock > 0;
     
-    const saved = await this.productRepository.save(product);
-    return this.toResponse(saved);
+    await this.addBatch(id, {
+      quantity,
+      purchasePrice: Number(product.price) * 0.7,
+    });
+    const updated = await this.productRepository.findOne({ where: { id }, relations: ['category'] });
+    return this.toResponse(updated!);
   }
 
   async checkStockAvailability(id: number, quantity: number): Promise<boolean> {
-    const product = await this.productRepository.findOne({ where: { id } });
-    if (!product) return false;
-    return product.stock >= quantity;
+    const batches = await this.batchRepository.find({ where: { productId: id } });
+    const totalAvailable = batches.reduce((sum, b) => sum + Math.max(0, b.quantity), 0);
+    return totalAvailable >= quantity;
   }
 
   async getLowStockProducts() {

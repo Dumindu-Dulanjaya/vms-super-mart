@@ -4,10 +4,12 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Category } from './category.entity';
+import { InventoryBatch } from './inventory-batch.entity';
 
 @Entity('products')
 export class Product {
@@ -57,6 +59,11 @@ export class Product {
   })
   @JoinColumn({ name: 'categoryId' })
   category!: Category | null;
+
+  @OneToMany(() => InventoryBatch, (batch) => batch.product, {
+    cascade: true,
+  })
+  batches!: InventoryBatch[];
 
   @CreateDateColumn()
   createdAt!: Date;
