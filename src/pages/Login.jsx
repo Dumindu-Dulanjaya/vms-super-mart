@@ -33,32 +33,31 @@ export default function Login() {
     }
   }
 
-  React.useEffect(() => {
-    const script = document.createElement('script')
-    script.src = 'https://accounts.google.com/gsi/client'
-    script.async = true
-    script.defer = true
-    document.body.appendChild(script)
 
-    script.onload = () => {
-      if (window.google) {
+  React.useEffect(() => {
+    const initGoogle = () => {
+      if (window.google && document.getElementById('googleBtn')) {
         window.google.accounts.id.initialize({
           client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || 'dummy-client-id.apps.googleusercontent.com',
           callback: handleGoogleCredentialResponse,
         })
         window.google.accounts.id.renderButton(
           document.getElementById('googleBtn'),
-          { theme: 'outline', size: 'large', width: '100%' }
+          { theme: 'outline', size: 'large', width: '320' }
         )
       }
     }
 
-    return () => {
-      try {
-        document.body.removeChild(script)
-      } catch (err) {
-        // script might have already been removed
-      }
+    let script = document.querySelector('script[src="https://accounts.google.com/gsi/client"]')
+    if (!script) {
+      script = document.createElement('script')
+      script.src = 'https://accounts.google.com/gsi/client'
+      script.async = true
+      script.defer = true
+      script.onload = initGoogle
+      document.body.appendChild(script)
+    } else {
+      initGoogle()
     }
   }, [mode])
 

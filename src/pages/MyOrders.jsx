@@ -190,10 +190,10 @@ const MyOrders = () => {
                                             <span>Subtotal:</span>
                                             <span>{currency || 'Rs.'}{order.summary?.subtotal || 0}</span>
                                         </div>
-                                        {order.summary?.discount > 0 && (
+                                        {Math.abs(order.summary?.discount || 0) > 0 && (
                                             <div className="flex justify-between text-green-600">
                                                 <span>Discount:</span>
-                                                <span>-{currency || 'Rs.'}{order.summary?.discount}</span>
+                                                <span>-{currency || 'Rs.'}{Math.abs(order.summary?.discount)}</span>
                                             </div>
                                         )}
                                         <div className="flex justify-between text-gray-500">

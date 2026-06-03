@@ -18,6 +18,7 @@ import Inventory from './Inventory';
 import Orders from './Orders';
 import EditProduct from './EditProduct';
 import Reports from './Reports';
+import Customers from './Customers';
 import { useAppContext } from '../../context/AppContext';
 import vmsLogo from '../../assets/VMS logo.png';
 
@@ -145,7 +146,7 @@ const AdminLayout = () => {
             <Route path="add-product" element={<AddProduct />} />
             <Route path="inventory" element={<Inventory />} />
             <Route path="inventory/edit/:id" element={<EditProduct />} />
-            <Route path="customers" element={<div className="p-10 text-center text-slate-400 bg-white rounded-3xl border border-dashed border-slate-200">Customer Management Coming Soon</div>} />
+            <Route path="customers" element={<Customers />} />
             <Route path="orders" element={<Orders />} />
             <Route path="reports" element={<Reports />} />
           </Routes>

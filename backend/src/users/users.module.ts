@@ -5,13 +5,18 @@ import { User } from '../entities/user.entity';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { EmailModule } from '../email/email.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
-    JwtModule.register({
-      secret: process.env.JWT_SECRET || 'your-secret-key',
-      signOptions: { expiresIn: '24h' },
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET') || 'vms_jwt_secret',
+        signOptions: { expiresIn: '24h' },
+      }),
     }),
     EmailModule,
   ],

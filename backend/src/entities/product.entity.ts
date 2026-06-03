@@ -29,7 +29,7 @@ export class Product {
   @Column({ type: 'varchar', length: 255 })
   image!: string;
 
-  @Column({ type: 'json', nullable: true, default: () => "'[]'" })
+  @Column({ type: 'json', nullable: true })
   images?: string[]; // Array of image URLs for product gallery (4-5 high-res images)
 
   @Column({ type: 'int', default: 0 })

@@ -34,7 +34,7 @@ import { join } from 'path';
       database: process.env.DB_NAME || 'vms_db',
       entities: [Admin, __dirname + '/**/*.entity{.ts,.js}'],
       migrations: [__dirname + '/../migrations/*{.ts,.js}'],
-      synchronize: false, // Always false in production
+      synchronize: true, // Always false in production, enabled here for development schema auto-creation
       migrationsRun: true, // Run migrations automatically on startup (optional)
     }),
     ProductsModule,

@@ -10,6 +10,8 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt.guard';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
 import {
   UsersService,
   CreateUserDto,
@@ -20,6 +22,13 @@ import {
 @Controller('users')
 export class UsersController {
   constructor(private usersService: UsersService) {}
+
+  @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
+  async getAllUsers() {
+    return this.usersService.getAllUsers();
+  }
 
   @Post('register')
   async registerUser(@Body() createUserDto: CreateUserDto) {

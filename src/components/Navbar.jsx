@@ -148,7 +148,7 @@ const Navbar = () => {
                                 <div className="relative group">
                                     <div className="flex items-center gap-3 cursor-pointer hover:bg-slate-800 px-3 py-2 rounded-none transition border border-slate-800">
                                         <img src={profileIcon} className="w-8 h-8 rounded-none border border-slate-700" alt="Profile" />
-                                        <span className="text-slate-300 font-black text-xs uppercase tracking-tight">{user.firstName} {user.lastName}</span>
+                                        <span className="text-slate-300 font-black text-xs uppercase tracking-tight">User: {user.firstName} {user.lastName}</span>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="group-hover:rotate-180 transition-transform duration-300 text-slate-400"><path d="m6 9 6 6 6-6" /></svg>
                                     </div>
                                     <div className="absolute top-full right-0 mt-3 w-56 bg-slate-900 rounded-none shadow-[0_10px_40px_rgba(0,0,0,0.5)] border border-slate-800 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50 overflow-hidden">
@@ -242,12 +242,12 @@ const Navbar = () => {
                     ) : (
                         <div className="w-full mt-2 pt-4 border-t border-slate-800 space-y-3">
                             <div className="flex items-center gap-4 py-2">
-                                <img src={profileIcon} className="w-10 h-10 rounded-none border border-slate-700" alt="Profile" />
-                                <div>
-                                    <p className="text-white font-black uppercase tracking-tight">{user.firstName} {user.lastName}</p>
-                                    <p className="text-[10px] text-[#00FF33] font-bold">{user.email}</p>
-                                </div>
-                            </div>
+                                        <img src={profileIcon} className="w-10 h-10 rounded-none border border-slate-700" alt="Profile" />
+                                        <div>
+                                            <p className="text-white font-black uppercase tracking-tight">User: {user.firstName} {user.lastName}</p>
+                                            <p className="text-[10px] text-[#00FF33] font-bold">{user.email}</p>
+                                        </div>
+                                    </div>
                             <Link 
                                 to="/my-orders" 
                                 onClick={() => setOpen(false)}

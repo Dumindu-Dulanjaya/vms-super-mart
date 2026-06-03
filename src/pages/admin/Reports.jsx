@@ -22,7 +22,7 @@ const Reports = () => {
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const currency = "Rs.";
 
-  const fetchReport = async () => {
+  const fetchReport = async (showToast = false) => {
     setLoading(true);
     try {
       const token = localStorage.getItem('vms_admin_token');
@@ -42,10 +42,14 @@ const Reports = () => {
       }
       const data = await res.json();
       setReportData(data);
-      toast.success('Report generated successfully!');
+      if (showToast) {
+        toast.success('Report generated successfully!');
+      }
     } catch (e) {
       console.error(e);
-      toast.error('Failed to generate report from database');
+      if (showToast) {
+        toast.error('Failed to generate report from database');
+      }
     } finally {
       setLoading(false);
     }
@@ -367,10 +371,9 @@ const Reports = () => {
             </div>
           )}
 
-          {/* Fetch Action */}
           <div className="flex gap-2">
             <button 
-              onClick={fetchReport}
+              onClick={() => fetchReport(true)}
               disabled={loading}
               className="w-full px-4 py-3.5 bg-slate-900 text-white text-xs font-black uppercase tracking-wider hover:bg-slate-800 transition-colors flex items-center justify-center gap-2"
             >
