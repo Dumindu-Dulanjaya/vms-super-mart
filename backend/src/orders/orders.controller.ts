@@ -65,6 +65,13 @@ export class OrdersController {
     return this.ordersService.findAll();
   }
 
+  @Get('delivery')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('admin', 'rider')
+  async findDeliveryOrders() {
+    return this.ordersService.findDeliveryOrders();
+  }
+
   @Get(':id')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('admin')
@@ -88,7 +95,7 @@ export class OrdersController {
 
   @Patch(':id/status')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles('admin')
+  @Roles('admin', 'rider')
   async updateStatus(
     @Param('id') id: string,
     @Body('status') status: string,

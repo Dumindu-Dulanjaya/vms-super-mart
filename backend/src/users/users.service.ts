@@ -5,31 +5,81 @@ import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../entities/user.entity';
 import { EmailService } from '../email/email.service';
+import { IsEmail, IsString, IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateUserDto {
+  @IsString()
+  @IsNotEmpty()
   firstName!: string;
+
+  @IsString()
+  @IsNotEmpty()
   lastName!: string;
+
+  @IsEmail()
   email!: string;
+
+  @IsString()
+  @IsNotEmpty()
   password!: string;
+
+  @IsOptional()
+  @IsString()
   phone?: string;
+
+  @IsOptional()
+  @IsString()
   address?: string;
+
+  @IsOptional()
+  @IsString()
   city?: string;
+
+  @IsOptional()
+  @IsString()
   postalCode?: string;
+
+  @IsOptional()
+  @IsString()
   province?: string;
 }
 
 export class UpdateUserDto {
+  @IsOptional()
+  @IsString()
   firstName?: string;
+
+  @IsOptional()
+  @IsString()
   lastName?: string;
+
+  @IsOptional()
+  @IsString()
   phone?: string;
+
+  @IsOptional()
+  @IsString()
   address?: string;
+
+  @IsOptional()
+  @IsString()
   city?: string;
+
+  @IsOptional()
+  @IsString()
   postalCode?: string;
+
+  @IsOptional()
+  @IsString()
   province?: string;
 }
 
 export class LoginUserDto {
+  @IsEmail()
   email!: string;
+
+  @IsString()
+  @IsNotEmpty()
   password!: string;
 }
 

@@ -95,55 +95,12 @@ const Navbar = () => {
                     {!hideIcons && (
                         <div className="flex items-center">
                             {!user ? (
-                                <div className="relative group">
-                                    {/* Trigger Button */}
-                                    <button
-                                        className="cursor-pointer px-6 py-2 bg-[#00FF33] hover:bg-[#00CC29] transition-all text-slate-900 rounded-none font-black text-xs uppercase tracking-tighter flex items-center gap-2 active:scale-95 shadow-[0_0_15px_rgba(0,255,51,0.2)] px-5"
-                                    >
-                                        Login
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="group-hover:rotate-180 transition-transform duration-300"><path d="m6 9 6 6 6-6" /></svg>
-                                    </button>
-
-                                    {/* Dropdown Menu */}
-                                    <div className="absolute top-full right-0 mt-3 w-56 bg-slate-900 rounded-none shadow-[0_10px_40px_rgba(0,0,0,0.5)] border border-slate-800 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50 overflow-hidden">
-                                        <div className="p-2 space-y-1">
-                                            <Link
-                                                to="/login"
-                                                className="flex items-center gap-3 px-4 py-3 hover:bg-slate-800 text-slate-300 rounded-none transition-colors group/item"
-                                            >
-                                                <div className="w-8 h-8 rounded-none bg-slate-800 flex items-center justify-center text-[#00FF33] group-hover/item:bg-[#00FF33] group-hover/item:text-slate-900 transition-colors">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
-                                                </div>
-                                                <div>
-                                                    <p className="text-sm font-black uppercase tracking-tight text-white">Customer Login</p>
-                                                    <p className="text-[10px] text-slate-500 font-bold tracking-tight">Active Session</p>
-                                                </div>
-                                            </Link>
-
-                                            <div className="h-px bg-slate-800 mx-2 my-1"></div>
-
-                                            <Link
-                                                to="/admin/login"
-                                                className="flex items-center gap-3 px-4 py-3 hover:bg-slate-800 text-slate-300 rounded-none transition-colors group/item"
-                                            >
-                                                <div className="w-8 h-8 rounded-none bg-slate-800 flex items-center justify-center text-slate-400 group-hover/item:bg-white group-hover/item:text-slate-900 transition-colors">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
-                                                </div>
-                                                <div>
-                                                    <p className="text-sm font-black uppercase tracking-tight text-white">Admin Portal</p>
-                                                    <p className="text-[10px] text-slate-500 font-bold tracking-tight">Node Control</p>
-                                                </div>
-                                            </Link>
-                                        </div>
-                                        <div className="bg-slate-950 px-4 py-2 flex items-center justify-between border-t border-slate-800">
-                                            <span className="text-[8px] text-slate-500 font-black tracking-[0.2em] uppercase">VMS Shield Enabled</span>
-                                            <div className="flex gap-1">
-                                                <div className="w-1 h-1 bg-[#00FF33] rounded-full animate-pulse"></div>
-                                                <div className="w-1 h-1 bg-[#00FF33] rounded-full animate-pulse delay-75"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                <Link
+                                    to="/login"
+                                    className="cursor-pointer px-6 py-2 bg-[#00FF33] hover:bg-[#00CC29] transition-all text-slate-900 rounded-none font-black text-xs uppercase tracking-tighter flex items-center gap-2 active:scale-95 shadow-[0_0_15px_rgba(0,255,51,0.2)]"
+                                >
+                                    Login
+                                </Link>
                             ) : (
                                 <div className="relative group">
                                     <div className="flex items-center gap-3 cursor-pointer hover:bg-slate-800 px-3 py-2 rounded-none transition border border-slate-800">

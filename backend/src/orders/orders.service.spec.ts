@@ -230,4 +230,21 @@ describe('OrdersService', () => {
       );
     });
   });
+
+  describe('findDeliveryOrders', () => {
+    it('should return orders with status ready or shipped', async () => {
+      mockOrderRepository.find.mockResolvedValue([mockOrder]);
+
+      const result = await service.findDeliveryOrders();
+
+      expect(result).toEqual([mockOrder]);
+      expect(mockOrderRepository.find).toHaveBeenCalledWith({
+        where: [
+          { status: 'ready' },
+          { status: 'shipped' },
+        ],
+        order: { createdAt: 'DESC' },
+      });
+    });
+  });
 });

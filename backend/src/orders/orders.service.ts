@@ -225,6 +225,16 @@ export class OrdersService {
     return reportData;
   }
 
+  async findDeliveryOrders() {
+    return this.orderRepository.find({
+      where: [
+        { status: 'ready' },
+        { status: 'shipped' },
+      ],
+      order: { createdAt: 'DESC' },
+    });
+  }
+
   async updateStatus(id: string, status: string) {
     const order = await this.orderRepository.findOne({ where: { id } });
     if (!order) {

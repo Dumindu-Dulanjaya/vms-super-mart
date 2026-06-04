@@ -1,12 +1,13 @@
 import 'dotenv/config';
 import { DataSource } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
-import { Admin } from './entities/admin.entity';
+
 import { Category } from './entities/category.entity';
 import { Product } from './entities/product.entity';
 import { Order } from './entities/order.entity';
 import { OrderItem } from './entities/order-item.entity';
 import { User } from './entities/user.entity';
+import { InventoryBatch } from './entities/inventory-batch.entity';
 import mysql from 'mysql2/promise';
 
 async function ensureDatabaseExists() {
@@ -32,35 +33,54 @@ async function run() {
     username: process.env.DB_USERNAME || 'root',
     password: process.env.DB_PASSWORD || '',
     database: process.env.DB_NAME || 'vms_db',
-    entities: [Admin, Category, Product, Order, OrderItem, User],
+    entities: [Category, Product, Order, OrderItem, User, InventoryBatch],
     synchronize: process.env.DB_SYNC === 'true',
   });
 
   await dataSource.initialize();
   console.log('DB connected for seeding');
 
-  const adminRepo = dataSource.getRepository(Admin);
+  const userRepo = dataSource.getRepository(User);
   const categoryRepo = dataSource.getRepository(Category);
   const productRepo = dataSource.getRepository(Product);
   const adminEmail = process.env.ADMIN_EMAIL || 'admin@vms.com';
-  const adminName = process.env.ADMIN_NAME || 'Admin';
   const adminPassword = process.env.ADMIN_PASSWORD || process.env.SUPERADMIN_PASSWORD || 'admin123';
 
-  const existing = await adminRepo.findOne({ where: { email: adminEmail } });
+  const existing = await userRepo.findOne({ where: { email: adminEmail } });
   if (existing) {
     console.log('Admin already exists:', existing.email);
   } else {
     const hashed = await bcrypt.hash(adminPassword, 10);
 
-    const admin = adminRepo.create({
-      name: adminName,
+    const admin = userRepo.create({
+      firstName: 'Admin',
+      lastName: 'Owner',
       email: adminEmail,
       password: hashed,
       role: 'admin',
     });
 
-    await adminRepo.save(admin);
+    await userRepo.save(admin);
     console.log('Admin created:', admin.email);
+  }
+
+  const riderEmail = 'rider@vms.com';
+  const riderPassword = 'rider123';
+
+  const existingRider = await userRepo.findOne({ where: { email: riderEmail } });
+  if (existingRider) {
+    console.log('Rider already exists:', existingRider.email);
+  } else {
+    const hashedRider = await bcrypt.hash(riderPassword, 10);
+    const rider = userRepo.create({
+      firstName: 'Rider',
+      lastName: 'Agent',
+      email: riderEmail,
+      password: hashedRider,
+      role: 'rider',
+    });
+    await userRepo.save(rider);
+    console.log('Rider created:', rider.email);
   }
 
   const categorySeeds = [

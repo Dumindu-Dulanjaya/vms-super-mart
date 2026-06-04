@@ -203,16 +203,21 @@ export const AppContextProvider = ({ children }) => {
     .then(async (res) => {
       if (!res.ok) throw new Error('Invalid credentials');
       const body = await res.json();
-      setIsAdminAuthenticated(true);
-      localStorage.setItem('vms_admin_auth', 'true');
-      // store token if provided
-      if (body.accessToken) localStorage.setItem('vms_admin_token', body.accessToken);
-      toast.success('Admin access granted!');
-      return true;
+      if (body.user.role === 'rider') {
+        localStorage.setItem('vms_rider_token', body.accessToken);
+        localStorage.setItem('vms_rider_user', JSON.stringify(body.user));
+        toast.success(`Welcome back, Rider ${body.user.name}!`);
+        return { role: 'rider', user: body.user };
+      } else {
+        setIsAdminAuthenticated(true);
+        localStorage.setItem('vms_admin_auth', 'true');
+        if (body.accessToken) localStorage.setItem('vms_admin_token', body.accessToken);
+        toast.success('Admin access granted!');
+        return { role: 'admin', user: body.user };
+      }
     })
     .catch((err) => {
-      toast.error('Invalid credentials!');
-      return false;
+      return null;
     });
   }
 
@@ -221,7 +226,7 @@ export const AppContextProvider = ({ children }) => {
     localStorage.removeItem('vms_admin_auth');
     localStorage.removeItem('vms_admin_token');
     toast.success("Logged out successfully!");
-    navigate('/admin/login');
+    navigate('/login');
   }
 
   // Add product to cart
@@ -337,7 +342,7 @@ export const AppContextProvider = ({ children }) => {
     }
   };
 
-  const userLogin = async (email, password) => {
+  const userLogin = async (email, password, showToastOnError = true) => {
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/users/login`, {
         method: 'POST',
@@ -352,13 +357,31 @@ export const AppContextProvider = ({ children }) => {
 
       const data = await res.json();
       if (data.accessToken) {
-        localStorage.setItem('userToken', data.accessToken);
-        await fetchAndSetProfile(data.accessToken);
-        toast.success('Logged in successfully!');
+        if (data.role === 'admin') {
+          setIsAdminAuthenticated(true);
+          localStorage.setItem('vms_admin_auth', 'true');
+          localStorage.setItem('vms_admin_token', data.accessToken);
+          toast.success('Admin access granted!');
+        } else if (data.role === 'rider') {
+          localStorage.setItem('vms_rider_token', data.accessToken);
+          localStorage.setItem('vms_rider_user', JSON.stringify({
+            id: data.id,
+            name: `${data.firstName} ${data.lastName}`,
+            email: data.email,
+            role: data.role
+          }));
+          toast.success(`Welcome back, Rider ${data.firstName}!`);
+        } else {
+          localStorage.setItem('userToken', data.accessToken);
+          await fetchAndSetProfile(data.accessToken);
+          toast.success('Logged in successfully!');
+        }
       }
       return data;
     } catch (e) {
-      toast.error(e.message || 'Login failed');
+      if (showToastOnError) {
+        toast.error(e.message || 'Login failed');
+      }
       throw e;
     }
   };

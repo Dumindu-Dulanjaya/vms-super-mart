@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 
 // Components
 import Navbar from './components/Navbar';
@@ -19,7 +19,7 @@ import Wishlist from './pages/Wishlist';
 import Checkout from './pages/Checkout';
 import MyOrders from './pages/MyOrders';
 import AdminLayout from './pages/admin/AdminLayout';
-import AdminLogin from './pages/admin/AdminLogin';
+import DeliveryDashboard from './pages/DeliveryDashboard';
 import { useAppContext } from './context/AppContext';
 
 import { Toaster } from 'react-hot-toast';
@@ -29,8 +29,9 @@ const App = () => {
   const location = useLocation();
   const isAdminPath = location.pathname.startsWith("/admin");
   const isSellerPath = location.pathname.includes("seller");
+  const isDeliveryPath = location.pathname.startsWith("/delivery");
 
-  const isFullLayoutPath = !isAdminPath && !isSellerPath;
+  const isFullLayoutPath = !isAdminPath && !isSellerPath && !isDeliveryPath;
   const isHomePage = location.pathname === "/";
 
   return (
@@ -58,9 +59,11 @@ const App = () => {
           <Route path='/checkout' element={<Checkout />} />
           <Route path='/my-orders' element={<MyOrders />} />
 
+          {/* Delivery Dashboard */}
+          <Route path='/delivery' element={<DeliveryDashboard />} />
+
           {/* Admin Routes */}
-          <Route path='/admin/login' element={<AdminLogin />} />
-          <Route path='/admin/*' element={isAdminAuthenticated ? <AdminLayout /> : <AdminLogin />} />
+          <Route path='/admin/*' element={isAdminAuthenticated ? <AdminLayout /> : <Navigate to="/login" replace />} />
         </Routes>
       </div>
       {isFullLayoutPath && <Footer />}

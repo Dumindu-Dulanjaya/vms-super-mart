@@ -6,12 +6,26 @@ import vmsHero from '../assets/vms hero.png'
 
 export default function Login() {
   const navigate = useNavigate()
-  const { userLogin, registerUser, googleLogin } = useAppContext()
+  const { userLogin, registerUser, googleLogin, user, isAdminAuthenticated } = useAppContext()
   const [mode, setMode] = React.useState('login') // 'login' or 'register'
   const [data, setData] = React.useState({ name: '', email: '', password: '' })
   const [error, setError] = React.useState('')
   const [success, setSuccess] = React.useState('')
   const [done, setDone] = React.useState(false)
+
+  React.useEffect(() => {
+    if (user) {
+      navigate('/')
+    } else if (isAdminAuthenticated) {
+      navigate('/admin/dashboard')
+    } else {
+      const savedRider = localStorage.getItem('vms_rider_user')
+      const riderToken = localStorage.getItem('vms_rider_token')
+      if (savedRider && riderToken) {
+        navigate('/delivery')
+      }
+    }
+  }, [user, isAdminAuthenticated, navigate])
 
   const onChange = (e) => {
     const { name, value } = e.target
@@ -81,8 +95,20 @@ export default function Login() {
 
     try {
       if (mode === 'login') {
-        await userLogin(data.email, data.password)
-        setSuccess('Login successful!')
+        const result = await userLogin(data.email, data.password, false)
+        if (result && result.role === 'rider') {
+          setSuccess('Rider login successful!')
+          setDone(true)
+          setTimeout(() => navigate('/delivery'), 1400)
+        } else if (result && result.role === 'admin') {
+          setSuccess('Admin login successful!')
+          setDone(true)
+          setTimeout(() => navigate('/admin/dashboard'), 1400)
+        } else if (result) {
+          setSuccess('Login successful!')
+          setDone(true)
+          setTimeout(() => navigate('/'), 1400)
+        }
       } else {
         let firstName = data.name.trim()
         let lastName = 'User'
@@ -99,9 +125,9 @@ export default function Login() {
           password: data.password,
         })
         setSuccess('Registration successful!')
+        setDone(true)
+        setTimeout(() => navigate('/'), 1400)
       }
-      setDone(true)
-      setTimeout(() => navigate('/'), 1400)
     } catch (err) {
       setError(err.message || 'Authentication failed')
     }
@@ -241,18 +267,7 @@ export default function Login() {
               </button>
             </p>
 
-            {/* New Admin Login Link */}
-            <div className="mt-8 pt-6 border-t border-gray-100 flex flex-col items-center gap-2">
-                <span className="text-[10px] text-gray-400 font-black tracking-widest uppercase">Management Portal</span>
-                <button 
-                    type="button"
-                    onClick={() => navigate('/admin/login')}
-                    className="text-xs font-bold text-gray-400 hover:text-indigo-600 transition-colors flex items-center gap-1 group"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:rotate-12 transition-transform"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                    Authorized Admin Login
-                </button>
-            </div>
+
           </form>
         </div>
 

@@ -2,14 +2,14 @@ import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
-import { Admin } from '../entities/admin.entity';
+import { User } from '../entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(Admin)
-    private readonly adminRepository: Repository<Admin>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -18,11 +18,15 @@ export class AuthService {
       if (typeof password !== 'string' || password.length === 0) {
         throw new BadRequestException('Password is required');
       }
-      const admin = await this.adminRepository.findOne({ where: { email } });
+      const admin = await this.userRepository.findOne({ where: { email } });
       if (!admin) throw new UnauthorizedException('Invalid credentials');
 
+      if (admin.role !== 'admin' && admin.role !== 'rider') {
+        throw new UnauthorizedException('Access denied. Insufficient role permissions.');
+      }
+
       if (!admin.password || typeof admin.password !== 'string') {
-        console.error('Admin record missing password for', email);
+        console.error('User record missing password for', email);
         throw new UnauthorizedException('Invalid credentials');
       }
 
@@ -44,7 +48,7 @@ export class AuthService {
         accessToken,
         user: {
           id: admin.id,
-          name: admin.name,
+          name: `${admin.firstName} ${admin.lastName}`,
           email: admin.email,
           role: admin.role,
         },
