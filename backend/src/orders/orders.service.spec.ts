@@ -210,22 +210,22 @@ describe('OrdersService', () => {
   describe('updateStatus', () => {
     it('should update order status and emit event', async () => {
       mockOrderRepository.findOne.mockResolvedValue(mockOrder);
-      mockOrderRepository.save.mockResolvedValue({ ...mockOrder, status: 'preparing' });
+      mockOrderRepository.save.mockResolvedValue({ ...mockOrder, status: 'ready' });
 
-      const result = await service.updateStatus('ord_123456', 'preparing');
+      const result = await service.updateStatus('ord_123456', 'ready');
 
       expect(result).toBeDefined();
-      expect(result.status).toBe('preparing');
+      expect(result.status).toBe('ready');
       expect(mockEventsGateway.emitOrderStatusUpdate).toHaveBeenCalledWith({
         orderId: 'ord_123456',
-        status: 'preparing',
+        status: 'ready',
       });
     });
 
     it('should throw NotFoundException if order to update does not exist', async () => {
       mockOrderRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.updateStatus('invalid_id', 'preparing')).rejects.toThrow(
+      await expect(service.updateStatus('invalid_id', 'ready')).rejects.toThrow(
         NotFoundException,
       );
     });

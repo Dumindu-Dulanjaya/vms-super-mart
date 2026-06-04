@@ -100,8 +100,6 @@ const Orders = () => {
     switch (status?.toLowerCase()) {
       case 'placed':
         return 'bg-blue-50 text-blue-700 border border-blue-200';
-      case 'preparing':
-        return 'bg-purple-50 text-purple-700 border border-purple-200';
       case 'ready':
         return 'bg-teal-50 text-teal-700 border border-teal-200';
       case 'shipped':
@@ -214,7 +212,6 @@ const Orders = () => {
                       className={`inline-block px-3 py-1.5 rounded-none text-[10px] font-black tracking-widest uppercase transition-all shadow-sm cursor-pointer border outline-none focus:ring-2 focus:ring-green-400 ${getStatusStyle(o.status)}`}
                     >
                       <option value="placed" className="bg-white text-slate-800">Placed</option>
-                      <option value="preparing" className="bg-white text-slate-800">Preparing</option>
                       <option value="ready" className="bg-white text-slate-800">Ready</option>
                       <option value="shipped" className="bg-white text-slate-800">Shipped</option>
                       <option value="delivered" className="bg-white text-slate-800">Delivered</option>

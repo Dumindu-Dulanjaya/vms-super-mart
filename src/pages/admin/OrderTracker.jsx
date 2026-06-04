@@ -95,10 +95,9 @@ const OrderTracker = () => {
         };
     }, []);
 
-    // Filter active tracking orders (placed, preparing, ready, shipped)
+    // Filter active tracking orders (placed, ready, shipped)
     const columns = {
-        placed: { title: 'New / Placed', color: 'border-blue-500 bg-blue-500/10 text-blue-700', nextStatus: 'preparing', actionText: 'Start Packing' },
-        preparing: { title: 'Preparing / Packing', color: 'border-purple-500 bg-purple-500/10 text-purple-700', nextStatus: 'ready', actionText: 'Mark Ready' },
+        placed: { title: 'New / Placed', color: 'border-blue-500 bg-blue-500/10 text-blue-700', nextStatus: 'ready', actionText: 'Mark Ready' },
         ready: { title: 'Ready to Dispatch', color: 'border-teal-500 bg-teal-500/10 text-teal-700', nextStatus: 'shipped', actionText: 'Ship / Out' },
         shipped: { title: 'Shipped / Out', color: 'border-amber-500 bg-amber-500/10 text-amber-700', nextStatus: 'delivered', actionText: 'Mark Delivered' },
     };
@@ -132,7 +131,7 @@ const OrderTracker = () => {
                 <p className="text-xs text-slate-400 mt-1 uppercase font-bold tracking-wider">Monitor and process client order fulfillment pipelines</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {Object.entries(columns).map(([statusKey, col]) => {
                     const colOrders = getColumnOrders(statusKey);
                     return (
