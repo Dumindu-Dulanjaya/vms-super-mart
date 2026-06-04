@@ -49,38 +49,65 @@ export const AppContextProvider = ({ children }) => {
 
   const dummyProducts = [];
 
+  const refreshProducts = async () => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/products`);
+      if (res.ok) {
+        const data = await res.json();
+        setProducts(data);
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem('vms_products', JSON.stringify(data));
+        }
+
+        // Auto-cap cart items if they exceed refreshed stock
+        setCartItems(prev => {
+          let updated = { ...prev };
+          let changed = false;
+          let messages = [];
+          for (const itemId in updated) {
+            const product = data.find(p => p.id === Number(itemId));
+            if (product) {
+              const maxAvailable = product.batches && product.batches.length > 0
+                ? product.batches[0].quantity
+                : product.stock;
+
+              if (maxAvailable <= 0) {
+                delete updated[itemId];
+                messages.push(`"${product.name}" has been removed from your cart because it is out of stock.`);
+                changed = true;
+              } else if (updated[itemId] > maxAvailable) {
+                updated[itemId] = maxAvailable;
+                messages.push(`Quantity for "${product.name}" in your cart has been reduced to ${maxAvailable} due to active batch stock limit.`);
+                changed = true;
+              }
+            }
+          }
+          if (messages.length > 0) {
+            messages.forEach(msg => toast.error(msg, { duration: 5000 }));
+          }
+          return changed ? updated : prev;
+        });
+        return;
+      }
+    } catch (e) {
+      // ignore and fallback
+    }
+
+    if (typeof localStorage === 'undefined') return;
+    const savedProducts = localStorage.getItem('vms_products');
+    if (savedProducts) {
+      setProducts(JSON.parse(savedProducts));
+    } else {
+      setProducts(dummyProducts);
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('vms_products', JSON.stringify(dummyProducts));
+      }
+    }
+  };
+
   // ✅ Load products when app starts
   useEffect(() => {
-    // Try loading products from backend first
-    const load = async () => {
-      if (typeof localStorage === 'undefined') return;
-      try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/products`);
-        if (res.ok) {
-          const data = await res.json();
-          setProducts(data);
-          if (typeof localStorage !== 'undefined') {
-            localStorage.setItem('vms_products', JSON.stringify(data));
-          }
-          return;
-        }
-      } catch (e) {
-        // ignore and fallback
-      }
-
-      if (typeof localStorage === 'undefined') return;
-      const savedProducts = localStorage.getItem('vms_products');
-      if (savedProducts) {
-        setProducts(JSON.parse(savedProducts));
-      } else {
-        setProducts(dummyProducts);
-        if (typeof localStorage !== 'undefined') {
-          localStorage.setItem('vms_products', JSON.stringify(dummyProducts));
-        }
-      }
-    };
-
-    load();
+    refreshProducts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -203,12 +230,16 @@ export const AppContextProvider = ({ children }) => {
     const currentQty = cartItems[itemId] || 0;
     
     if (product) {
-      if (product.stock <= 0) {
+      const maxAvailable = product.batches && product.batches.length > 0
+        ? product.batches[0].quantity
+        : product.stock;
+
+      if (maxAvailable <= 0) {
         toast.error("This product is out of stock!");
         return;
       }
-      if (currentQty >= product.stock) {
-        toast.error(`Only ${product.stock} items available in stock!`);
+      if (currentQty >= maxAvailable) {
+        toast.error(`Only ${maxAvailable} items available in the current active batch!`);
         return;
       }
     }
@@ -226,9 +257,15 @@ export const AppContextProvider = ({ children }) => {
   // Update cart item quantity
   const updateCartItem = (itemId, quantity) => {
     const product = products.find(p => p.id === Number(itemId));
-    if (product && quantity > product.stock) {
-      toast.error(`Only ${product.stock} items available in stock!`);
-      return;
+    if (product) {
+      const maxAvailable = product.batches && product.batches.length > 0
+        ? product.batches[0].quantity
+        : product.stock;
+
+      if (quantity > maxAvailable) {
+        toast.error(`Only ${maxAvailable} items available in the current active batch!`);
+        return;
+      }
     }
 
     let cartData = structuredClone(cartItems);
@@ -444,7 +481,8 @@ export const AppContextProvider = ({ children }) => {
         toast.error(e.message || 'Failed to submit rating');
         throw e;
       }
-    }
+    },
+    refreshProducts
   };
 
   return (

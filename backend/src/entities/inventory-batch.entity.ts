@@ -26,10 +26,16 @@ export class InventoryBatch {
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
   purchasePrice!: number;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  sellingPrice!: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  regularPrice!: number;
+
+  @Column({ type: 'date' })
   receivedAt!: Date;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'date', nullable: true })
   expiryDate!: Date | null;
 
   @ManyToOne(() => Product, (product) => product.batches, {

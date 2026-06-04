@@ -5,6 +5,15 @@ import { Product } from '../entities/product.entity';
 import { Category } from '../entities/category.entity';
 import { InventoryBatch } from '../entities/inventory-batch.entity';
 
+type ProductBatchInfo = {
+  id: number;
+  batchNumber: string;
+  quantity: number;
+  sellingPrice: number;
+  regularPrice: number;
+  receivedAt: Date | string;
+};
+
 type ProductResponse = {
   id: number;
   name: string;
@@ -20,6 +29,7 @@ type ProductResponse = {
   description: string | null;
   stock: number;
   lowStockThreshold: number;
+  batches?: ProductBatchInfo[];
 };
 
 type CreateProductInput = {
@@ -50,6 +60,25 @@ export class ProductsService {
   ) {}
 
   private toResponse(product: Product): ProductResponse {
+    const activeBatches = product.batches
+      ? product.batches
+          .filter((b) => b.quantity > 0)
+          .sort((a, b) => {
+            const timeA = new Date(a.receivedAt).getTime();
+            const timeB = new Date(b.receivedAt).getTime();
+            if (timeA !== timeB) return timeA - timeB;
+            return a.id - b.id;
+          })
+          .map((b) => ({
+            id: b.id,
+            batchNumber: b.batchNumber,
+            quantity: b.quantity,
+            sellingPrice: Number(b.sellingPrice),
+            regularPrice: Number(b.regularPrice),
+            receivedAt: b.receivedAt,
+          }))
+      : [];
+
     return {
       id: product.id,
       name: product.name,
@@ -65,12 +94,13 @@ export class ProductsService {
       description: product.description,
       stock: product.stock,
       lowStockThreshold: product.lowStockThreshold,
+      batches: activeBatches,
     };
   }
 
   async findAll() {
     const products = await this.productRepository.find({
-      relations: ['category'],
+      relations: ['category', 'batches'],
       order: { id: 'ASC' },
     });
     return products.map((product) => this.toResponse(product));
@@ -79,7 +109,7 @@ export class ProductsService {
   async findOne(id: number) {
     const product = await this.productRepository.findOne({
       where: { id },
-      relations: ['category'],
+      relations: ['category', 'batches'],
     });
 
     if (!product) {
@@ -92,7 +122,7 @@ export class ProductsService {
   async findBySlug(slug: string) {
     const product = await this.productRepository.findOne({
       where: { slug },
-      relations: ['category'],
+      relations: ['category', 'batches'],
     });
 
     if (!product) {
@@ -106,6 +136,7 @@ export class ProductsService {
     const products = await this.productRepository
       .createQueryBuilder('product')
       .leftJoinAndSelect('product.category', 'category')
+      .leftJoinAndSelect('product.batches', 'batches')
       .where('LOWER(category.slug) = LOWER(:category)', { category })
       .orderBy('product.id', 'ASC')
       .getMany();
@@ -160,7 +191,9 @@ export class ProductsService {
         initialQuantity: stockVal,
         quantity: stockVal,
         purchasePrice: Number(productInput.price) * 0.7,
-        receivedAt: new Date(),
+        sellingPrice: Number(productInput.price),
+        regularPrice: Number(productInput.oldPrice) || Number(productInput.price),
+        receivedAt: new Date(new Date().setHours(0, 0, 0, 0)),
         product: saved,
       });
       await this.batchRepository.save(initialBatch);
@@ -219,27 +252,57 @@ export class ProductsService {
 
     product.stock = totalStock;
     product.instock = totalStock > 0;
+
+    // FIFO active batch selling price matching
+    const activeBatches = batches
+      .filter((b) => b.quantity > 0)
+      .sort((a, b) => {
+        const timeA = new Date(a.receivedAt).getTime();
+        const timeB = new Date(b.receivedAt).getTime();
+        if (timeA !== timeB) return timeA - timeB;
+        return a.id - b.id;
+      });
+
+    if (activeBatches.length > 0) {
+      const oldestActive = activeBatches[0];
+      if (Number(oldestActive.sellingPrice) > 0) {
+        product.price = Number(oldestActive.sellingPrice);
+        product.oldPrice = Number(oldestActive.regularPrice) || 0;
+      }
+    }
+
     await this.productRepository.save(product);
   }
 
   // Helper to sync stock adjustments with batches
   private async syncStockBatches(productId: number, targetStock: number, price: number) {
+    const product = await this.productRepository.findOne({ where: { id: productId } });
     const batches = await this.batchRepository.find({ where: { productId } });
     const currentStock = batches.reduce((sum, b) => sum + Math.max(0, b.quantity), 0);
 
     if (targetStock > currentStock) {
+      const regularPriceVal = product ? (Number(product.oldPrice) || Number(product.price)) : price;
       const initialBatch = this.batchRepository.create({
         batchNumber: `BATCH-ADJ-${Date.now()}`,
         initialQuantity: targetStock - currentStock,
         quantity: targetStock - currentStock,
         purchasePrice: price * 0.7,
-        receivedAt: new Date(),
+        sellingPrice: price,
+        regularPrice: regularPriceVal,
+        receivedAt: new Date(new Date().setHours(0, 0, 0, 0)),
         productId,
       });
       await this.batchRepository.save(initialBatch);
     } else if (targetStock < currentStock) {
       let remainingToDeduct = currentStock - targetStock;
-      const activeBatches = batches.filter(b => b.quantity > 0).sort((a, b) => new Date(a.receivedAt).getTime() - new Date(b.receivedAt).getTime());
+      const activeBatches = batches
+        .filter((b) => b.quantity > 0)
+        .sort((a, b) => {
+          const timeA = new Date(a.receivedAt).getTime();
+          const timeB = new Date(b.receivedAt).getTime();
+          if (timeA !== timeB) return timeA - timeB;
+          return a.id - b.id;
+        });
       
       for (const batch of activeBatches) {
         if (remainingToDeduct <= 0) break;
@@ -260,26 +323,32 @@ export class ProductsService {
   async getBatches(productId: number) {
     return this.batchRepository.find({
       where: { productId },
-      order: { receivedAt: 'ASC' },
+      order: { receivedAt: 'ASC', id: 'ASC' },
     });
   }
 
-  async addBatch(productId: number, batchData: { batchNumber?: string; quantity: number; purchasePrice: number; receivedAt?: Date | string; expiryDate?: Date | string | null; newPrice?: number }) {
+  async addBatch(productId: number, batchData: { batchNumber?: string; quantity: number; purchasePrice: number; receivedAt?: Date | string; expiryDate?: Date | string | null; sellingPrice?: number; regularPrice?: number }) {
     const product = await this.productRepository.findOne({ where: { id: productId } });
     if (!product) throw new NotFoundException(`Product with id ${productId} not found`);
 
-    if (batchData.newPrice !== undefined && batchData.newPrice !== null && Number(batchData.newPrice) > 0) {
-      product.oldPrice = product.price;
-      product.price = Number(batchData.newPrice);
-      await this.productRepository.save(product);
-    }
+    const sellingPriceVal = batchData.sellingPrice !== undefined && Number(batchData.sellingPrice) > 0
+      ? Number(batchData.sellingPrice)
+      : Number(product.price);
+
+    const regularPriceVal = batchData.regularPrice !== undefined && Number(batchData.regularPrice) > 0
+      ? Number(batchData.regularPrice)
+      : (Number(product.oldPrice) || sellingPriceVal);
 
     const batch = this.batchRepository.create({
       batchNumber: batchData.batchNumber || `BATCH-${Date.now()}`,
       initialQuantity: Number(batchData.quantity),
       quantity: Number(batchData.quantity),
       purchasePrice: Number(batchData.purchasePrice) || 0,
-      receivedAt: batchData.receivedAt ? new Date(batchData.receivedAt) : new Date(),
+      sellingPrice: sellingPriceVal,
+      regularPrice: regularPriceVal,
+      receivedAt: batchData.receivedAt 
+        ? new Date(new Date(batchData.receivedAt).setHours(0, 0, 0, 0)) 
+        : new Date(new Date().setHours(0, 0, 0, 0)),
       expiryDate: batchData.expiryDate ? new Date(batchData.expiryDate) : null,
       product,
     });
@@ -313,7 +382,7 @@ export class ProductsService {
 
     const batches = await this.batchRepository.find({
       where: { productId: id },
-      order: { receivedAt: 'ASC' }, // FIFO - oldest first
+      order: { receivedAt: 'ASC', id: 'ASC' }, // FIFO - oldest first
     });
 
     const activeBatches = batches.filter(b => b.quantity > 0);
@@ -321,6 +390,13 @@ export class ProductsService {
 
     if (totalAvailable < quantity) {
       throw new BadRequestException(`Insufficient stock for product ${product.name}. Available: ${totalAvailable}, Requested: ${quantity}`);
+    }
+
+    if (activeBatches.length > 0) {
+      const oldestBatch = activeBatches[0];
+      if (quantity > oldestBatch.quantity) {
+        throw new BadRequestException(`Cannot purchase more than the remaining quantity (${oldestBatch.quantity}) of the active batch. Please purchase up to ${oldestBatch.quantity} units.`);
+      }
     }
 
     let remainingToDeduct = quantity;

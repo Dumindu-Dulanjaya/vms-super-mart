@@ -4,8 +4,12 @@ import { useAppContext } from '../context/AppContext';
 import { Trash2, ShoppingBag, ArrowLeft } from 'lucide-react';
 
 const Cart = () => {
-    const { cartItems, products, currency, updateCartItem, removeFromCart, navigate } = useAppContext();
+    const { cartItems, products, currency, updateCartItem, removeFromCart, navigate, refreshProducts } = useAppContext();
     const [cartData, setCartData] = useState([]);
+
+    useEffect(() => {
+        refreshProducts();
+    }, []);
 
     useEffect(() => {
         const tempData = [];
@@ -28,7 +32,29 @@ const Cart = () => {
     };
 
     const getCartDiscount = () => {
-        return cartData.reduce((total, item) => total + ((item.oldPrice - item.price) * item.quantity), 0);
+        return cartData.reduce((total, item) => {
+            const disc = item.oldPrice > item.price ? (item.oldPrice - item.price) : 0;
+            return total + (disc * item.quantity);
+        }, 0);
+    };
+
+    const getCartItemBatchBreakdown = (item) => {
+        if (!item.batches || item.batches.length === 0) return [];
+        let remaining = item.quantity;
+        const breakdown = [];
+        for (const batch of item.batches) {
+            if (remaining <= 0) break;
+            const taken = Math.min(remaining, batch.quantity);
+            if (taken > 0) {
+                breakdown.push({
+                    batchNumber: batch.batchNumber,
+                    quantity: taken,
+                    sellingPrice: batch.sellingPrice
+                });
+                remaining -= taken;
+            }
+        }
+        return breakdown;
     };
 
     if (cartData.length === 0) {
@@ -60,72 +86,78 @@ const Cart = () => {
                     {/* Cart Items */}
                     <div className="lg:col-span-2">
                         <div className="bg-white rounded-lg shadow-md overflow-hidden">
-                            {cartData.map((item, index) => (
-                                <div
-                                    key={item.id}
-                                    className={`p-6 flex gap-6 ${index !== cartData.length - 1 ? 'border-b border-gray-200' : ''}`}
-                                >
-                                    {/* Product Image */}
-                                    <Link to={`/product/${item.slug}`} className="flex-shrink-0">
-                                        <div className="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden">
-                                            <img
-                                                src={item.image}
-                                                alt={item.name}
-                                                className="w-full h-full object-contain hover:scale-110 transition-transform"
-                                            />
-                                        </div>
-                                    </Link>
-
-                                    {/* Product Details */}
-                                    <div className="flex-1">
-                                        <Link to={`/product/${item.slug}`}>
-                                            <h3 className="text-lg font-semibold text-gray-800 hover:text-[#00FF33] mb-1">
-                                                {item.name}
-                                            </h3>
-                                        </Link>
-                                        <p className="text-sm text-gray-500 mb-3">{item.category}</p>
-
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-4">
-                                                {/* Price */}
-                                                <div>
-                                                    <p className="text-xl font-bold text-gray-900">{currency}{item.price}</p>
-                                                    <p className="text-sm text-gray-400 line-through">{currency}{item.oldPrice}</p>
-                                                </div>
-
-                                                {/* Quantity Controls */}
-                                                <div className="flex items-center gap-2 bg-gray-100 px-3 py-2 rounded-lg border border-gray-300">
-                                                    <button
-                                                        onClick={() => {
-                                                            if (item.quantity > 1) {
-                                                                updateCartItem(item.id, item.quantity - 1);
-                                                            } else {
-                                                                removeFromCart(item.id);
-                                                            }
-                                                        }}
-                                                        className="text-gray-600 font-bold text-lg w-7 h-7 flex items-center justify-center hover:bg-gray-200 rounded transition-colors"
-                                                    >
-                                                        -
-                                                    </button>
-                                                    <span className="text-gray-800 font-semibold w-10 text-center">{item.quantity}</span>
-                                                    <button
-                                                        onClick={() => {
-                                                            if (item.quantity < item.stock) {
-                                                                updateCartItem(item.id, item.quantity + 1);
-                                                            }
-                                                        }}
-                                                        disabled={item.quantity >= item.stock}
-                                                        className={`text-gray-600 font-bold text-lg w-7 h-7 flex items-center justify-center rounded transition-colors ${
-                                                            item.quantity >= item.stock 
-                                                                ? 'opacity-30 cursor-not-allowed' 
-                                                                : 'hover:bg-gray-200'
-                                                        }`}
-                                                        title={item.quantity >= item.stock ? "Stock limit reached" : "Increase quantity"}
-                                                    >
-                                                        +
-                                                    </button>
-                                                </div>
+                            {cartData.map((item, index) => {
+                                const maxAvailable = item.batches && item.batches.length > 0
+                                    ? item.batches[0].quantity
+                                    : item.stock;
+                                return (
+                                    <div
+                                        key={item.id}
+                                        className={`p-6 flex gap-6 ${index !== cartData.length - 1 ? 'border-b border-gray-200' : ''}`}
+                                    >
+                                        {/* Product Image */}
+                                        <Link to={`/product/${item.slug}`} className="flex-shrink-0">
+                                            <div className="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden">
+                                                <img
+                                                    src={item.image}
+                                                    alt={item.name}
+                                                    className="w-full h-full object-contain hover:scale-110 transition-transform"
+                                                />
                                             </div>
+                                        </Link>
+
+                                        {/* Product Details */}
+                                        <div className="flex-1">
+                                            <Link to={`/product/${item.slug}`}>
+                                                <h3 className="text-lg font-semibold text-gray-800 hover:text-[#00FF33] mb-1">
+                                                    {item.name}
+                                                </h3>
+                                            </Link>
+                                            <p className="text-sm text-gray-500 mb-3">{item.category}</p>
+
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-4">
+                                                    {/* Price */}
+                                                    <div>
+                                                        <p className="text-xl font-bold text-gray-900">{currency}{item.price}</p>
+                                                        {item.oldPrice > item.price && (
+                                                            <p className="text-sm text-gray-400 line-through">{currency}{item.oldPrice}</p>
+                                                        )}
+                                                    </div>
+
+                                                    {/* Quantity Controls */}
+                                                    <div className="flex items-center gap-2 bg-gray-100 px-3 py-2 rounded-lg border border-gray-300">
+                                                        <button
+                                                            onClick={() => {
+                                                                if (item.quantity > 1) {
+                                                                    updateCartItem(item.id, item.quantity - 1);
+                                                                } else {
+                                                                    removeFromCart(item.id);
+                                                                }
+                                                            }}
+                                                            className="text-gray-600 font-bold text-lg w-7 h-7 flex items-center justify-center hover:bg-gray-200 rounded transition-colors"
+                                                        >
+                                                            -
+                                                        </button>
+                                                        <span className="text-gray-800 font-semibold w-10 text-center">{item.quantity}</span>
+                                                        <button
+                                                            onClick={() => {
+                                                                if (item.quantity < maxAvailable) {
+                                                                    updateCartItem(item.id, item.quantity + 1);
+                                                                }
+                                                            }}
+                                                            disabled={item.quantity >= maxAvailable}
+                                                            className={`text-gray-600 font-bold text-lg w-7 h-7 flex items-center justify-center rounded transition-colors ${
+                                                                item.quantity >= maxAvailable 
+                                                                    ? 'opacity-30 cursor-not-allowed' 
+                                                                    : 'hover:bg-gray-200'
+                                                            }`}
+                                                            title={item.quantity >= maxAvailable ? "Stock limit reached" : "Increase quantity"}
+                                                        >
+                                                            +
+                                                        </button>
+                                                    </div>
+                                                </div>
 
                                             {/* Remove Button */}
                                             <button
@@ -145,7 +177,8 @@ const Cart = () => {
                                         </div>
                                     </div>
                                 </div>
-                            ))}
+                            );
+                        })}
                         </div>
 
                         {/* Continue Shopping */}
@@ -171,7 +204,9 @@ const Cart = () => {
                                 </div>
                                 <div className="flex justify-between text-green-600">
                                     <span>Discount</span>
-                                    <span className="font-semibold">-{currency}{getCartDiscount()}</span>
+                                    <span className="font-semibold">
+                                        {getCartDiscount() > 0 ? `-${currency}${getCartDiscount()}` : `${currency}0`}
+                                    </span>
                                 </div>
                                 <div className="flex justify-between text-gray-600">
                                     <span>Shipping</span>

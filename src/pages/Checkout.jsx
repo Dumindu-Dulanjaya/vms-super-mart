@@ -5,10 +5,14 @@ import { MapPin, CreditCard, Wallet, Check, Package } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const Checkout = () => {
-    const { cartItems, products, currency, setCartItems, checkout, user } = useAppContext();
+    const { cartItems, products, currency, setCartItems, checkout, user, refreshProducts } = useAppContext();
     const navigate = useNavigate();
     const [cartData, setCartData] = useState([]);
     const [paymentMethod, setPaymentMethod] = useState('cod');
+
+    useEffect(() => {
+        refreshProducts();
+    }, []);
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -57,7 +61,29 @@ const Checkout = () => {
     };
 
     const getCartDiscount = () => {
-        return cartData.reduce((total, item) => total + ((item.oldPrice - item.price) * item.quantity), 0);
+        return cartData.reduce((total, item) => {
+            const disc = item.oldPrice > item.price ? (item.oldPrice - item.price) : 0;
+            return total + (disc * item.quantity);
+        }, 0);
+    };
+
+    const getCartItemBatchBreakdown = (item) => {
+        if (!item.batches || item.batches.length === 0) return [];
+        let remaining = item.quantity;
+        const breakdown = [];
+        for (const batch of item.batches) {
+            if (remaining <= 0) break;
+            const taken = Math.min(remaining, batch.quantity);
+            if (taken > 0) {
+                breakdown.push({
+                    batchNumber: batch.batchNumber,
+                    quantity: taken,
+                    sellingPrice: batch.sellingPrice
+                });
+                remaining -= taken;
+            }
+        }
+        return breakdown;
     };
 
     const handleInputChange = (e) => {
@@ -322,7 +348,9 @@ const Checkout = () => {
                                 </div>
                                 <div className="flex justify-between text-green-600">
                                     <span>Discount</span>
-                                    <span className="font-semibold">-{currency}{getCartDiscount()}</span>
+                                    <span className="font-semibold">
+                                        {getCartDiscount() > 0 ? `-${currency}${getCartDiscount()}` : `${currency}0`}
+                                    </span>
                                 </div>
                                 <div className="flex justify-between text-gray-600">
                                     <span>Shipping</span>

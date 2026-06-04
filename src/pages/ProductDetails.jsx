@@ -5,10 +5,14 @@ import { ChevronLeft, ChevronRight, AlertCircle, CheckCircle } from "lucide-reac
 import toast from "react-hot-toast";
 
 const ProductDetails  = () => {
-    const { products, addToCart, rateProduct, cartItems } = useAppContext();
+    const { products, addToCart, rateProduct, cartItems, refreshProducts } = useAppContext();
     const { slug } = useParams();
     const navigate = useNavigate();
     const currency = "Rs.";
+
+    useEffect(() => {
+        refreshProducts();
+    }, []);
     const [thumbnail, setThumbnail] = useState(null);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -19,8 +23,11 @@ const ProductDetails  = () => {
 
     const product = products.find((item) => item.slug === slug);
     const currentQtyInCart = product && cartItems ? (cartItems[product.id] || 0) : 0;
-    const isOutOfStock = !product || (product.stock || 0) === 0;
-    const isLimitReached = product && currentQtyInCart >= product.stock;
+    const maxAvailable = product && product.batches && product.batches.length > 0
+        ? product.batches[0].quantity
+        : (product ? product.stock : 0);
+    const isOutOfStock = !product || maxAvailable === 0;
+    const isLimitReached = product && currentQtyInCart >= maxAvailable;
 
     // Get all images (main + gallery)
     const allImages = product
@@ -151,14 +158,16 @@ const ProductDetails  = () => {
 
                     {/* Price */}
                     <div className="mt-6 mb-6">
-                        <p className="text-sm text-gray-500 line-through">MRP: {currency}{product.oldPrice}</p>
+                        {product.oldPrice > product.price && (
+                            <p className="text-sm text-gray-500 line-through">MRP: {currency}{product.oldPrice}</p>
+                        )}
                         <p className="text-3xl font-semibold text-gray-800 mt-1">MRP: {currency}{product.price}</p>
                         <span className="text-sm text-gray-500">(inclusive of all taxes)</span>
                     </div>
 
                     {/* Stock Status */}
                     <div className="mb-6">
-                        {(product.stock || 0) === 0 ? (
+                        {maxAvailable === 0 ? (
                             <div className="bg-red-50 border-2 border-red-200 rounded-lg px-4 py-3 flex items-center gap-3">
                                 <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
                                 <div>
@@ -166,12 +175,12 @@ const ProductDetails  = () => {
                                     <p className="text-red-600 text-sm">This item is currently unavailable</p>
                                 </div>
                             </div>
-                        ) : (product.stock || 0) < 5 ? (
+                        ) : maxAvailable < 5 ? (
                             <div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg px-4 py-3 flex items-center gap-3">
                                 <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0" />
                                 <div>
                                     <p className="text-yellow-700 font-semibold">Limited Stock</p>
-                                    <p className="text-yellow-600 text-sm">Only {product.stock} items available</p>
+                                    <p className="text-yellow-600 text-sm">Only {maxAvailable} items available in the current active batch</p>
                                 </div>
                             </div>
                         ) : (
@@ -179,7 +188,7 @@ const ProductDetails  = () => {
                                 <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
                                 <div>
                                     <p className="text-green-700 font-semibold">In Stock</p>
-                                    <p className="text-green-600 text-sm">{product.stock} items available</p>
+                                    <p className="text-green-600 text-sm">{maxAvailable} items available in the current active batch</p>
                                 </div>
                             </div>
                         )}

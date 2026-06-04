@@ -88,7 +88,9 @@ const Wishlist = () => {
                                 {/* Price */}
                                 <div className="mb-3">
                                     <span className="text-green-600 font-bold text-xl">{currency}{product.price}</span>
-                                    <span className="text-gray-400 line-through text-sm ml-2">{currency}{product.oldPrice}</span>
+                                    {product.oldPrice > product.price && (
+                                        <span className="text-gray-400 line-through text-sm ml-2">{currency}{product.oldPrice}</span>
+                                    )}
                                 </div>
 
                                 {/* Add to Cart Button */}

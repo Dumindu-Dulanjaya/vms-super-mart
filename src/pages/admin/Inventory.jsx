@@ -22,8 +22,21 @@ const Inventory = () => {
     purchasePrice: '',
     receivedAt: new Date().toISOString().split('T')[0],
     expiryDate: '',
-    newPrice: ''
+    sellingPrice: '',
+    regularPrice: ''
   });
+
+  const generateBatchNumber = (productBatches = []) => {
+    const todayStr = new Date().toISOString().split('T')[0];
+    const datePart = todayStr.replace(/-/g, '');
+    const todayBatchesCount = productBatches.filter(b => {
+      if (!b.receivedAt) return false;
+      const batchDate = new Date(b.receivedAt).toISOString().split('T')[0];
+      return batchDate === todayStr;
+    }).length;
+    const seq = String(todayBatchesCount + 1).padStart(2, '0');
+    return `${datePart}-${seq}`;
+  };
 
   const load = async () => {
     setLoading(true);
@@ -92,7 +105,8 @@ const Inventory = () => {
           purchasePrice: Number(batchFormData.purchasePrice),
           receivedAt: batchFormData.receivedAt || undefined,
           expiryDate: batchFormData.expiryDate || undefined,
-          newPrice: batchFormData.newPrice ? Number(batchFormData.newPrice) : undefined
+          sellingPrice: batchFormData.sellingPrice ? Number(batchFormData.sellingPrice) : undefined,
+          regularPrice: batchFormData.regularPrice ? Number(batchFormData.regularPrice) : undefined
         })
       });
 
@@ -112,7 +126,8 @@ const Inventory = () => {
         purchasePrice: '',
         receivedAt: new Date().toISOString().split('T')[0],
         expiryDate: '',
-        newPrice: ''
+        sellingPrice: '',
+        regularPrice: ''
       });
     } catch (e) {
       alert('Failed to add batch: ' + e.message);
@@ -286,8 +301,26 @@ const Inventory = () => {
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <button
-                            onClick={() => {
+                            onClick={async () => {
                               setBatchProduct(p);
+                              let productBatches = batches[p.id];
+                              if (!productBatches) {
+                                try {
+                                  const token = localStorage.getItem('vms_admin_token');
+                                  const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/products/${p.id}/batches`, {
+                                    headers: { Authorization: `Bearer ${token}` }
+                                  });
+                                  productBatches = await res.json();
+                                  setBatches(prev => ({ ...prev, [p.id]: productBatches }));
+                                } catch (e) {
+                                  productBatches = [];
+                                }
+                              }
+                              const batchNo = generateBatchNumber(productBatches);
+                              setBatchFormData(prev => ({
+                                ...prev,
+                                batchNumber: batchNo
+                              }));
                               setShowAddBatchModal(true);
                             }}
                             className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1.5 bg-green-50 border border-green-200 text-green-700 hover:bg-green-100 transition-colors shadow-sm"
@@ -344,6 +377,8 @@ const Inventory = () => {
                                       <th className="px-4 py-2">Date Received</th>
                                       <th className="px-4 py-2">Expiry Date</th>
                                       <th className="px-4 py-2">Purchase Cost</th>
+                                      <th className="px-4 py-2">Regular Price</th>
+                                      <th className="px-4 py-2">Selling Price</th>
                                       <th className="px-4 py-2">Stock Level (Initial)</th>
                                       <th className="px-4 py-2 text-center">Action</th>
                                     </tr>
@@ -370,6 +405,10 @@ const Inventory = () => {
                                             )}
                                           </td>
                                           <td className="px-4 py-3 text-slate-700 font-bold">{currency}{Number(b.purchasePrice).toFixed(2)}</td>
+                                          <td className="px-4 py-3 text-slate-400 line-through font-semibold">
+                                            {b.regularPrice && b.regularPrice > b.sellingPrice ? `${currency}${Number(b.regularPrice).toFixed(2)}` : 'N/A'}
+                                          </td>
+                                          <td className="px-4 py-3 text-green-600 font-bold">{currency}{Number(b.sellingPrice || 0).toFixed(2)}</td>
                                           <td className="px-4 py-3 font-semibold">
                                             {b.quantity === 0 ? (
                                               <span className="text-red-500 font-bold uppercase text-[9px] tracking-wide bg-red-50 px-1.5 py-0.5 rounded">Depleted</span>
@@ -478,21 +517,6 @@ const Inventory = () => {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider">New Selling Price (Rs.) (Optional)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    className="w-full p-3 bg-slate-800 border border-slate-700 text-white text-xs font-bold rounded-none focus:outline-none focus:border-green-500 transition-colors"
-                    placeholder={`Current: Rs. ${batchProduct.price}`}
-                    value={batchFormData.newPrice}
-                    onChange={(e) => setBatchFormData(prev => ({ ...prev, newPrice: e.target.value }))}
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
                   <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider">Date Received</label>
                   <input
                     type="date"
@@ -502,6 +526,36 @@ const Inventory = () => {
                     onChange={(e) => setBatchFormData(prev => ({ ...prev, receivedAt: e.target.value }))}
                   />
                 </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider">Batch Regular Price (Rs.) (Optional)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    className="w-full p-3 bg-slate-800 border border-slate-700 text-white text-xs font-bold rounded-none focus:outline-none focus:border-green-500 transition-colors"
+                    placeholder={batchProduct.oldPrice ? `Default: Rs. ${batchProduct.oldPrice}` : `Default: Rs. ${batchProduct.price}`}
+                    value={batchFormData.regularPrice}
+                    onChange={(e) => setBatchFormData(prev => ({ ...prev, regularPrice: e.target.value }))}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider">Batch Selling Price (Rs.) (Optional)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    className="w-full p-3 bg-slate-800 border border-slate-700 text-white text-xs font-bold rounded-none focus:outline-none focus:border-green-500 transition-colors"
+                    placeholder={`Default: Rs. ${batchProduct.price}`}
+                    value={batchFormData.sellingPrice}
+                    onChange={(e) => setBatchFormData(prev => ({ ...prev, sellingPrice: e.target.value }))}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider">Expiry Date (Optional)</label>
                   <input
@@ -510,6 +564,9 @@ const Inventory = () => {
                     value={batchFormData.expiryDate}
                     onChange={(e) => setBatchFormData(prev => ({ ...prev, expiryDate: e.target.value }))}
                   />
+                </div>
+                <div className="space-y-1.5">
+                  {/* Spacer */}
                 </div>
               </div>
 

@@ -41,6 +41,7 @@ describe('ProductsService', () => {
     initialQuantity: 10,
     quantity: 10,
     purchasePrice: 70.0,
+    sellingPrice: 99.99,
     receivedAt: new Date(),
     expiryDate: null,
     productId: 1,
@@ -116,6 +117,7 @@ describe('ProductsService', () => {
           description: 'Test Description',
           stock: 10,
           lowStockThreshold: 5,
+          batches: [],
         },
       ]);
       expect(mockProductRepository.find).toHaveBeenCalled();
@@ -143,10 +145,11 @@ describe('ProductsService', () => {
         description: 'Test Description',
         stock: 10,
         lowStockThreshold: 5,
+        batches: [],
       });
       expect(mockProductRepository.findOne).toHaveBeenCalledWith({
         where: { id: 1 },
-        relations: ['category'],
+        relations: ['category', 'batches'],
       });
     });
 
@@ -214,6 +217,7 @@ describe('ProductsService', () => {
         stock: 20,
         lowStockThreshold: 5,
         description: 'New Description',
+        batches: [],
       });
       expect(mockProductRepository.create).toHaveBeenCalled();
       expect(mockProductRepository.save).toHaveBeenCalled();

@@ -77,16 +77,20 @@ class CreateBatchDto {
   purchasePrice!: number;
 
   @IsOptional()
+  @IsNumber()
+  sellingPrice?: number;
+
+  @IsOptional()
+  @IsNumber()
+  regularPrice?: number;
+
+  @IsOptional()
   @IsString()
   receivedAt?: string;
 
   @IsOptional()
   @IsString()
   expiryDate?: string;
-
-  @IsOptional()
-  @IsNumber()
-  newPrice?: number;
 }
 
 @Controller('products')

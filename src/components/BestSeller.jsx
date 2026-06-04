@@ -52,9 +52,11 @@ function ProductCard({ product }) {
           <span className="text-lg font-bold text-green-600">
             Rs. {product.price}
           </span>
-          <span className="text-gray-400 line-through text-sm">
-            Rs. {product.oldPrice}
-          </span>
+          {product.oldPrice > product.price && (
+            <span className="text-gray-400 line-through text-sm">
+              Rs. {product.oldPrice}
+            </span>
+          )}
         </div>
         {/* Rating */}
         <div className="flex items-center gap-1 mt-2 text-yellow-500">
