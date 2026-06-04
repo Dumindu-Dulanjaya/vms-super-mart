@@ -70,7 +70,15 @@ const ProductCard = ({ product }) => {
         </div>
 
         {/* Add to Cart Button */}
-        {cartQuantity === 0 ? (
+        {product.stock === 0 ? (
+          <button
+            disabled
+            className="w-full bg-gray-50 text-gray-400 border border-gray-200 px-4 py-2.5 rounded-none flex items-center justify-center gap-2 cursor-not-allowed font-medium"
+          >
+            <ShoppingCart size={18} />
+            <span>Out of Stock</span>
+          </button>
+        ) : cartQuantity === 0 ? (
           <button
             onClick={() => addToCart(product.id)}
             className="w-full bg-green-50 hover:bg-green-600 text-green-600 hover:text-white border border-green-200 hover:border-green-600 px-4 py-2.5 rounded-none flex items-center justify-center gap-2 transition-all duration-200 font-medium"

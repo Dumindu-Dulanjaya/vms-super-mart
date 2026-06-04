@@ -199,6 +199,20 @@ export const AppContextProvider = ({ children }) => {
 
   // Add product to cart
   const addToCart = (itemId) => {
+    const product = products.find(p => p.id === Number(itemId));
+    const currentQty = cartItems[itemId] || 0;
+    
+    if (product) {
+      if (product.stock <= 0) {
+        toast.error("This product is out of stock!");
+        return;
+      }
+      if (currentQty >= product.stock) {
+        toast.error(`Only ${product.stock} items available in stock!`);
+        return;
+      }
+    }
+
     let cartData = structuredClone(cartItems);
     if (cartData[itemId]) {
       cartData[itemId] += 1;
@@ -211,6 +225,12 @@ export const AppContextProvider = ({ children }) => {
 
   // Update cart item quantity
   const updateCartItem = (itemId, quantity) => {
+    const product = products.find(p => p.id === Number(itemId));
+    if (product && quantity > product.stock) {
+      toast.error(`Only ${product.stock} items available in stock!`);
+      return;
+    }
+
     let cartData = structuredClone(cartItems);
     cartData[itemId] = quantity;
     setCartItems(cartData);

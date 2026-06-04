@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight, AlertCircle, CheckCircle } from "lucide-reac
 import toast from "react-hot-toast";
 
 const ProductDetails  = () => {
-    const { products, addToCart, rateProduct } = useAppContext();
+    const { products, addToCart, rateProduct, cartItems } = useAppContext();
     const { slug } = useParams();
     const navigate = useNavigate();
     const currency = "Rs.";
@@ -18,6 +18,9 @@ const ProductDetails  = () => {
     const [hasRated, setHasRated] = useState(false);
 
     const product = products.find((item) => item.slug === slug);
+    const currentQtyInCart = product && cartItems ? (cartItems[product.id] || 0) : 0;
+    const isOutOfStock = !product || (product.stock || 0) === 0;
+    const isLimitReached = product && currentQtyInCart >= product.stock;
 
     // Get all images (main + gallery)
     const allImages = product
@@ -196,25 +199,25 @@ const ProductDetails  = () => {
                     <div className="flex items-center mt-10 gap-4">
                         <button 
                             onClick={() => addToCart(product.id)}
-                            disabled={(product.stock || 0) === 0}
+                            disabled={isOutOfStock || isLimitReached}
                             className={`flex-1 py-3.5 px-6 font-medium rounded-lg border transition ${
-                                (product.stock || 0) === 0
+                                isOutOfStock || isLimitReached
                                     ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
                                     : 'bg-gray-100 text-gray-800 hover:bg-gray-200 border-gray-300'
                             }`}
                         >
-                            {(product.stock || 0) === 0 ? 'Out of Stock' : 'Add to Cart'}
+                            {isOutOfStock ? 'Out of Stock' : isLimitReached ? 'Limit Reached' : 'Add to Cart'}
                         </button>
                         <button 
                             onClick={() => { addToCart(product.id); navigate("/cart"); }}
-                            disabled={(product.stock || 0) === 0}
+                            disabled={isOutOfStock || isLimitReached}
                             className={`flex-1 py-3.5 px-6 font-medium rounded-lg transition ${
-                                (product.stock || 0) === 0
+                                isOutOfStock || isLimitReached
                                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                     : 'bg-blue-600 text-white hover:bg-blue-700'
                             }`}
                         >
-                            {(product.stock || 0) === 0 ? 'Unavailable' : 'Buy now'}
+                            {isOutOfStock ? 'Unavailable' : isLimitReached ? 'Limit Reached' : 'Buy now'}
                         </button>
                     </div>
 

@@ -109,8 +109,18 @@ const Cart = () => {
                                                     </button>
                                                     <span className="text-gray-800 font-semibold w-10 text-center">{item.quantity}</span>
                                                     <button
-                                                        onClick={() => updateCartItem(item.id, item.quantity + 1)}
-                                                        className="text-gray-600 font-bold text-lg w-7 h-7 flex items-center justify-center hover:bg-gray-200 rounded transition-colors"
+                                                        onClick={() => {
+                                                            if (item.quantity < item.stock) {
+                                                                updateCartItem(item.id, item.quantity + 1);
+                                                            }
+                                                        }}
+                                                        disabled={item.quantity >= item.stock}
+                                                        className={`text-gray-600 font-bold text-lg w-7 h-7 flex items-center justify-center rounded transition-colors ${
+                                                            item.quantity >= item.stock 
+                                                                ? 'opacity-30 cursor-not-allowed' 
+                                                                : 'hover:bg-gray-200'
+                                                        }`}
+                                                        title={item.quantity >= item.stock ? "Stock limit reached" : "Increase quantity"}
                                                     >
                                                         +
                                                     </button>
