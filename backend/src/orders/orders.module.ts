@@ -3,12 +3,13 @@ import { OrdersController } from './orders.controller';
 import { OrdersService } from './orders.service';
 import { ProductsModule } from '../products/products.module';
 import { EmailModule } from '../email/email.module';
+import { EventsModule } from '../events/events.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Order } from '../entities/order.entity';
 import { OrderItem } from '../entities/order-item.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Order, OrderItem]), ProductsModule, EmailModule],
+  imports: [TypeOrmModule.forFeature([Order, OrderItem]), ProductsModule, EmailModule, EventsModule],
   controllers: [OrdersController],
   providers: [OrdersService],
 })

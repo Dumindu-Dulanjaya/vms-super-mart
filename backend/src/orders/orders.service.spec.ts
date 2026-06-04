@@ -6,6 +6,7 @@ import { OrderItem } from '../entities/order-item.entity';
 import { ProductsService } from '../products/products.service';
 import { EmailService } from '../email/email.service';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { EventsGateway } from '../events/events.gateway';
 
 describe('OrdersService', () => {
   let service: OrdersService;
@@ -13,6 +14,7 @@ describe('OrdersService', () => {
   let mockOrderItemRepository: any;
   let mockProductsService: any;
   let mockEmailService: any;
+  let mockEventsGateway: any;
 
   const mockOrder = {
     id: 'ord_123456',
@@ -61,6 +63,11 @@ describe('OrdersService', () => {
       sendOrderConfirmation: jest.fn().mockResolvedValue(undefined),
     };
 
+    mockEventsGateway = {
+      emitNewOrder: jest.fn().mockResolvedValue(undefined),
+      emitOrderStatusUpdate: jest.fn().mockResolvedValue(undefined),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         OrdersService,
@@ -79,6 +86,10 @@ describe('OrdersService', () => {
         {
           provide: EmailService,
           useValue: mockEmailService,
+        },
+        {
+          provide: EventsGateway,
+          useValue: mockEventsGateway,
         },
       ],
     }).compile();
@@ -192,6 +203,30 @@ describe('OrdersService', () => {
 
       await expect(service.checkout(checkoutPayload)).rejects.toThrow(
         BadRequestException,
+      );
+    });
+  });
+
+  describe('updateStatus', () => {
+    it('should update order status and emit event', async () => {
+      mockOrderRepository.findOne.mockResolvedValue(mockOrder);
+      mockOrderRepository.save.mockResolvedValue({ ...mockOrder, status: 'preparing' });
+
+      const result = await service.updateStatus('ord_123456', 'preparing');
+
+      expect(result).toBeDefined();
+      expect(result.status).toBe('preparing');
+      expect(mockEventsGateway.emitOrderStatusUpdate).toHaveBeenCalledWith({
+        orderId: 'ord_123456',
+        status: 'preparing',
+      });
+    });
+
+    it('should throw NotFoundException if order to update does not exist', async () => {
+      mockOrderRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.updateStatus('invalid_id', 'preparing')).rejects.toThrow(
+        NotFoundException,
       );
     });
   });

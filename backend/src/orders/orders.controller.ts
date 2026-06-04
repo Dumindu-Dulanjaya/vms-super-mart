@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, UseGuards, Query, BadRequestException } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Patch, UseGuards, Query, BadRequestException } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from '../auth/roles.decorator';
@@ -84,6 +84,19 @@ export class OrdersController {
       throw new BadRequestException('Query parameter "type" must be "daily" or "monthly"');
     }
     return this.ordersService.generateSalesReport(type, startDate, endDate);
+  }
+
+  @Patch(':id/status')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('admin')
+  async updateStatus(
+    @Param('id') id: string,
+    @Body('status') status: string,
+  ) {
+    if (!status) {
+      throw new BadRequestException('Status is required');
+    }
+    return this.ordersService.updateStatus(id, status);
   }
 
   @Post('checkout')

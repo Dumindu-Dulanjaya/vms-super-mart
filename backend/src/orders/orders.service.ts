@@ -5,6 +5,7 @@ import { ProductsService } from '../products/products.service';
 import { EmailService } from '../email/email.service';
 import { Order } from '../entities/order.entity';
 import { OrderItem } from '../entities/order-item.entity';
+import { EventsGateway } from '../events/events.gateway';
 
 type CheckoutItem = {
   productId: number;
@@ -34,6 +35,7 @@ export class OrdersService {
     private readonly orderRepository: Repository<Order>,
     @InjectRepository(OrderItem)
     private readonly orderItemRepository: Repository<OrderItem>,
+    private readonly eventsGateway: EventsGateway,
   ) {}
 
   async findAll() {
@@ -119,6 +121,9 @@ export class OrdersService {
     });
 
     const saved = await this.orderRepository.save(order);
+
+    // Notify administrators via WebSockets
+    this.eventsGateway.emitNewOrder(saved);
 
     // Deduct stock for each item after order is created
     for (const item of payload.items) {
@@ -218,5 +223,20 @@ export class OrdersService {
     })).sort((a, b) => a.period.localeCompare(b.period));
 
     return reportData;
+  }
+
+  async updateStatus(id: string, status: string) {
+    const order = await this.orderRepository.findOne({ where: { id } });
+    if (!order) {
+      throw new NotFoundException(`Order ${id} not found`);
+    }
+
+    order.status = status;
+    const updated = await this.orderRepository.save(order);
+
+    // Notify clients via WebSockets
+    this.eventsGateway.emitOrderStatusUpdate({ orderId: id, status });
+
+    return updated;
   }
 }

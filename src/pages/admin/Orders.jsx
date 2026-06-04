@@ -1,10 +1,33 @@
 import React, { useEffect, useState } from 'react';
 import { ShoppingBag, Calendar, MapPin, Phone, Mail } from 'lucide-react';
+import { io } from 'socket.io-client';
+import toast from 'react-hot-toast';
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const currency = "Rs.";
+
+  const playBeep = () => {
+    try {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+      
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // A5 note
+      gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+      
+      oscillator.start();
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+      oscillator.stop(audioCtx.currentTime + 0.4);
+    } catch (e) {
+      console.warn('AudioContext sound blocked:', e);
+    }
+  };
 
   const load = async () => {
     setLoading(true);
@@ -22,16 +45,69 @@ const Orders = () => {
     }
   };
 
-  useEffect(() => { load(); }, []);
+  const updateOrderStatus = async (orderId, nextStatus) => {
+    try {
+      const token = localStorage.getItem('vms_admin_token');
+      const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/orders/${orderId}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ status: nextStatus })
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to update status');
+      }
+
+      toast.success(`Order status updated to ${nextStatus}`);
+      load(); // Refresh local list
+    } catch (e) {
+      toast.error(e.message || 'Error updating order status');
+    }
+  };
+
+  useEffect(() => {
+    load();
+
+    const socketUrl = import.meta.env.VITE_API_URL || window.location.origin;
+    const socket = io(socketUrl);
+
+    socket.on('connect', () => {
+      console.log('Connected to order WebSockets (Admin)');
+    });
+
+    socket.on('order:new', (newOrder) => {
+      playBeep();
+      toast.success(`New order received! Order ID: ${newOrder.id}`, {
+        duration: 5000,
+        position: 'top-right',
+      });
+      load();
+    });
+
+    socket.on('order:status-update', () => {
+      load();
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   const getStatusStyle = (status) => {
     switch (status?.toLowerCase()) {
       case 'placed':
-        return 'bg-emerald-50 text-emerald-700 border border-emerald-200';
-      case 'shipped':
         return 'bg-blue-50 text-blue-700 border border-blue-200';
+      case 'preparing':
+        return 'bg-purple-50 text-purple-700 border border-purple-200';
+      case 'ready':
+        return 'bg-teal-50 text-teal-700 border border-teal-200';
+      case 'shipped':
+        return 'bg-amber-50 text-amber-700 border border-amber-200';
       case 'delivered':
-        return 'bg-indigo-50 text-indigo-700 border border-indigo-200';
+        return 'bg-green-50 text-green-700 border border-green-200';
       case 'cancelled':
         return 'bg-red-50 text-red-700 border border-red-200';
       default:
@@ -132,9 +208,18 @@ const Orders = () => {
 
                   {/* Status */}
                   <td className="px-6 py-5 text-center">
-                    <span className={`inline-block px-3 py-1.5 rounded-none text-[10px] font-black tracking-widest uppercase transition-all shadow-sm ${getStatusStyle(o.status)}`}>
-                      {o.status}
-                    </span>
+                    <select
+                      value={o.status}
+                      onChange={(e) => updateOrderStatus(o.id, e.target.value)}
+                      className={`inline-block px-3 py-1.5 rounded-none text-[10px] font-black tracking-widest uppercase transition-all shadow-sm cursor-pointer border outline-none focus:ring-2 focus:ring-green-400 ${getStatusStyle(o.status)}`}
+                    >
+                      <option value="placed" className="bg-white text-slate-800">Placed</option>
+                      <option value="preparing" className="bg-white text-slate-800">Preparing</option>
+                      <option value="ready" className="bg-white text-slate-800">Ready</option>
+                      <option value="shipped" className="bg-white text-slate-800">Shipped</option>
+                      <option value="delivered" className="bg-white text-slate-800">Delivered</option>
+                      <option value="cancelled" className="bg-white text-slate-800">Cancelled</option>
+                    </select>
                   </td>
                 </tr>
               ))}

@@ -12,6 +12,7 @@ import { UploadModule } from './upload/upload.module';
 import { UsersModule } from './users/users.module';
 import { EmailModule } from './email/email.module';
 import { ChatbotModule } from './chatbot/chatbot.module';
+import { EventsModule } from './events/events.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 
@@ -45,6 +46,7 @@ import { join } from 'path';
     UsersModule,
     EmailModule,
     ChatbotModule,
+    EventsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

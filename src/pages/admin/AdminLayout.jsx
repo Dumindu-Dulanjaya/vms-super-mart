@@ -10,7 +10,8 @@ import {
   ChevronRight,
   TrendingUp,
   ShoppingCart,
-  BarChart3
+  BarChart3,
+  ClipboardList
 } from 'lucide-react';
 import Dashboard from './Dashboard';
 import AddProduct from './AddProduct';
@@ -19,6 +20,7 @@ import Orders from './Orders';
 import EditProduct from './EditProduct';
 import Reports from './Reports';
 import Customers from './Customers';
+import OrderTracker from './OrderTracker';
 import { useAppContext } from '../../context/AppContext';
 import vmsLogo from '../../assets/VMS logo.png';
 
@@ -31,6 +33,7 @@ const AdminSidebar = () => {
     { name: 'Add Product', path: '/admin/add-product', icon: PlusCircle },
     { name: 'Inventory', path: '/admin/inventory', icon: Package },
     { name: 'Orders', path: '/admin/orders', icon: ShoppingCart },
+    { name: 'Order Tracker', path: '/admin/order-tracker', icon: ClipboardList },
     { name: 'Reports', path: '/admin/reports', icon: BarChart3 },
     { name: 'Customers', path: '/admin/customers', icon: Users },
   ];
@@ -148,6 +151,7 @@ const AdminLayout = () => {
             <Route path="inventory/edit/:id" element={<EditProduct />} />
             <Route path="customers" element={<Customers />} />
             <Route path="orders" element={<Orders />} />
+            <Route path="order-tracker" element={<OrderTracker />} />
             <Route path="reports" element={<Reports />} />
           </Routes>
         </div>

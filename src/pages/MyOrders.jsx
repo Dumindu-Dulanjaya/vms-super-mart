@@ -2,11 +2,73 @@ import React, { useEffect, useState } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { Package, MapPin, Calendar, CreditCard, ChevronRight, Clock } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { io } from 'socket.io-client';
 
 const MyOrders = () => {
     const { user, products, currency, navigate } = useAppContext();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [highlightedOrders, setHighlightedOrders] = useState({});
+
+    useEffect(() => {
+        if (!user) return;
+
+        const socketUrl = import.meta.env.VITE_API_URL || window.location.origin;
+        const socket = io(socketUrl);
+
+        socket.on('connect', () => {
+            console.log('Connected to order WebSockets (Customer)');
+        });
+
+        socket.on('order:status-update', (data) => {
+            const { orderId, status } = data;
+            
+            setOrders((prevOrders) => {
+                const orderExists = prevOrders.some(o => o.id === orderId);
+                if (!orderExists) return prevOrders;
+
+                try {
+                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioCtx.createOscillator();
+                    const gainNode = audioCtx.createGain();
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5 note
+                    gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                    oscillator.start();
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+                    oscillator.stop(audioCtx.currentTime + 0.3);
+                } catch (e) {
+                    console.warn('AudioContext sound blocked:', e);
+                }
+
+                toast.success(`Your order status is updated to ${status.toUpperCase()}!`, {
+                    duration: 6000,
+                    position: 'bottom-right'
+                });
+
+                setHighlightedOrders(prev => ({
+                    ...prev,
+                    [orderId]: true
+                }));
+
+                setTimeout(() => {
+                    setHighlightedOrders(prev => {
+                        const copy = { ...prev };
+                        delete copy[orderId];
+                        return copy;
+                    });
+                }, 5000);
+
+                return prevOrders.map(o => o.id === orderId ? { ...o, status } : o);
+            });
+        });
+
+        return () => {
+            socket.disconnect();
+        };
+    }, [user]);
 
     useEffect(() => {
         if (!user) {
@@ -45,6 +107,10 @@ const MyOrders = () => {
         switch (status?.toLowerCase()) {
             case 'placed':
                 return 'bg-blue-50 text-blue-700 border-blue-200';
+            case 'preparing':
+                return 'bg-purple-50 text-purple-700 border-purple-200';
+            case 'ready':
+                return 'bg-teal-50 text-teal-700 border-teal-200';
             case 'shipped':
                 return 'bg-amber-50 text-amber-700 border-amber-200';
             case 'delivered':
@@ -124,8 +190,17 @@ const MyOrders = () => {
                 </div>
 
                 <div className="space-y-6">
-                    {orders.map((order) => (
-                        <div key={order.id} className="bg-white border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                    {orders.map((order) => {
+                        const isHighlighted = highlightedOrders[order.id];
+                        return (
+                            <div 
+                                key={order.id} 
+                                className={`bg-white border shadow-sm overflow-hidden hover:shadow-md transition-all duration-500 ${
+                                    isHighlighted 
+                                        ? 'border-green-500 ring-2 ring-green-400 ring-opacity-50 scale-[1.01] animate-pulse' 
+                                        : 'border-gray-200'
+                                }`}
+                            >
                             {/* Order Header */}
                             <div className="bg-slate-900 text-white px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                                 <div className="grid grid-cols-2 md:flex md:items-center gap-x-8 gap-y-2">
@@ -208,7 +283,8 @@ const MyOrders = () => {
                                 </div>
                             </div>
                         </div>
-                    ))}
+                        );
+                    })}
                 </div>
             </div>
         </div>
