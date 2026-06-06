@@ -32,8 +32,8 @@ export class EmailService {
     // Using Gmail or your email service credentials
     this.transporter = nodemailer.createTransport({
       host: this.configService.get('EMAIL_HOST', 'smtp.gmail.com'),
-      port: this.configService.get('EMAIL_PORT', 587),
-      secure: this.configService.get('EMAIL_SECURE', false),
+      port: Number(this.configService.get('EMAIL_PORT', 587)),
+      secure: this.configService.get('EMAIL_SECURE') === 'true',
       auth: {
         user: this.configService.get('EMAIL_USER'),
         pass: this.configService.get('EMAIL_PASSWORD'),
@@ -43,6 +43,7 @@ export class EmailService {
 
   @OnEvent('order.placed')
   async sendOrderConfirmation(data: OrderConfirmationData): Promise<void> {
+    console.log('DEBUG: EmailService received order.placed event for order:', data?.orderId);
     try {
       const itemsHtml = data.items
         .map(
@@ -159,6 +160,7 @@ export class EmailService {
 
   @OnEvent('user.registered')
   async sendWelcomeEmail(payload: { email: string; firstName: string }): Promise<void> {
+    console.log('DEBUG: EmailService received user.registered event for user:', payload?.email);
     const { email, firstName } = payload;
     try {
       const html = `

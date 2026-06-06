@@ -7,4 +7,6 @@ import { EmailService } from './email.service';
   providers: [EmailService],
   exports: [EmailService],
 })
-export class EmailModule {}
+export class EmailModule {
+  constructor(private readonly emailService: EmailService) {}
+}
