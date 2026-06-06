@@ -17,6 +17,7 @@ import {
   CreateUserDto,
   LoginUserDto,
   UpdateUserDto,
+  ChangePasswordDto,
 } from './users.service';
 
 @Controller('users')
@@ -56,6 +57,12 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   async updateUserProfile(@Request() req: any, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.updateUserProfile(req.user.userId, updateUserDto);
+  }
+
+  @Put('change-password')
+  @UseGuards(JwtAuthGuard)
+  async changePassword(@Request() req: any, @Body() changePasswordDto: ChangePasswordDto) {
+    return this.usersService.changePassword(req.user.userId, changePasswordDto);
   }
 
   @Get(':id/orders')

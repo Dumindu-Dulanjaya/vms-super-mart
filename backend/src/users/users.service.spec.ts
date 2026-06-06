@@ -172,4 +172,56 @@ describe('UsersService', () => {
       expect(mockUserRepository.findOne).toHaveBeenCalledWith({ where: { id: 1 }, relations: ['orders'] });
     });
   });
+
+  describe('updateUserProfile', () => {
+    it('should update user fields and return updated user info', async () => {
+      mockUserRepository.findOne.mockResolvedValue(mockUser);
+      mockUserRepository.save.mockResolvedValue({
+        ...mockUser,
+        firstName: 'Jane',
+        phone: '9999999999',
+      });
+
+      const result = await service.updateUserProfile(1, {
+        firstName: 'Jane',
+        phone: '9999999999',
+      });
+
+      expect(result.firstName).toBe('Jane');
+      expect(result.phone).toBe('9999999999');
+      expect(mockUserRepository.save).toHaveBeenCalled();
+    });
+  });
+
+  describe('changePassword', () => {
+    it('should change user password successfully when current password matches', async () => {
+      mockUserRepository.findOne.mockResolvedValue(mockUser);
+      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+      (bcrypt.hash as jest.Mock).mockResolvedValue('newHashedPassword');
+      mockUserRepository.save.mockResolvedValue({
+        ...mockUser,
+        password: 'newHashedPassword',
+      });
+
+      const result = await service.changePassword(1, {
+        currentPassword: 'hashedPassword',
+        newPassword: 'newPassword123',
+      });
+
+      expect(result.success).toBe(true);
+      expect(mockUserRepository.save).toHaveBeenCalled();
+    });
+
+    it('should throw error when current password does not match', async () => {
+      mockUserRepository.findOne.mockResolvedValue(mockUser);
+      (bcrypt.compare as jest.Mock).mockResolvedValue(false);
+
+      await expect(
+        service.changePassword(1, {
+          currentPassword: 'wrongPassword',
+          newPassword: 'newPassword123',
+        }),
+      ).rejects.toThrow(BadRequestException);
+    });
+  });
 });

@@ -46,6 +46,9 @@ export class User {
   @Column({ default: true })
   isActive!: boolean;
 
+  @Column({ type: 'json', nullable: true })
+  addresses?: any[];
+
   @OneToMany(() => Order, (order) => order.user, {
     cascade: true,
     onDelete: 'CASCADE',

@@ -5,7 +5,7 @@ import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../entities/user.entity';
 import { EmailService } from '../email/email.service';
-import { IsEmail, IsString, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsEmail, IsString, IsNotEmpty, IsOptional, IsArray } from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
@@ -72,6 +72,20 @@ export class UpdateUserDto {
   @IsOptional()
   @IsString()
   province?: string;
+
+  @IsOptional()
+  @IsArray()
+  addresses?: any[];
+}
+
+export class ChangePasswordDto {
+  @IsString()
+  @IsNotEmpty()
+  currentPassword!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  newPassword!: string;
 }
 
 export class LoginUserDto {
@@ -179,7 +193,10 @@ export class UsersService {
 
     // Don't return password
     const { password, ...userWithoutPassword } = user;
-    return userWithoutPassword;
+    return {
+      ...userWithoutPassword,
+      addresses: user.addresses || [],
+    };
   }
 
   async updateUserProfile(id: number, updateUserDto: UpdateUserDto) {
@@ -195,7 +212,35 @@ export class UsersService {
     const updatedUser = await this.usersRepository.save(user);
 
     const { password, ...userWithoutPassword } = updatedUser;
-    return userWithoutPassword;
+    return {
+      ...userWithoutPassword,
+      addresses: updatedUser.addresses || [],
+    };
+  }
+
+  async changePassword(id: number, changePasswordDto: ChangePasswordDto) {
+    const user = await this.usersRepository.findOne({
+      where: { id },
+    });
+
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    const passwordMatches = await bcrypt.compare(
+      changePasswordDto.currentPassword,
+      user.password,
+    );
+
+    if (!passwordMatches) {
+      throw new BadRequestException('Incorrect current password');
+    }
+
+    const hashedPassword = await bcrypt.hash(changePasswordDto.newPassword, 10);
+    user.password = hashedPassword;
+    await this.usersRepository.save(user);
+
+    return { success: true };
   }
 
   async getUserOrders(id: number) {
@@ -281,6 +326,7 @@ export class UsersService {
         city: user.city || '',
         postalCode: user.postalCode || '',
         province: user.province || '',
+        addresses: user.addresses || [],
         accessToken: token,
       };
     } catch (err: any) {

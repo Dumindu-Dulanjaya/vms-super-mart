@@ -106,6 +106,68 @@ export class ProductsService {
     return products.map((product) => this.toResponse(product));
   }
 
+  async findPaginated(options: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    category?: string;
+    sort?: string;
+  }) {
+    const page = options.page || 1;
+    const limit = options.limit || 10;
+    const skip = (page - 1) * limit;
+
+    const query = this.productRepository.createQueryBuilder('product')
+      .leftJoinAndSelect('product.category', 'category')
+      .leftJoinAndSelect('product.batches', 'batches');
+
+    if (options.search) {
+      query.andWhere(
+        '(product.name LIKE :search OR product.description LIKE :search)',
+        { search: `%${options.search}%` },
+      );
+    }
+
+    if (options.category) {
+      query.andWhere('category.name = :category', { category: options.category });
+    }
+
+    if (options.sort) {
+      switch (options.sort) {
+        case 'price_low':
+          query.orderBy('product.price', 'ASC');
+          break;
+        case 'price_high':
+          query.orderBy('product.price', 'DESC');
+          break;
+        case 'rating':
+          query.orderBy('product.rating', 'DESC');
+          break;
+        case 'name':
+          query.orderBy('product.name', 'ASC');
+          break;
+        default:
+          query.orderBy('product.id', 'ASC');
+      }
+    } else {
+      query.orderBy('product.id', 'ASC');
+    }
+
+    query.skip(skip).take(limit);
+
+    const [products, total] = await query.getManyAndCount();
+
+    return {
+      data: products.map((product) => this.toResponse(product)),
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
   async findOne(id: number) {
     const product = await this.productRepository.findOne({
       where: { id },

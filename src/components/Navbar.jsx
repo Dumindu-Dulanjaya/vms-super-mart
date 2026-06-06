@@ -11,7 +11,35 @@ const Navbar = () => {
     const location = useLocation()
     const navigate = useNavigate()
     const hideIcons = location && location.pathname === '/login'
-    const { searchQuery, setSearchQuery, cartItems, wishlistItems = [], user, userLogout } = useAppContext()
+    const { searchQuery, setSearchQuery, cartItems, wishlistItems = [], user, userLogout, products = [], currency } = useAppContext()
+    const [suggestions, setSuggestions] = React.useState([])
+    const [showSuggestions, setShowSuggestions] = React.useState(false)
+
+    const handleSearchChange = (e) => {
+        const query = e.target.value;
+        setSearchQuery(query);
+        
+        if (query.trim().length > 1) {
+            const matches = products.filter(p => 
+                p.name.toLowerCase().includes(query.toLowerCase()) ||
+                p.category.toLowerCase().includes(query.toLowerCase())
+            ).slice(0, 5);
+            setSuggestions(matches);
+            setShowSuggestions(true);
+        } else {
+            setSuggestions([]);
+            setShowSuggestions(false);
+        }
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            setShowSuggestions(false);
+            if (location.pathname !== '/all-products') {
+                navigate('/all-products');
+            }
+        }
+    };
 
     // Calculate total cart items
     const getCartCount = () => {
@@ -49,20 +77,53 @@ const Navbar = () => {
                 </div>
 
                 {!hideIcons && (
-                    <div className="hidden lg:flex items-center text-sm gap-3 border border-slate-700 px-4 py-2 rounded-none hover:border-[#00FF33] transition-all bg-slate-800/50 group">
-                        <Search size={16} className="text-slate-500 group-hover:text-[#00FF33] transition-colors" />
+                    <div className="hidden lg:flex items-center text-sm gap-3 border border-slate-700 px-4 py-2 rounded-none hover:border-[#00FF33] transition-all bg-slate-800/50 group relative">
+                        <Search size={16} className="text-slate-500 group-hover:text-[#00FF33] transition-colors cursor-pointer" onClick={() => {
+                            if (location.pathname !== '/all-products') navigate('/all-products');
+                        }} />
                         <input
                             className="py-1 w-48 xl:w-64 bg-transparent outline-none text-white placeholder-slate-500 font-bold"
                             type="text"
                             placeholder="Search in VMS Super Mart"
                             value={searchQuery}
-                            onChange={(e) => {
-                                setSearchQuery(e.target.value)
-                                if (location.pathname !== '/all-products') {
-                                    navigate('/all-products')
+                            onChange={handleSearchChange}
+                            onKeyDown={handleKeyDown}
+                            onFocus={() => {
+                                if (searchQuery.trim().length > 1) {
+                                    setShowSuggestions(true);
                                 }
                             }}
+                            onBlur={() => setTimeout(() => setShowSuggestions(false), 250)}
                         />
+
+                        {/* Suggestions Dropdown */}
+                        {showSuggestions && suggestions.length > 0 && (
+                            <div className="absolute top-full left-0 right-0 bg-slate-900 border border-slate-800 mt-2 shadow-[0_10px_30px_rgba(0,0,0,0.6)] z-50 overflow-hidden divide-y divide-slate-800/60 animate-fadeIn">
+                                {suggestions.map((p) => (
+                                    <div
+                                        key={p.id}
+                                        onClick={() => {
+                                            setShowSuggestions(false);
+                                            navigate(`/product/${p.slug}`);
+                                        }}
+                                        className="flex items-center justify-between gap-3 p-3 hover:bg-slate-800 cursor-pointer transition-colors"
+                                    >
+                                        <div className="flex items-center gap-3 min-w-0">
+                                            <div className="w-10 h-10 bg-slate-800 rounded-none overflow-hidden flex-shrink-0 flex items-center justify-center border border-slate-700">
+                                                <img src={p.image} alt={p.name} className="w-full h-full object-contain" />
+                                            </div>
+                                            <div className="min-w-0 text-left">
+                                                <p className="text-xs font-bold text-white truncate">{p.name}</p>
+                                                <p className="text-[9px] font-black uppercase text-slate-400 tracking-wider mt-0.5">{p.category}</p>
+                                            </div>
+                                        </div>
+                                        <div className="text-right flex-shrink-0">
+                                            <p className="text-xs font-black text-[#00FF33]">{currency}{p.price}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 )}
 
@@ -115,6 +176,18 @@ const Navbar = () => {
                                             <p className="text-[10px] text-slate-500 font-medium truncate">{user.email}</p>
                                         </div>
                                         <div className="p-2 space-y-1">
+                                            <Link
+                                                to="/profile"
+                                                className="flex items-center gap-3 px-4 py-3 hover:bg-slate-800 text-slate-300 rounded-none transition-colors group/item"
+                                            >
+                                                <div className="w-8 h-8 rounded-none bg-slate-800 flex items-center justify-center text-[#00FF33] group-hover/item:bg-[#00FF33] group-hover/item:text-slate-900 transition-colors">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm font-black uppercase tracking-tight text-white">My Profile</p>
+                                                    <p className="text-[10px] text-slate-500 font-bold tracking-tight">Account & Addresses</p>
+                                                </div>
+                                            </Link>
                                             <Link
                                                 to="/my-orders"
                                                 className="flex items-center gap-3 px-4 py-3 hover:bg-slate-800 text-slate-300 rounded-none transition-colors group/item"

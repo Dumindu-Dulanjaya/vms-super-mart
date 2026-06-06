@@ -130,7 +130,8 @@ export const AppContextProvider = ({ children }) => {
           address: data.address || '',
           city: data.city || '',
           postalCode: data.postalCode || '',
-          province: data.province || ''
+          province: data.province || '',
+          addresses: data.addresses || []
         };
         setUser(profile);
         return profile;
@@ -419,8 +420,75 @@ export const AppContextProvider = ({ children }) => {
     navigate('/');
   };
 
+  const updateUserProfile = async (profileData) => {
+    try {
+      const token = localStorage.getItem('userToken');
+      const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/users/profile`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(profileData)
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || 'Failed to update profile');
+      }
+
+      const data = await res.json();
+      const profile = {
+        id: data.id,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        role: data.role,
+        phone: data.phone || '',
+        address: data.address || '',
+        city: data.city || '',
+        postalCode: data.postalCode || '',
+        province: data.province || '',
+        addresses: data.addresses || []
+      };
+      setUser(profile);
+      toast.success('Profile updated successfully!');
+      return profile;
+    } catch (e) {
+      toast.error(e.message || 'Failed to update profile');
+      throw e;
+    }
+  };
+
+  const changePassword = async (passwordsData) => {
+    try {
+      const token = localStorage.getItem('userToken');
+      const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/users/change-password`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(passwordsData)
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || 'Failed to change password');
+      }
+
+      toast.success('Password updated successfully!');
+      return true;
+    } catch (e) {
+      toast.error(e.message || 'Failed to change password');
+      throw e;
+    }
+  };
+
   const value = {
     navigate,
+    updateUserProfile,
+    changePassword,
     user,
     setUser,
     isSeller,

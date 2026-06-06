@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards, Put, Delete } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards, Put, Delete, Query } from '@nestjs/common';
 import { IsString, IsNumber, IsOptional, IsBoolean, IsArray, IsInt, Min, Max } from 'class-validator';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from '../auth/roles.decorator';
@@ -98,7 +98,22 @@ export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Get()
-  findAll() {
+  findAll(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('search') search?: string,
+    @Query('category') category?: string,
+    @Query('sort') sort?: string,
+  ) {
+    if (page || limit || search || category || sort) {
+      return this.productsService.findPaginated({
+        page: page ? Number(page) : 1,
+        limit: limit ? Number(limit) : 10,
+        search,
+        category,
+        sort,
+      });
+    }
     return this.productsService.findAll();
   }
 

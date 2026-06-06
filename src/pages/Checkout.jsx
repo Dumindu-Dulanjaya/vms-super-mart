@@ -5,13 +5,138 @@ import { MapPin, CreditCard, Wallet, Check, Package } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const Checkout = () => {
-    const { cartItems, products, currency, setCartItems, checkout, user, refreshProducts } = useAppContext();
+    const { cartItems, products, currency, setCartItems, checkout, user, refreshProducts, updateUserProfile } = useAppContext();
     const navigate = useNavigate();
     const [cartData, setCartData] = useState([]);
     const [paymentMethod, setPaymentMethod] = useState('cod');
+    const [saveAddressToBook, setSaveAddressToBook] = useState(false);
+
+    const mapInstanceRef = React.useRef(null);
+    const markerRef = React.useRef(null);
 
     useEffect(() => {
         refreshProducts();
+    }, []);
+
+    const reverseGeocode = async (lat, lng) => {
+        try {
+            const response = await fetch(
+                `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`
+            );
+            if (response.ok) {
+                const data = await response.json();
+                const addr = data.address || {};
+                
+                // Match Sri Lankan provinces
+                const stateName = addr.state || addr.province || '';
+                let matchedProvince = '';
+                if (stateName.toLowerCase().includes('western')) matchedProvince = 'Western';
+                else if (stateName.toLowerCase().includes('central')) matchedProvince = 'Central';
+                else if (stateName.toLowerCase().includes('southern')) matchedProvince = 'Southern';
+                else if (stateName.toLowerCase().includes('northern')) matchedProvince = 'Northern';
+                else if (stateName.toLowerCase().includes('eastern')) matchedProvince = 'Eastern';
+                else if (stateName.toLowerCase().includes('north western')) matchedProvince = 'North Western';
+                else if (stateName.toLowerCase().includes('north central')) matchedProvince = 'North Central';
+                else if (stateName.toLowerCase().includes('uva')) matchedProvince = 'Uva';
+                else if (stateName.toLowerCase().includes('sabaragamuwa')) matchedProvince = 'Sabaragamuwa';
+
+                // Auto-fill form fields
+                const road = addr.road || addr.suburb || addr.neighbourhood || '';
+                const village = addr.village || addr.suburb || addr.town || '';
+                const streetAddress = road ? `${road}${village ? ', ' + village : ''}` : (data.display_name || '');
+
+                setFormData((prev) => ({
+                    ...prev,
+                    address: streetAddress,
+                    city: addr.city || addr.town || addr.village || addr.suburb || '',
+                    postalCode: addr.postcode || '',
+                    province: matchedProvince || prev.province || ''
+                }));
+                
+                toast.success('Address auto-filled from map!');
+            }
+        } catch (err) {
+            console.error('Failed to reverse geocode', err);
+        }
+    };
+
+    const handleDetectLocation = () => {
+        if (!navigator.geolocation) {
+            toast.error('Geolocation is not supported by your browser.');
+            return;
+        }
+
+        toast.loading('Detecting your GPS location...', { id: 'gps-loading' });
+
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                const { latitude, longitude } = position.coords;
+                toast.dismiss('gps-loading');
+                toast.success('Live location detected!');
+
+                if (mapInstanceRef.current && markerRef.current) {
+                    const latLng = [latitude, longitude];
+                    mapInstanceRef.current.setView(latLng, 16);
+                    markerRef.current.setLatLng(latLng);
+                    await reverseGeocode(latitude, longitude);
+                }
+            },
+            (error) => {
+                toast.dismiss('gps-loading');
+                console.error('GPS detection error', error);
+                toast.error('Unable to retrieve GPS coordinates. Please select manually on map.');
+            },
+            { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+        );
+    };
+
+    useEffect(() => {
+        // If Leaflet is not loaded from CDN yet, wait or skip
+        if (!window.L) return;
+
+        if (!mapInstanceRef.current && document.getElementById('checkout-map')) {
+            const defaultLatLng = [6.9271, 79.8612]; // Colombo
+            
+            const map = window.L.map('checkout-map', {
+                zoomControl: true,
+                scrollWheelZoom: true
+            }).setView(defaultLatLng, 13);
+
+            window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            const customIcon = window.L.divIcon({
+                className: 'custom-map-pin',
+                html: `<div class="flex items-center justify-center w-8 h-8 rounded-full bg-slate-900 border-2 border-[#00FF33] shadow-lg relative">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00FF33" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                         <div class="absolute -bottom-1 w-2 h-2 bg-slate-900 border-r border-b border-[#00FF33] rotate-45"></div>
+                       </div>`,
+                iconSize: [32, 32],
+                iconAnchor: [16, 32]
+            });
+
+            const marker = window.L.marker(defaultLatLng, {
+                draggable: true,
+                icon: customIcon
+            }).addTo(map);
+
+            marker.on('dragend', async () => {
+                const position = marker.getLatLng();
+                await reverseGeocode(position.lat, position.lng);
+            });
+
+            mapInstanceRef.current = map;
+            markerRef.current = marker;
+        }
+
+        return () => {
+            if (mapInstanceRef.current) {
+                mapInstanceRef.current.remove();
+                mapInstanceRef.current = null;
+                markerRef.current = null;
+            }
+        };
     }, []);
     const [formData, setFormData] = useState({
         firstName: '',
@@ -94,7 +219,7 @@ const Checkout = () => {
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
+        if (e && e.preventDefault) e.preventDefault();
 
         // Validation
         const requiredFields = ['firstName', 'lastName', 'email', 'phone', 'address', 'city', 'postalCode', 'province'];
@@ -107,6 +232,31 @@ const Checkout = () => {
 
         setIsSubmitting(true);
         try {
+            // Save address to book if checked
+            if (user && saveAddressToBook) {
+                const currentAddresses = user.addresses || [];
+                const exists = currentAddresses.some(addr => 
+                    addr.address.toLowerCase().trim() === formData.address.toLowerCase().trim() && 
+                    addr.city.toLowerCase().trim() === formData.city.toLowerCase().trim()
+                );
+                
+                if (!exists) {
+                    const newAddress = {
+                        id: Math.random().toString(36).substring(2, 9),
+                        label: 'Home',
+                        firstName: formData.firstName,
+                        lastName: formData.lastName,
+                        phone: formData.phone,
+                        address: formData.address,
+                        city: formData.city,
+                        postalCode: formData.postalCode,
+                        province: formData.province,
+                        isDefault: currentAddresses.length === 0
+                    };
+                    await updateUserProfile({ addresses: [...currentAddresses, newAddress] });
+                }
+            }
+
             const order = await checkout(formData, paymentMethod);
             setCartItems({});
             navigate('/');
@@ -148,6 +298,96 @@ const Checkout = () => {
                                     <MapPin size={20} className="text-white" />
                                 </div>
                                 <h2 className="text-xl font-bold text-gray-800">Shipping Address</h2>
+                            </div>
+
+                            {/* Saved Address Selector */}
+                            {user && user.addresses && user.addresses.length > 0 && (
+                                <div className="mb-6 p-4 bg-slate-50 border border-slate-200">
+                                    <p className="text-xs font-black uppercase tracking-wider text-slate-400 mb-3">Choose from saved addresses</p>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        {user.addresses.map((addr) => (
+                                            <div
+                                                key={addr.id}
+                                                onClick={() => {
+                                                    setFormData({
+                                                        firstName: addr.firstName,
+                                                        lastName: addr.lastName,
+                                                        email: user.email,
+                                                        phone: addr.phone,
+                                                        address: addr.address,
+                                                        city: addr.city,
+                                                        postalCode: addr.postalCode,
+                                                        province: addr.province
+                                                    });
+                                                }}
+                                                className={`cursor-pointer p-4 bg-white border transition-all hover:border-[#00FF33] text-left relative ${
+                                                    formData.address === addr.address && formData.city === addr.city
+                                                        ? 'border-l-4 border-l-[#00FF33] border-slate-900 shadow-sm'
+                                                        : 'border-slate-200'
+                                                }`}
+                                            >
+                                                <div className="flex items-center gap-1.5 mb-1.5">
+                                                    <span className="bg-slate-900 text-white px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider">
+                                                        {addr.label}
+                                                    </span>
+                                                    {addr.isDefault && (
+                                                        <span className="bg-green-50 text-green-700 border border-green-200 px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider">
+                                                            Default
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <p className="text-xs font-black text-slate-800">{addr.firstName} {addr.lastName}</p>
+                                                <p className="text-[11px] text-slate-500 font-semibold truncate mt-0.5">{addr.phone}</p>
+                                                <p className="text-[11px] text-slate-755 mt-1 truncate">{addr.address}</p>
+                                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">{addr.city}, {addr.province}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="mt-4 flex items-center justify-between">
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setFormData({
+                                                    firstName: '',
+                                                    lastName: '',
+                                                    email: user.email || '',
+                                                    phone: '',
+                                                    address: '',
+                                                    city: '',
+                                                    postalCode: '',
+                                                    province: ''
+                                                });
+                                            }}
+                                            className="text-xs font-black uppercase tracking-widest text-[#00FF33] hover:text-[#00CC29] bg-transparent border-none cursor-pointer"
+                                        >
+                                            + Enter New Address
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Map Picker Dashboard */}
+                            <div className="mb-6 p-4 border border-slate-200/80 bg-slate-50/50">
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+                                    <div>
+                                        <p className="text-xs font-black uppercase tracking-wider text-slate-800">Choose Location on Map</p>
+                                        <p className="text-[10px] text-slate-400 font-bold uppercase mt-0.5">Drag the pin to your delivery address</p>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={handleDetectLocation}
+                                        className="flex items-center justify-center gap-1.5 bg-slate-900 hover:bg-slate-800 text-[#00FF33] px-3.5 py-2 text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 cursor-pointer border-none shadow-sm"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+                                        Use Live GPS Location
+                                    </button>
+                                </div>
+                                
+                                <div 
+                                    id="checkout-map" 
+                                    className="h-60 w-full border border-slate-200 z-10 relative bg-slate-100"
+                                    style={{ minHeight: '240px' }}
+                                ></div>
                             </div>
 
                             <form onSubmit={handleSubmit} className="space-y-4">
@@ -265,6 +505,21 @@ const Checkout = () => {
                                         </select>
                                     </div>
                                 </div>
+
+                                {user && (
+                                    <div className="flex items-center gap-2 mt-4 pt-2 border-t border-slate-100">
+                                        <input
+                                            type="checkbox"
+                                            id="saveAddressToBook"
+                                            checked={saveAddressToBook}
+                                            onChange={(e) => setSaveAddressToBook(e.target.checked)}
+                                            className="w-4 h-4 text-[#00FF33] border-gray-300 rounded focus:ring-[#00FF33] cursor-pointer"
+                                        />
+                                        <label htmlFor="saveAddressToBook" className="text-xs text-gray-600 font-bold select-none cursor-pointer uppercase tracking-tight">
+                                            Save this address to my Address Book for future checkouts
+                                        </label>
+                                    </div>
+                                )}
                             </form>
                         </div>
 

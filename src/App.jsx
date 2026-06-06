@@ -18,6 +18,7 @@ import Cart from './pages/Cart';
 import Wishlist from './pages/Wishlist';
 import Checkout from './pages/Checkout';
 import MyOrders from './pages/MyOrders';
+import Profile from './pages/Profile';
 import AdminLayout from './pages/admin/AdminLayout';
 import DeliveryDashboard from './pages/DeliveryDashboard';
 import { useAppContext } from './context/AppContext';
@@ -58,6 +59,7 @@ const App = () => {
           <Route path='/wishlist' element={<Wishlist />} />
           <Route path='/checkout' element={<Checkout />} />
           <Route path='/my-orders' element={<MyOrders />} />
+          <Route path='/profile' element={<Profile />} />
 
           {/* Delivery Dashboard */}
           <Route path='/delivery' element={<DeliveryDashboard />} />

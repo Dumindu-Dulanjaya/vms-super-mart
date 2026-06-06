@@ -17,6 +17,10 @@ const AllProducts = () => {
   const [sortBy, setSortBy] = useState('featured');
   const [selectedCategories, setSelectedCategories] = useState([]);
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+
   // Get unique categories
   const categories = [...new Set(products.map(p => p.category))];
 
@@ -75,6 +79,10 @@ const AllProducts = () => {
 
     setFilteredProducts(filtered);
   }, [searchQuery, products, categoryFilter, priceRange, selectedRating, sortBy, selectedCategories]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, categoryFilter, priceRange, selectedRating, sortBy, selectedCategories]);
 
   const toggleCategory = (category) => {
     setSelectedCategories(prev =>
@@ -215,26 +223,87 @@ const AllProducts = () => {
 
           {/* Products Grid */}
           <div className="flex-1">
-            {/* Results count */}
-            <div className="mb-4 text-gray-600">
-              Showing {filteredProducts.length} products
-            </div>
+            {(() => {
+              const inStockProducts = filteredProducts.filter((product) => (product.instock ?? true));
+              const totalPages = Math.ceil(inStockProducts.length / itemsPerPage);
+              const paginatedProducts = inStockProducts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-            {filteredProducts.length === 0 ? (
-              <div className="text-center py-16">
-                <p className="text-xl text-gray-500">
-                  {searchQuery ? 'No products found matching your search.' : 'Loading products...'}
-                </p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {filteredProducts
-                  .filter((product) => (product.instock ?? true))
-                  .map((product) => (
-                    <ProductCard key={product.id} product={product} />
-                  ))}
-              </div>
-            )}
+              return (
+                <>
+                  {/* Results count */}
+                  <div className="mb-4 text-gray-600 text-xs font-black uppercase tracking-wider">
+                    {inStockProducts.length > 0 ? (
+                      <span>Showing {Math.min((currentPage - 1) * itemsPerPage + 1, inStockProducts.length)}-{Math.min(currentPage * itemsPerPage, inStockProducts.length)} of {inStockProducts.length} products</span>
+                    ) : (
+                      <span>Showing 0 products</span>
+                    )}
+                  </div>
+
+                  {paginatedProducts.length === 0 ? (
+                    <div className="text-center py-16">
+                      <p className="text-xl text-gray-500">
+                        {searchQuery ? 'No products found matching your search.' : 'Loading products...'}
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        {paginatedProducts.map((product) => (
+                          <ProductCard key={product.id} product={product} />
+                        ))}
+                      </div>
+
+                      {/* Pagination Controls */}
+                      {totalPages > 1 && (
+                        <div className="flex items-center justify-center gap-2 mt-12 pt-6 border-t border-slate-100">
+                          <button
+                            onClick={() => {
+                              setCurrentPage(prev => Math.max(prev - 1, 1));
+                              window.scrollTo({ top: 0, behavior: 'smooth' });
+                            }}
+                            disabled={currentPage === 1}
+                            className="px-4 py-2 text-xs font-black uppercase tracking-widest bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors"
+                          >
+                            Prev
+                          </button>
+                          
+                          {Array.from({ length: totalPages }).map((_, idx) => {
+                            const pageNum = idx + 1;
+                            return (
+                              <button
+                                key={pageNum}
+                                onClick={() => {
+                                  setCurrentPage(pageNum);
+                                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                                }}
+                                className={`w-9 h-9 text-xs font-black transition-all cursor-pointer border ${
+                                  currentPage === pageNum
+                                    ? 'bg-slate-900 text-[#00FF33] border-slate-900 shadow-sm'
+                                    : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                                }`}
+                              >
+                                {pageNum}
+                              </button>
+                            );
+                          })}
+
+                          <button
+                            onClick={() => {
+                              setCurrentPage(prev => Math.min(prev + 1, totalPages));
+                              window.scrollTo({ top: 0, behavior: 'smooth' });
+                            }}
+                            disabled={currentPage === totalPages}
+                            className="px-4 py-2 text-xs font-black uppercase tracking-widest bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors"
+                          >
+                            Next
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </>
+              );
+            })()}
           </div>
         </div>
       </div>
