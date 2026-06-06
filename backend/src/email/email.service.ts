@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import { ConfigService } from '@nestjs/config';
+import { OnEvent } from '@nestjs/event-emitter';
 
 interface OrderConfirmationData {
   orderId: string;
@@ -40,6 +41,7 @@ export class EmailService {
     });
   }
 
+  @OnEvent('order.placed')
   async sendOrderConfirmation(data: OrderConfirmationData): Promise<void> {
     try {
       const itemsHtml = data.items
@@ -155,7 +157,9 @@ export class EmailService {
     }
   }
 
-  async sendWelcomeEmail(email: string, firstName: string): Promise<void> {
+  @OnEvent('user.registered')
+  async sendWelcomeEmail(payload: { email: string; firstName: string }): Promise<void> {
+    const { email, firstName } = payload;
     try {
       const html = `
         <!DOCTYPE html>

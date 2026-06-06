@@ -4,7 +4,7 @@ import { OrdersService } from './orders.service';
 import { Order } from '../entities/order.entity';
 import { OrderItem } from '../entities/order-item.entity';
 import { ProductsService } from '../products/products.service';
-import { EmailService } from '../email/email.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { EventsGateway } from '../events/events.gateway';
 
@@ -13,7 +13,7 @@ describe('OrdersService', () => {
   let mockOrderRepository: any;
   let mockOrderItemRepository: any;
   let mockProductsService: any;
-  let mockEmailService: any;
+  let mockEventEmitter: any;
   let mockEventsGateway: any;
 
   const mockOrder = {
@@ -59,8 +59,8 @@ describe('OrdersService', () => {
       decreaseStock: jest.fn().mockResolvedValue(undefined),
     };
 
-    mockEmailService = {
-      sendOrderConfirmation: jest.fn().mockResolvedValue(undefined),
+    mockEventEmitter = {
+      emit: jest.fn(),
     };
 
     mockEventsGateway = {
@@ -84,8 +84,8 @@ describe('OrdersService', () => {
           useValue: mockProductsService,
         },
         {
-          provide: EmailService,
-          useValue: mockEmailService,
+          provide: EventEmitter2,
+          useValue: mockEventEmitter,
         },
         {
           provide: EventsGateway,
@@ -160,7 +160,7 @@ describe('OrdersService', () => {
 
       expect(result).toBeDefined();
       expect(mockProductsService.checkStockAvailability).toHaveBeenCalled();
-      expect(mockEmailService.sendOrderConfirmation).toHaveBeenCalled();
+      expect(mockEventEmitter.emit).toHaveBeenCalledWith('order.placed', expect.any(Object));
       expect(mockProductsService.decreaseStock).toHaveBeenCalled();
     });
 

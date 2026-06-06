@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ProductsService } from '../products/products.service';
-import { EmailService } from '../email/email.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Order } from '../entities/order.entity';
 import { OrderItem } from '../entities/order-item.entity';
 import { EventsGateway } from '../events/events.gateway';
@@ -30,7 +30,7 @@ type CheckoutPayload = {
 export class OrdersService {
   constructor(
     private readonly productsService: ProductsService,
-    private readonly emailService: EmailService,
+    private readonly eventEmitter: EventEmitter2,
     @InjectRepository(Order)
     private readonly orderRepository: Repository<Order>,
     @InjectRepository(OrderItem)
@@ -130,8 +130,8 @@ export class OrdersService {
       await this.productsService.decreaseStock(item.productId, item.quantity);
     }
 
-    // Send order confirmation email
-    await this.emailService.sendOrderConfirmation({
+    // Send order confirmation email (asynchronously in background)
+    this.eventEmitter.emit('order.placed', {
       orderId: saved.id,
       customerName: `${payload.firstName} ${payload.lastName}`,
       customerEmail: payload.email,

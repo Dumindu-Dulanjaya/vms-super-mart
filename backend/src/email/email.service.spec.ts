@@ -108,7 +108,7 @@ describe('EmailService', () => {
       const email = 'newuser@example.com';
       const firstName = 'John';
 
-      await service.sendWelcomeEmail(email, firstName);
+      await service.sendWelcomeEmail({ email, firstName });
 
       expect((service as any).transporter.sendMail).toHaveBeenCalled();
       const callArgs = ((service as any).transporter.sendMail as jest.Mock).mock.calls[0][0];
@@ -124,7 +124,7 @@ describe('EmailService', () => {
 
       // Should not throw error
       await expect(
-        service.sendWelcomeEmail('test@example.com', 'Test'),
+        service.sendWelcomeEmail({ email: 'test@example.com', firstName: 'Test' }),
       ).resolves.not.toThrow();
     });
   });

@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../entities/user.entity';
-import { EmailService } from '../email/email.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { IsEmail, IsString, IsNotEmpty, IsOptional, IsArray } from 'class-validator';
 
 export class CreateUserDto {
@@ -103,7 +103,7 @@ export class UsersService {
     @InjectRepository(User)
     private usersRepository: Repository<User>,
     private jwtService: JwtService,
-    private emailService: EmailService,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async registerUser(createUserDto: CreateUserDto) {
@@ -127,8 +127,8 @@ export class UsersService {
 
     const savedUser = await this.usersRepository.save(user);
 
-    // Send welcome email
-    await this.emailService.sendWelcomeEmail(savedUser.email, savedUser.firstName);
+    // Send welcome email (asynchronously in background)
+    this.eventEmitter.emit('user.registered', { email: savedUser.email, firstName: savedUser.firstName });
 
     // Generate JWT token
     const token = this.jwtService.sign({
@@ -302,11 +302,8 @@ export class UsersService {
         });
         user = await this.usersRepository.save(user);
 
-        try {
-          await this.emailService.sendWelcomeEmail(user.email, user.firstName);
-        } catch (e) {
-          // ignore email errors in local/dev
-        }
+        // Send welcome email (asynchronously in background)
+        this.eventEmitter.emit('user.registered', { email: user.email, firstName: user.firstName });
       }
 
       const token = this.jwtService.sign({

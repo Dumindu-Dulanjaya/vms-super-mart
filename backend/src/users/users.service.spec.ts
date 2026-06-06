@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { UsersService } from './users.service';
-import { EmailService } from '../email/email.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { User } from '../entities/user.entity';
 import { BadRequestException } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
@@ -13,7 +13,7 @@ describe('UsersService', () => {
   let service: UsersService;
   let mockUserRepository: any;
   let mockJwtService: any;
-  let mockEmailService: any;
+  let mockEventEmitter: any;
 
   const mockUser = {
     id: 1,
@@ -43,8 +43,8 @@ describe('UsersService', () => {
       sign: jest.fn().mockReturnValue('jwt_token'),
     };
 
-    mockEmailService = {
-      sendWelcomeEmail: jest.fn().mockResolvedValue(undefined),
+    mockEventEmitter = {
+      emit: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -59,8 +59,8 @@ describe('UsersService', () => {
           useValue: mockJwtService,
         },
         {
-          provide: EmailService,
-          useValue: mockEmailService,
+          provide: EventEmitter2,
+          useValue: mockEventEmitter,
         },
       ],
     }).compile();
@@ -92,9 +92,9 @@ describe('UsersService', () => {
 
       expect(result).toHaveProperty('accessToken');
       expect(result.email).toBe(createUserDto.email);
-      expect(mockEmailService.sendWelcomeEmail).toHaveBeenCalledWith(
-        createUserDto.email,
-        createUserDto.firstName,
+      expect(mockEventEmitter.emit).toHaveBeenCalledWith(
+        'user.registered',
+        { email: createUserDto.email, firstName: createUserDto.firstName }
       );
       expect(mockJwtService.sign).toHaveBeenCalled();
     });
