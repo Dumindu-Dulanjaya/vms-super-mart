@@ -19,6 +19,7 @@ import Wishlist from './pages/Wishlist';
 import Checkout from './pages/Checkout';
 import MyOrders from './pages/MyOrders';
 import Profile from './pages/Profile';
+import VmsPortal from './pages/VmsPortal';
 import AdminLayout from './pages/admin/AdminLayout';
 import DeliveryDashboard from './pages/DeliveryDashboard';
 import { useAppContext } from './context/AppContext';
@@ -31,8 +32,9 @@ const App = () => {
   const isAdminPath = location.pathname.startsWith("/admin");
   const isSellerPath = location.pathname.includes("seller");
   const isDeliveryPath = location.pathname.startsWith("/delivery");
+  const isPortalPath = location.pathname.startsWith("/portal");
 
-  const isFullLayoutPath = !isAdminPath && !isSellerPath && !isDeliveryPath;
+  const isFullLayoutPath = !isAdminPath && !isSellerPath && !isDeliveryPath && !isPortalPath;
   const isHomePage = location.pathname === "/";
 
   return (
@@ -60,6 +62,7 @@ const App = () => {
           <Route path='/checkout' element={<Checkout />} />
           <Route path='/my-orders' element={<MyOrders />} />
           <Route path='/profile' element={<Profile />} />
+          <Route path='/portal' element={<VmsPortal />} />
 
           {/* Delivery Dashboard */}
           <Route path='/delivery' element={<DeliveryDashboard />} />
