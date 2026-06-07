@@ -1,0 +1,11 @@
+schemaVersion: "1.0"
+
+endpoints:
+  - name: vms-backend-api
+    displayName: VMS Backend API
+    service:
+      port: 3001
+      basePath: /
+    type: REST
+    networkVisibilities:
+      - Public

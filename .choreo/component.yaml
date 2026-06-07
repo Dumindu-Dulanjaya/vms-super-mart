@@ -1,0 +1,11 @@
+schemaVersion: "1.0"
+
+endpoints:
+  - name: vms-frontend
+    displayName: VMS Supermarket Frontend
+    service:
+      port: 80
+      basePath: /
+    type: REST
+    networkVisibilities:
+      - Public

@@ -12,8 +12,23 @@ async function bootstrap() {
 
   const app = await NestFactory.create(AppModule);
 
+  const allowedOrigins = process.env.CORS_ORIGIN
+    ? process.env.CORS_ORIGIN.split(',').map((o) => o.trim())
+    : ['http://localhost:5173', 'http://localhost:4173'];
+
   app.enableCors({
-    origin: true,
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, Postman, etc.)
+      if (!origin) return callback(null, true);
+      if (
+        allowedOrigins.some((allowed) =>
+          allowed === '*' || origin === allowed || origin.endsWith('.choreoapis.dev') || origin.endsWith('.choreoapps.dev')
+        )
+      ) {
+        return callback(null, true);
+      }
+      return callback(new Error(`CORS: origin ${origin} not allowed`));
+    },
     credentials: true,
   });
 
