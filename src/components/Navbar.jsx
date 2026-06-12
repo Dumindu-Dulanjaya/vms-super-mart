@@ -74,7 +74,6 @@ const Navbar = () => {
                     <Link to="/" className="hover:text-[#00FF33] transition-colors border-b-2 border-transparent hover:border-[#00FF33] pb-1">Home</Link>
                     <Link to="/contact" className="hover:text-[#00FF33] transition-colors border-b-2 border-transparent hover:border-[#00FF33] pb-1">Contact</Link>
                     <Link to="/all-products" className="hover:text-[#00FF33] transition-colors border-b-2 border-transparent hover:border-[#00FF33] pb-1">All Products</Link>
-                    <Link to="/portal" className="text-[#00FF33] hover:text-white transition-colors border-b-2 border-transparent hover:border-white pb-1 flex items-center gap-1">✨ Portal</Link>
                 </div>
 
                 {!hideIcons && (
@@ -201,18 +200,6 @@ const Navbar = () => {
                                                     <p className="text-[10px] text-slate-500 font-bold tracking-tight">Order History</p>
                                                 </div>
                                             </Link>
-                                            <Link
-                                                to="/portal"
-                                                className="flex items-center gap-3 px-4 py-3 hover:bg-slate-800 text-slate-300 rounded-none transition-colors group/item"
-                                            >
-                                                <div className="w-8 h-8 rounded-none bg-slate-800 flex items-center justify-center text-[#00FF33] group-hover/item:bg-[#00FF33] group-hover/item:text-slate-900 transition-colors">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-                                                </div>
-                                                <div>
-                                                    <p className="text-sm font-black uppercase tracking-tight text-white">Customer Portal</p>
-                                                    <p className="text-[10px] text-slate-500 font-bold tracking-tight">Mobile App View</p>
-                                                </div>
-                                            </Link>
                                             <button
                                                 onClick={userLogout}
                                                 className="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-950/40 text-red-400 rounded-none transition-colors group/item text-left border-none bg-transparent cursor-pointer"
@@ -244,7 +231,6 @@ const Navbar = () => {
                 <Link to="/" onClick={() => setOpen(false)} className="block text-slate-300 font-black uppercase tracking-widest hover:text-[#00FF33] transition-colors w-full py-2">Home</Link>
                 <Link to="/all-products" onClick={() => setOpen(false)} className="block text-slate-300 font-black uppercase tracking-widest hover:text-[#00FF33] transition-colors w-full py-2">All Products</Link>
                 <Link to="/contact" onClick={() => setOpen(false)} className="block text-slate-300 font-black uppercase tracking-widest hover:text-[#00FF33] transition-colors w-full py-2">Contact</Link>
-                <Link to="/portal" onClick={() => setOpen(false)} className="block text-[#00FF33] font-black uppercase tracking-widest hover:text-[#00FF33] transition-colors w-full py-2">✨ Customer Portal</Link>
 
                 {/* Mobile Search */}
                 {!hideIcons && (
@@ -298,13 +284,6 @@ const Navbar = () => {
                                 className="block bg-slate-800 text-white font-black uppercase text-xs text-center py-3 w-full border border-slate-700 hover:border-[#00FF33] transition"
                             >
                                 My Orders
-                            </Link>
-                            <Link 
-                                to="/portal" 
-                                onClick={() => setOpen(false)}
-                                className="block bg-slate-800 text-white font-black uppercase text-xs text-center py-3 w-full border border-slate-700 hover:border-[#00FF33] transition"
-                            >
-                                Customer Portal
                             </Link>
                             <button
                                 onClick={() => {

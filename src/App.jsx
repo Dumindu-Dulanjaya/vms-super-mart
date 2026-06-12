@@ -29,13 +29,28 @@ import { Toaster } from 'react-hot-toast';
 const App = () => {
   const { isAdminAuthenticated } = useAppContext();
   const location = useLocation();
+
+  // Mobile viewport detection
+  const [isMobile, setIsMobile] = React.useState(
+    typeof window !== 'undefined' ? window.innerWidth < 768 : false
+  );
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const isAdminPath = location.pathname.startsWith("/admin");
   const isSellerPath = location.pathname.includes("seller");
   const isDeliveryPath = location.pathname.startsWith("/delivery");
-  const isPortalPath = location.pathname.startsWith("/portal");
+  const isPortalPath = location.pathname.startsWith("/portal") || (location.pathname === "/" && isMobile);
 
   const isFullLayoutPath = !isAdminPath && !isSellerPath && !isDeliveryPath && !isPortalPath;
-  const isHomePage = location.pathname === "/";
+  const isHomePage = location.pathname === "/" && !isMobile;
+
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
@@ -50,7 +65,7 @@ const App = () => {
       <div className={`${isFullLayoutPath ? (isHomePage ? "p-0" : "px-6 md:px-16 lg:px-24 xl:px-32 py-10") : "p-0"} flex-1`}>
         <Routes>
           {/* Normal user routes */}
-          <Route path='/' element={<Home />} />
+          <Route path='/' element={isMobile ? <VmsPortal /> : <Home />} />
           <Route path='/contact' element={<Contact />} />
           <Route path='/login' element={<Login />} />
           <Route path='/signup' element={<SignUp />} />
