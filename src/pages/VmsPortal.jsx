@@ -15,123 +15,8 @@ import {
   Sparkles
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useAppContext } from '../context/AppContext';
 import './vms-portal.css';
-
-// Mock Product Database
-const GROCERY_PRODUCTS = [
-  {
-    id: 1,
-    name: 'Local Red Onions',
-    unit: '500g',
-    price: 180,
-    oldPrice: 220,
-    discount: '18% OFF',
-    category: 'Fresh Vegetables',
-    tag: 'Fresh',
-    image: 'https://cdn-icons-png.flaticon.com/512/3501/3501869.png', // Onion vector icon
-    description: 'Freshly harvested local red onions. Perfect as a base for Sri Lankan curries, salads, and everyday cooking.',
-    stock: 'In Stock',
-    weightOptions: ['250g', '500g', '1kg']
-  },
-  {
-    id: 2,
-    name: 'Organic Carrots',
-    unit: '500g',
-    price: 240,
-    oldPrice: 280,
-    discount: '14% OFF',
-    category: 'Fresh Vegetables',
-    tag: 'Organic',
-    image: 'https://cdn-icons-png.flaticon.com/512/4056/4056860.png', // Carrot vector
-    description: 'Crisp, sweet, and highly nutritious carrots grown without synthetic pesticides. Ideal for juices, salads, and soups.',
-    stock: 'In Stock',
-    weightOptions: ['500g', '1kg']
-  },
-  {
-    id: 3,
-    name: 'Imported Gala Apples',
-    unit: '1kg',
-    price: 650,
-    oldPrice: 750,
-    discount: '13% OFF',
-    category: 'Fruits',
-    tag: 'Imported',
-    image: 'https://cdn-icons-png.flaticon.com/512/415/415733.png', // Apple vector
-    description: 'Crisp and exceptionally sweet Gala apples imported fresh. High in dietary fiber and essential vitamins.',
-    stock: 'In Stock',
-    weightOptions: ['500g', '1kg', '2kg']
-  },
-  {
-    id: 4,
-    name: 'Organic Avocado',
-    unit: 'Single',
-    price: 120,
-    oldPrice: 150,
-    discount: '20% OFF',
-    category: 'Fruits',
-    tag: 'Organic',
-    image: 'https://cdn-icons-png.flaticon.com/512/2909/2909772.png', // Avocado vector
-    description: 'Buttery, rich local avocados. Perfect for smoothies, healthy spreads, or as a fresh addition to salads.',
-    stock: 'Low Stock',
-    weightOptions: ['Single', 'Pack of 3']
-  },
-  {
-    id: 5,
-    name: 'Fresh Dairy Milk',
-    unit: '1L',
-    price: 450,
-    oldPrice: 480,
-    discount: '6% OFF',
-    category: 'Dairy & Eggs',
-    tag: 'Fresh',
-    image: 'https://cdn-icons-png.flaticon.com/512/372/372982.png', // Milk vector
-    description: '100% pure pasteurized fresh cow milk. Sourced from local dairy farms and packed with calcium and protein.',
-    stock: 'In Stock',
-    weightOptions: ['500ml', '1L']
-  },
-  {
-    id: 6,
-    name: 'Cheddar Cheese Block',
-    unit: '200g',
-    price: 850,
-    oldPrice: 950,
-    discount: '10% OFF',
-    category: 'Dairy & Eggs',
-    tag: 'Premium',
-    image: 'https://cdn-icons-png.flaticon.com/512/2206/2206179.png', // Cheese vector
-    description: 'Rich, creamy cheddar cheese block aged for premium sharp flavor. Perfect for sandwiches, grating, and melting.',
-    stock: 'In Stock',
-    weightOptions: ['200g', '500g']
-  },
-  {
-    id: 7,
-    name: 'Fresh Chicken Breast',
-    unit: '500g',
-    price: 720,
-    oldPrice: 800,
-    discount: '10% OFF',
-    category: 'Meat & Seafood',
-    tag: 'Fresh',
-    image: 'https://cdn-icons-png.flaticon.com/512/1041/1041375.png', // Chicken vector
-    description: 'Boneless, skinless fresh chicken breast. Lean meat source packed with protein, prepared under strict hygienic standards.',
-    stock: 'In Stock',
-    weightOptions: ['500g', '1kg']
-  },
-  {
-    id: 8,
-    name: 'Coca-Cola Zero Can',
-    unit: '330ml',
-    price: 180,
-    oldPrice: 180,
-    discount: '',
-    category: 'Beverages',
-    tag: 'Popular',
-    image: 'https://cdn-icons-png.flaticon.com/512/2405/2405479.png', // Can vector
-    description: 'The great refreshing taste of Coca-Cola with zero sugar. Serve chilled for maximum refreshment.',
-    stock: 'In Stock',
-    weightOptions: ['330ml', '6-Pack']
-  }
-];
 
 const PROMOTIONS = [
   {
@@ -154,9 +39,12 @@ const PROMOTIONS = [
   }
 ];
 
-const CATEGORIES = ['All', 'Fresh Vegetables', 'Fruits', 'Dairy & Eggs', 'Meat & Seafood', 'Beverages'];
-
 const VmsPortal = () => {
+  const { products } = useAppContext();
+  const GROCERY_PRODUCTS = products || [];
+
+  const CATEGORIES = ['All', ...new Set(GROCERY_PRODUCTS.map(p => p.category).filter(Boolean))];
+
   const [activeCategory, setActiveCategory] = useState('All');
   const [cart, setCart] = useState({});
   const [searchQuery, setSearchQuery] = useState('');
@@ -179,7 +67,8 @@ const VmsPortal = () => {
   // Sync weight option on product selection
   useEffect(() => {
     if (selectedProduct) {
-      setSelectedWeight(selectedProduct.weightOptions[0]);
+      const opts = selectedProduct.weightOptions || ['1 Unit'];
+      setSelectedWeight(opts[0]);
     }
   }, [selectedProduct]);
 
@@ -382,8 +271,10 @@ const VmsPortal = () => {
               const qty = cart[product.id] || 0;
               return (
                 <div key={product.id} className="portal-product-card">
-                  {product.discount && (
-                    <div className="portal-card-badge">{product.discount}</div>
+                  {product.oldPrice > product.price && (
+                    <div className="portal-card-badge">
+                      {Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)}% OFF
+                    </div>
                   )}
                   
                   <div 
@@ -398,7 +289,7 @@ const VmsPortal = () => {
                   </div>
                   
                   <div className="portal-product-info">
-                    <span className="portal-product-unit">{product.unit}</span>
+                    <span className="portal-product-unit">{product.unit || '1 Unit'}</span>
                     <h4 
                       className="portal-product-name"
                       onClick={() => setSelectedProduct(product)}
@@ -611,7 +502,7 @@ const VmsPortal = () => {
               {/* Detail Meta */}
               <div className="portal-details-meta">
                 <span className="portal-product-price text-lg">Rs.{selectedProduct.price}</span>
-                <span className="portal-details-stock-badge">{selectedProduct.stock}</span>
+                <span className="portal-details-stock-badge">{selectedProduct.stock > 0 ? 'In Stock' : 'Out of Stock'}</span>
               </div>
 
               {/* Description */}
@@ -620,7 +511,7 @@ const VmsPortal = () => {
               {/* Weight Options */}
               <span className="text-[10px] text-slate-400 font-black uppercase tracking-wider mb-2.5 block">Select Portion Size:</span>
               <div className="portal-details-weight-options">
-                {selectedProduct.weightOptions.map(opt => (
+                {(selectedProduct.weightOptions || ['1 Unit']).map(opt => (
                   <button
                     key={opt}
                     onClick={() => setSelectedWeight(opt)}
