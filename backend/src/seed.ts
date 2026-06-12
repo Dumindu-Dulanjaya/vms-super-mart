@@ -111,48 +111,6 @@ async function run() {
 
   const productSeeds = [
     {
-      name: 'Classic Headphone',
-      price: 1299,
-      oldPrice: 1599,
-      category: 'electronics',
-      image: '/products/headphone.jpg',
-      slug: 'classic-headphone',
-      rating: 4,
-      reviews: 12,
-      instock: true,
-      description: 'A sample product for the storefront.',
-      stock: 50,
-      lowStockThreshold: 5,
-    },
-    {
-      name: 'Kids Teddy Bear',
-      price: 899,
-      oldPrice: 1099,
-      category: 'toys',
-      image: '/products/teddy.jpg',
-      slug: 'kids-teddy-bear',
-      rating: 5,
-      reviews: 8,
-      instock: true,
-      description: 'Soft toy example for product listings.',
-      stock: 3,
-      lowStockThreshold: 5,
-    },
-    {
-      name: 'Kitchen Mug Set',
-      price: 499,
-      oldPrice: 699,
-      category: 'kitchen',
-      image: '/products/mugs.jpg',
-      slug: 'kitchen-mug-set',
-      rating: 4,
-      reviews: 5,
-      instock: true,
-      description: 'Simple starter data for category pages.',
-      stock: 100,
-      lowStockThreshold: 10,
-    },
-    {
       name: 'Local Red Onions',
       price: 180,
       oldPrice: 220,
@@ -298,7 +256,7 @@ async function run() {
   const orderItemRepo = dataSource.getRepository(OrderItem);
   const existingOrders = await orderRepo.count();
   if (existingOrders === 0) {
-    const prod = await productRepo.findOne({ where: { slug: 'classic-headphone' } });
+    const prod = await productRepo.findOne({ where: { slug: 'rice-cooker' } });
     if (prod) {
       const item = orderItemRepo.create({
         productId: prod.id,
