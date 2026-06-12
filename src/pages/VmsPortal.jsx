@@ -12,7 +12,8 @@ import {
   Truck, 
   Tag, 
   ArrowRight,
-  Sparkles
+  Sparkles,
+  Menu
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAppContext } from '../context/AppContext';
@@ -23,19 +24,19 @@ const PROMOTIONS = [
     id: 1,
     title: 'Flat 20% off on Veggies',
     desc: 'Fresh farm harvest deals',
-    bg: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)'
+    bg: 'linear-gradient(135deg, #090e18 0%, #161e31 100%)'
   },
   {
     id: 2,
     title: 'Mega Weekend Grocery Sale',
     desc: 'Up to 30% savings on essentials',
-    bg: 'linear-gradient(135deg, #064e3b 0%, #022c22 100%)'
+    bg: 'linear-gradient(135deg, #063121 0%, #0c4d35 100%)'
   },
   {
     id: 3,
     title: 'Buy 1 Get 1 Free on Beverages',
     desc: 'Quench your thirst this weekend',
-    bg: 'linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%)'
+    bg: 'linear-gradient(135deg, #101c3d 0%, #1b2f67 100%)'
   }
 ];
 
@@ -49,6 +50,7 @@ const VmsPortal = () => {
   const [cart, setCart] = useState({});
   const [searchQuery, setSearchQuery] = useState('');
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState('Main Outlet (Colombo)');
   const [promoIndex, setPromoIndex] = useState(0);
@@ -169,8 +171,35 @@ const VmsPortal = () => {
         {/* Sticky App Header */}
         <header className="portal-header">
           <div className="portal-header-top">
+            <div className="flex items-center gap-3">
+              <button 
+                onClick={() => setIsMenuOpen(true)}
+                className="portal-menu-btn"
+                aria-label="Toggle Menu"
+              >
+                <Menu size={22} />
+              </button>
+              
+              <div className="portal-brand">
+                <span className="portal-brand-light">VMS</span>
+                <span className="portal-brand-accent">MART</span>
+              </div>
+            </div>
+
+            <div 
+              className="portal-cart-trigger" 
+              onClick={() => setIsCartOpen(true)}
+            >
+              <ShoppingBag size={18} />
+              {getCartCount() > 0 && (
+                <div className="portal-cart-badge">{getCartCount()}</div>
+              )}
+            </div>
+          </div>
+
+          <div className="portal-header-bottom">
             <div className="portal-location-selector">
-              <MapPin className="text-[#00FF33]" size={16} />
+              <MapPin size={13} className="text-[#00F631]" />
               <select 
                 value={selectedLocation} 
                 onChange={(e) => setSelectedLocation(e.target.value)}
@@ -182,23 +211,13 @@ const VmsPortal = () => {
                 <option value="Negombo Branch">Negombo Branch</option>
               </select>
             </div>
-            
-            <div 
-              className="portal-cart-trigger" 
-              onClick={() => setIsCartOpen(true)}
-            >
-              <ShoppingBag size={20} />
-              {getCartCount() > 0 && (
-                <div className="portal-cart-badge">{getCartCount()}</div>
-              )}
-            </div>
           </div>
           
           <div className="portal-search-bar">
             <Search className="text-slate-400" size={16} />
             <input 
               type="text" 
-              placeholder="Search vegetables, fruits, dairy..." 
+              placeholder="Search products, groceries..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="portal-search-input"
@@ -213,17 +232,93 @@ const VmsPortal = () => {
           </div>
         </header>
 
+        {/* Sliding Menu Drawer */}
+        {isMenuOpen && (
+          <div className="portal-drawer-backdrop" onClick={() => setIsMenuOpen(false)}>
+            <div className="portal-menu-drawer" onClick={(e) => e.stopPropagation()}>
+              <div className="portal-drawer-header">
+                <div className="portal-brand text-lg">
+                  <span className="portal-brand-light">VMS</span>
+                  <span className="portal-brand-accent">MART</span>
+                </div>
+                <button 
+                  className="portal-drawer-close"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="portal-drawer-content">
+                {/* User Info */}
+                <div className="portal-drawer-user-card">
+                  <div className="portal-user-avatar">
+                    <span className="font-bold text-[#00F631]">U</span>
+                  </div>
+                  <div>
+                    <p className="text-sm font-black text-white">Shopper Account</p>
+                    <p className="text-[10px] text-slate-500 font-semibold">Active Session</p>
+                  </div>
+                </div>
+
+                <div className="portal-drawer-divider"></div>
+
+                {/* Categories */}
+                <div className="portal-drawer-section">
+                  <h4 className="portal-drawer-section-title">Shop Categories</h4>
+                  <div className="portal-drawer-links">
+                    {CATEGORIES.map(cat => (
+                      <button
+                        key={cat}
+                        onClick={() => {
+                          setActiveCategory(cat);
+                          setIsMenuOpen(false);
+                        }}
+                        className={`portal-drawer-link-btn ${activeCategory === cat ? 'active' : ''}`}
+                      >
+                        <span className="portal-link-dot"></span>
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="portal-drawer-divider"></div>
+
+                {/* Support Info */}
+                <div className="portal-drawer-section">
+                  <h4 className="portal-drawer-section-title">Support & Info</h4>
+                  <div className="portal-drawer-info-list text-xs text-slate-400 space-y-3 mt-1">
+                    <p className="flex items-center gap-2">
+                      <Truck size={14} className="text-[#00F631]" /> Free Delivery over Rs.2,000
+                    </p>
+                    <p className="flex items-center gap-2">
+                      <MapPin size={14} className="text-[#00F631]" /> Islandwide Delivery outlets
+                    </p>
+                    <p className="flex items-center gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg> 
+                      +94 11 234 5678
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="portal-drawer-footer">
+                <p className="text-[10px] text-slate-500 font-bold text-center">VMS SUPER MART v1.5</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Promo Offers Carousel */}
         <section className="portal-carousel">
           <div className="portal-carousel-track">
             {PROMOTIONS.map((promo, idx) => (
               <div 
                 key={promo.id} 
-                className="portal-carousel-slide"
+                className={`portal-carousel-slide ${idx === promoIndex ? 'active' : ''}`}
                 style={{ 
-                  background: promo.bg,
-                  transform: `translateX(${(idx - promoIndex) * 100}%)`,
-                  display: idx === promoIndex ? 'flex' : 'none'
+                  background: promo.bg
                 }}
               >
                 <div className="portal-carousel-overlay">
@@ -336,6 +431,57 @@ const VmsPortal = () => {
             })}
           </div>
         </section>
+
+        {/* Footer section */}
+        <footer className="portal-footer">
+          <div className="portal-footer-divider"></div>
+          <div className="portal-footer-content">
+            <div className="portal-brand text-sm mb-2">
+              <span className="portal-brand-light">VMS</span>
+              <span className="portal-brand-accent">MART</span>
+            </div>
+            <p className="text-[11px] text-slate-400 leading-relaxed mb-5">
+              Premium fresh groceries, dairy, beverages and daily essentials delivered directly to your doorstep. Experience modern digital shopping.
+            </p>
+
+            <div className="grid grid-cols-2 gap-4 mb-6 text-[11px] text-slate-400">
+              <div>
+                <h5 className="text-white font-bold uppercase tracking-wider mb-2 text-[10px]">Store Outlets</h5>
+                <ul className="space-y-1 text-slate-400">
+                  <li>Colombo Outlet</li>
+                  <li>Kandy Branch</li>
+                  <li>Galle Outlet</li>
+                </ul>
+              </div>
+              <div>
+                <h5 className="text-white font-bold uppercase tracking-wider mb-2 text-[10px]">Customer Support</h5>
+                <ul className="space-y-1 text-slate-400">
+                  <li>Help Center</li>
+                  <li>Delivery Policy</li>
+                  <li>Terms of Service</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="portal-footer-bottom">
+              <p className="text-[9px] text-slate-500 font-bold mb-0">
+                © {new Date().getFullYear()} VMS Super Mart. All Rights Reserved.
+              </p>
+              
+              <div className="portal-social-links">
+                <a href="#" aria-label="Facebook" className="portal-social-link">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                </a>
+                <a href="#" aria-label="Instagram" className="portal-social-link">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                </a>
+                <a href="#" aria-label="Twitter" className="portal-social-link">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/></svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        </footer>
 
         {/* Sticky Bottom Cart Bar */}
         {getCartCount() > 0 && !isCartOpen && (
