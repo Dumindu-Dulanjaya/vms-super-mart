@@ -5,15 +5,13 @@ import {
   ShoppingBag, 
   Plus, 
   Minus, 
-  Trash2, 
   ChevronRight, 
   X, 
-  Percent, 
   Truck, 
-  Tag, 
   ArrowRight,
-  Sparkles,
-  Menu
+  Menu,
+  ChevronDown,
+  Mail
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAppContext } from '../context/AppContext';
@@ -58,6 +56,23 @@ const VmsPortal = () => {
   const [discountApplied, setDiscountApplied] = useState(0); // Rs. discount amount
   const [selectedWeight, setSelectedWeight] = useState('');
 
+  // Newsletter states
+  const [menuEmail, setMenuEmail] = useState('');
+  const [footerEmail, setFooterEmail] = useState('');
+
+  // Accordion states
+  const [openDrawerAccordions, setOpenDrawerAccordions] = useState({
+    mainMenu: true,
+    links: false,
+    contactUs: false
+  });
+
+  const [openFooterAccordions, setOpenFooterAccordions] = useState({
+    storeOutlets: true,
+    customerSupport: false,
+    quickLinks: false
+  });
+
   // Auto-rotate promo slides
   useEffect(() => {
     const timer = setInterval(() => {
@@ -98,12 +113,10 @@ const VmsPortal = () => {
     });
   };
 
-  // Get total items count
   const getCartCount = () => {
     return Object.values(cart).reduce((sum, qty) => sum + qty, 0);
   };
 
-  // Pricing calculations
   const getSubtotal = () => {
     return Object.entries(cart).reduce((sum, [id, qty]) => {
       const product = GROCERY_PRODUCTS.find(p => p.id === parseInt(id));
@@ -133,7 +146,6 @@ const VmsPortal = () => {
     return subtotal + getDeliveryFee() - discountApplied;
   };
 
-  // Coupon activation
   const handleApplyCoupon = () => {
     if (coupon.toLowerCase() === 'vms20') {
       const discount = Math.round(getSubtotal() * 0.2); // 20% discount
@@ -156,7 +168,34 @@ const VmsPortal = () => {
     }, 1500);
   };
 
-  // Filter products
+  const handleSubscribeMenu = (e) => {
+    e.preventDefault();
+    if (!menuEmail.trim()) return;
+    toast.success('Thank you for subscribing to VMS Mart newsletter!');
+    setMenuEmail('');
+  };
+
+  const handleSubscribeFooter = (e) => {
+    e.preventDefault();
+    if (!footerEmail.trim()) return;
+    toast.success('Thank you for subscribing to VMS Mart newsletter!');
+    setFooterEmail('');
+  };
+
+  const toggleDrawerAccordion = (section) => {
+    setOpenDrawerAccordions(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
+
+  const toggleFooterAccordion = (section) => {
+    setOpenFooterAccordions(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
+
   const filteredProducts = GROCERY_PRODUCTS.filter(p => {
     const matchesCategory = activeCategory === 'All' || p.category === activeCategory;
     const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -168,53 +207,65 @@ const VmsPortal = () => {
     <div className="portal-wrapper">
       <div className="portal-container">
         
-        {/* Sticky App Header */}
+        {/* Top promo alert banner */}
+        <div className="portal-top-banner">
+          <span>10% DISCOUNT ON YOUR FIRST ORDER | FRESH INGREDIENTS</span>
+        </div>
+
+        {/* Sticky Premium Header */}
         <header className="portal-header">
           <div className="portal-header-top">
-            <div className="flex items-center gap-3">
-              <button 
-                onClick={() => setIsMenuOpen(true)}
-                className="portal-menu-btn"
-                aria-label="Toggle Menu"
-              >
-                <Menu size={22} />
-              </button>
-              
-              <div className="portal-brand">
-                <span className="portal-brand-light">VMS</span>
-                <span className="portal-brand-accent">MART</span>
-              </div>
+            <button 
+              onClick={() => setIsMenuOpen(true)}
+              className="portal-menu-btn"
+              aria-label="Toggle Menu"
+            >
+              <Menu size={24} />
+            </button>
+            
+            {/* Centered Brand Logo */}
+            <div className="portal-brand-centered">
+              <svg width="24" height="24" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" className="portal-brand-icon">
+                <path d="M10 32V14C10 10.6863 12.6863 8 16 8H24C27.3137 8 30 10.6863 30 14V32" stroke="#00F631" strokeWidth="4.5" strokeLinecap="round"/>
+                <path d="M20 32V20C20 18.8954 20.8954 18 22 18H28C29.1046 18 30 18.8954 30 20V32" stroke="#00F631" strokeWidth="4.5" strokeLinecap="round"/>
+              </svg>
+              <span className="portal-brand-text">VMS</span>
             </div>
 
             <div 
               className="portal-cart-trigger" 
               onClick={() => setIsCartOpen(true)}
             >
-              <ShoppingBag size={18} />
+              <ShoppingBag size={20} />
               {getCartCount() > 0 && (
                 <div className="portal-cart-badge">{getCartCount()}</div>
               )}
             </div>
           </div>
 
+          {/* Location Selector Bar */}
           <div className="portal-header-bottom">
             <div className="portal-location-selector">
-              <MapPin size={13} className="text-[#00F631]" />
-              <select 
-                value={selectedLocation} 
-                onChange={(e) => setSelectedLocation(e.target.value)}
-                className="portal-location-select"
-              >
-                <option value="Main Outlet (Colombo)">Main Outlet (Colombo)</option>
-                <option value="Kandy Branch">Kandy Branch</option>
-                <option value="Galle Outlet">Galle Outlet</option>
-                <option value="Negombo Branch">Negombo Branch</option>
-              </select>
+              <div className="flex items-center gap-2">
+                <MapPin size={14} className="text-[#00F631]" />
+                <select 
+                  value={selectedLocation} 
+                  onChange={(e) => setSelectedLocation(e.target.value)}
+                  className="portal-location-select"
+                >
+                  <option value="Main Outlet (Colombo)">MAIN OUTLET (COLOMBO)</option>
+                  <option value="Kandy Branch">KANDY BRANCH</option>
+                  <option value="Galle Outlet">GALLE OUTLET</option>
+                  <option value="Negombo Branch">NEGOMBO BRANCH</option>
+                </select>
+              </div>
+              <ChevronDown size={14} className="text-slate-500" />
             </div>
           </div>
           
+          {/* Search Area */}
           <div className="portal-search-bar">
-            <Search className="text-slate-400" size={16} />
+            <Search className="text-slate-400" size={18} />
             <input 
               type="text" 
               placeholder="Search products, groceries..." 
@@ -225,22 +276,28 @@ const VmsPortal = () => {
             {searchQuery && (
               <X 
                 className="text-slate-400 cursor-pointer" 
-                size={16} 
+                size={18} 
                 onClick={() => setSearchQuery('')}
               />
             )}
           </div>
         </header>
 
-        {/* Sliding Menu Drawer */}
+        {/* Sliding Left Full-Screen Menu Drawer */}
         {isMenuOpen && (
           <div className="portal-drawer-backdrop" onClick={() => setIsMenuOpen(false)}>
-            <div className="portal-menu-drawer" onClick={(e) => e.stopPropagation()}>
+            <div className="portal-menu-drawer animate-slide-in-left" onClick={(e) => e.stopPropagation()}>
+              
               <div className="portal-drawer-header">
-                <div className="portal-brand text-lg">
-                  <span className="portal-brand-light">VMS</span>
-                  <span className="portal-brand-accent">MART</span>
+                {/* Centered Brand Logo inside drawer */}
+                <div className="portal-brand-centered">
+                  <svg width="24" height="24" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" className="portal-brand-icon">
+                    <path d="M10 32V14C10 10.6863 12.6863 8 16 8H24C27.3137 8 30 10.6863 30 14V32" stroke="#00F631" strokeWidth="4.5" strokeLinecap="round"/>
+                    <path d="M20 32V20C20 18.8954 20.8954 18 22 18H28C29.1046 18 30 18.8954 30 20V32" stroke="#00F631" strokeWidth="4.5" strokeLinecap="round"/>
+                  </svg>
+                  <span className="portal-brand-text">VMS</span>
                 </div>
+                
                 <button 
                   className="portal-drawer-close"
                   onClick={() => setIsMenuOpen(false)}
@@ -249,62 +306,160 @@ const VmsPortal = () => {
                 </button>
               </div>
 
+              {/* Drawer Content */}
               <div className="portal-drawer-content">
-                {/* User Info */}
-                <div className="portal-drawer-user-card">
-                  <div className="portal-user-avatar">
-                    <span className="font-bold text-[#00F631]">U</span>
+                
+                {/* Search box inside drawer */}
+                <div className="portal-drawer-search">
+                  <Search size={16} className="text-slate-400" />
+                  <input 
+                    type="text" 
+                    placeholder="Search groceries..." 
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="portal-drawer-search-input"
+                  />
+                  {searchQuery && (
+                    <X 
+                      size={16} 
+                      onClick={() => setSearchQuery('')}
+                      className="text-slate-400 cursor-pointer"
+                    />
+                  )}
+                </div>
+
+                {/* Interactive Accordion Menus */}
+                <div className="portal-accordions-group">
+                  
+                  {/* MAIN MENU */}
+                  <div className="portal-accordion-item">
+                    <button 
+                      className="portal-accordion-trigger"
+                      onClick={() => toggleDrawerAccordion('mainMenu')}
+                    >
+                      <span>MAIN MENU</span>
+                      <ChevronRight size={16} className={`portal-accordion-arrow ${openDrawerAccordions.mainMenu ? 'rotate-90' : ''}`} />
+                    </button>
+                    {openDrawerAccordions.mainMenu && (
+                      <div className="portal-accordion-panel">
+                        <a href="/" className="portal-accordion-link">Home Portal</a>
+                        <a href="/all-products" className="portal-accordion-link">Browse Catalog</a>
+                        <a href="/my-orders" className="portal-accordion-link">My Purchase History</a>
+                        <a href="/profile" className="portal-accordion-link">My Account Profile</a>
+                      </div>
+                    )}
                   </div>
-                  <div>
-                    <p className="text-sm font-black text-white">Shopper Account</p>
-                    <p className="text-[10px] text-slate-500 font-semibold">Active Session</p>
+
+                  {/* LINKS */}
+                  <div className="portal-accordion-item">
+                    <button 
+                      className="portal-accordion-trigger"
+                      onClick={() => toggleDrawerAccordion('links')}
+                    >
+                      <span>PRODUCT CATEGORIES</span>
+                      <ChevronRight size={16} className={`portal-accordion-arrow ${openDrawerAccordions.links ? 'rotate-90' : ''}`} />
+                    </button>
+                    {openDrawerAccordions.links && (
+                      <div className="portal-accordion-panel">
+                        {CATEGORIES.map(cat => (
+                          <button
+                            key={cat}
+                            onClick={() => {
+                              setActiveCategory(cat);
+                              setIsMenuOpen(false);
+                            }}
+                            className="portal-accordion-link text-left w-full bg-transparent border-none py-2 cursor-pointer font-bold block"
+                          >
+                            {cat}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* CONTACT US */}
+                  <div className="portal-accordion-item">
+                    <button 
+                      className="portal-accordion-trigger"
+                      onClick={() => toggleDrawerAccordion('contactUs')}
+                    >
+                      <span>CONTACT US</span>
+                      <ChevronRight size={16} className={`portal-accordion-arrow ${openDrawerAccordions.contactUs ? 'rotate-90' : ''}`} />
+                    </button>
+                    {openDrawerAccordions.contactUs && (
+                      <div className="portal-accordion-panel text-xs text-slate-400 space-y-2.5 py-1">
+                        <p className="flex items-center gap-2">
+                          <Truck size={14} className="text-[#00F631]" />
+                          <span>Islandwide Rapid Delivery Outlets</span>
+                        </p>
+                        <p className="flex items-center gap-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-[#00F631]"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg> 
+                          <span>+94 11 234 5678</span>
+                        </p>
+                        <p className="flex items-center gap-2">
+                          <Mail size={14} className="text-[#00F631]" />
+                          <span>support@vmssupermart.com</span>
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                </div>
+
+                {/* Stay in Touch inside Menu Drawer */}
+                <div className="portal-drawer-subscribe-box">
+                  <div className="portal-subscribe-header">
+                    <Mail size={20} className="text-[#00F631]" />
+                    <h4>STAY IN TOUCH</h4>
+                  </div>
+                  <p className="text-[11px] text-slate-500 leading-relaxed mb-3">
+                    Subscribe to get special offers, free giveaways, and once-in-a-lifetime deals.
+                  </p>
+                  <form onSubmit={handleSubscribeMenu} className="portal-subscribe-form">
+                    <input 
+                      type="email" 
+                      placeholder="your-email@example.com" 
+                      value={menuEmail}
+                      onChange={(e) => setMenuEmail(e.target.value)}
+                      className="portal-subscribe-input"
+                      required
+                    />
+                    <button type="submit" className="portal-subscribe-btn" aria-label="Subscribe">
+                      <ArrowRight size={16} />
+                    </button>
+                  </form>
+                </div>
+
+                {/* Social links */}
+                <div className="portal-drawer-socials">
+                  <a href="#" className="portal-drawer-social-icon" aria-label="TikTok">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.02 1.59 4.23.86 1.09 2.05 1.86 3.4 2.27v4.13c-1.89-.22-3.65-1.04-4.88-2.47-.02 2.9-.01 5.8 0 8.7-.13 2.13-.97 4.22-2.44 5.75-1.63 1.77-4.04 2.76-6.44 2.66-2.58-.09-5.04-1.39-6.43-3.56-1.57-2.39-1.78-5.59-.57-8.15C2.1 11.23 4.22 9.54 6.78 9.17c.05 1.48.02 2.96.03 4.44-1.21.24-2.29.98-2.88 2.07-.63 1.08-.66 2.45-.07 3.56.59 1.15 1.82 1.93 3.12 1.99 1.25.07 2.52-.42 3.27-1.42.59-.75.83-1.72.78-2.68V0h1.49z"/></svg>
+                  </a>
+                  <a href="#" className="portal-drawer-social-icon" aria-label="Instagram">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                  </a>
+                  <a href="#" className="portal-drawer-social-icon" aria-label="Facebook">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                  </a>
+                  <a href="#" className="portal-drawer-social-icon" aria-label="YouTube">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg>
+                  </a>
+                </div>
+
+                {/* Currency selector inside drawer */}
+                <div className="portal-drawer-currency">
+                  <div className="portal-currency-trigger">
+                    <span>SRI LANKA (LKR Rs)</span>
+                    <ChevronDown size={14} />
                   </div>
                 </div>
 
-                <div className="portal-drawer-divider"></div>
-
-                {/* Categories */}
-                <div className="portal-drawer-section">
-                  <h4 className="portal-drawer-section-title">Shop Categories</h4>
-                  <div className="portal-drawer-links">
-                    {CATEGORIES.map(cat => (
-                      <button
-                        key={cat}
-                        onClick={() => {
-                          setActiveCategory(cat);
-                          setIsMenuOpen(false);
-                        }}
-                        className={`portal-drawer-link-btn ${activeCategory === cat ? 'active' : ''}`}
-                      >
-                        <span className="portal-link-dot"></span>
-                        {cat}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="portal-drawer-divider"></div>
-
-                {/* Support Info */}
-                <div className="portal-drawer-section">
-                  <h4 className="portal-drawer-section-title">Support & Info</h4>
-                  <div className="portal-drawer-info-list text-xs text-slate-400 space-y-3 mt-1">
-                    <p className="flex items-center gap-2">
-                      <Truck size={14} className="text-[#00F631]" /> Free Delivery over Rs.2,000
-                    </p>
-                    <p className="flex items-center gap-2">
-                      <MapPin size={14} className="text-[#00F631]" /> Islandwide Delivery outlets
-                    </p>
-                    <p className="flex items-center gap-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg> 
-                      +94 11 234 5678
-                    </p>
-                  </div>
-                </div>
               </div>
 
               <div className="portal-drawer-footer">
-                <p className="text-[10px] text-slate-500 font-bold text-center">VMS SUPER MART v1.5</p>
+                <p className="text-[10px] text-slate-500 font-bold text-center">
+                  © VMS PORTAL 2026<br />POWERED BY VMS SOLUTIONS
+                </p>
               </div>
             </div>
           </div>
@@ -339,16 +494,17 @@ const VmsPortal = () => {
           </div>
         </section>
 
-        {/* Horizontal Category Pill Selector */}
+        {/* Horizontal Category Tab Selector */}
         <section className="portal-categories-section">
           <div className="portal-categories-swiper">
             {CATEGORIES.map(cat => (
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`portal-category-pill ${activeCategory === cat ? 'active' : ''}`}
+                className={`portal-category-tab ${activeCategory === cat ? 'active' : ''}`}
               >
-                {cat}
+                <span>{cat.toUpperCase()}</span>
+                {activeCategory === cat && <span className="portal-category-tab-line" />}
               </button>
             ))}
           </div>
@@ -432,54 +588,124 @@ const VmsPortal = () => {
           </div>
         </section>
 
-        {/* Footer section */}
+        {/* Completely Redesigned Stay-in-Touch Footer */}
         <footer className="portal-footer">
           <div className="portal-footer-divider"></div>
-          <div className="portal-footer-content">
-            <div className="portal-brand text-sm mb-2">
-              <span className="portal-brand-light">VMS</span>
-              <span className="portal-brand-accent">MART</span>
+          
+          {/* Newsletter Stay-in-Touch Section */}
+          <div className="portal-footer-newsletter">
+            <div className="portal-subscribe-header">
+              <Mail size={22} className="text-[#00F631]" />
+              <h4>STAY IN TOUCH</h4>
             </div>
-            <p className="text-[11px] text-slate-400 leading-relaxed mb-5">
-              Premium fresh groceries, dairy, beverages and daily essentials delivered directly to your doorstep. Experience modern digital shopping.
+            <p className="text-xs text-slate-400 leading-relaxed mb-4">
+              Subscribe to get special offers, free giveaways, and once-in-a-lifetime deals.
             </p>
+            <form onSubmit={handleSubscribeFooter} className="portal-subscribe-form">
+              <input 
+                type="email" 
+                placeholder="your-email@example.com" 
+                value={footerEmail}
+                onChange={(e) => setFooterEmail(e.target.value)}
+                className="portal-subscribe-input"
+                required
+              />
+              <button type="submit" className="portal-subscribe-btn" aria-label="Subscribe">
+                <ArrowRight size={16} />
+              </button>
+            </form>
+          </div>
 
-            <div className="grid grid-cols-2 gap-4 mb-6 text-[11px] text-slate-400">
-              <div>
-                <h5 className="text-white font-bold uppercase tracking-wider mb-2 text-[10px]">Store Outlets</h5>
-                <ul className="space-y-1 text-slate-400">
-                  <li>Colombo Outlet</li>
-                  <li>Kandy Branch</li>
-                  <li>Galle Outlet</li>
-                </ul>
-              </div>
-              <div>
-                <h5 className="text-white font-bold uppercase tracking-wider mb-2 text-[10px]">Customer Support</h5>
-                <ul className="space-y-1 text-slate-400">
-                  <li>Help Center</li>
-                  <li>Delivery Policy</li>
-                  <li>Terms of Service</li>
-                </ul>
-              </div>
+          {/* Interactive Footer Accordion Sections */}
+          <div className="portal-footer-accordions">
+            
+            {/* STORE OUTLETS */}
+            <div className="portal-footer-accordion-item">
+              <button 
+                className="portal-footer-accordion-trigger"
+                onClick={() => toggleFooterAccordion('storeOutlets')}
+              >
+                <span>STORE OUTLETS</span>
+                <ChevronRight size={14} className={`portal-accordion-arrow ${openFooterAccordions.storeOutlets ? 'rotate-90' : ''}`} />
+              </button>
+              {openFooterAccordions.storeOutlets && (
+                <div className="portal-footer-accordion-panel">
+                  <p>Colombo Outlet</p>
+                  <p>Kandy Branch</p>
+                  <p>Galle Outlet</p>
+                  <p>Negombo Branch</p>
+                </div>
+              )}
             </div>
 
-            <div className="portal-footer-bottom">
-              <p className="text-[9px] text-slate-500 font-bold mb-0">
-                © {new Date().getFullYear()} VMS Super Mart. All Rights Reserved.
-              </p>
-              
-              <div className="portal-social-links">
-                <a href="#" aria-label="Facebook" className="portal-social-link">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-                </a>
-                <a href="#" aria-label="Instagram" className="portal-social-link">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-                </a>
-                <a href="#" aria-label="Twitter" className="portal-social-link">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/></svg>
-                </a>
-              </div>
+            {/* CUSTOMER SUPPORT */}
+            <div className="portal-footer-accordion-item">
+              <button 
+                className="portal-footer-accordion-trigger"
+                onClick={() => toggleFooterAccordion('customerSupport')}
+              >
+                <span>CUSTOMER SUPPORT</span>
+                <ChevronRight size={14} className={`portal-accordion-arrow ${openFooterAccordions.customerSupport ? 'rotate-90' : ''}`} />
+              </button>
+              {openFooterAccordions.customerSupport && (
+                <div className="portal-footer-accordion-panel">
+                  <p>Help Center</p>
+                  <p>Delivery Policy</p>
+                  <p>Terms of Service</p>
+                </div>
+              )}
             </div>
+
+            {/* QUICK LINKS */}
+            <div className="portal-footer-accordion-item">
+              <button 
+                className="portal-footer-accordion-trigger"
+                onClick={() => toggleFooterAccordion('quickLinks')}
+              >
+                <span>QUICK LINKS</span>
+                <ChevronRight size={14} className={`portal-accordion-arrow ${openFooterAccordions.quickLinks ? 'rotate-90' : ''}`} />
+              </button>
+              {openFooterAccordions.quickLinks && (
+                <div className="portal-footer-accordion-panel">
+                  <a href="/">Home Portal</a>
+                  <a href="/all-products">Browse Catalog</a>
+                  <a href="/my-orders">My Purchase History</a>
+                  <a href="/profile">My Account Profile</a>
+                </div>
+              )}
+            </div>
+
+          </div>
+
+          {/* Social Links */}
+          <div className="portal-footer-socials">
+            <a href="#" className="portal-footer-social-icon" aria-label="TikTok">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.02 1.59 4.23.86 1.09 2.05 1.86 3.4 2.27v4.13c-1.89-.22-3.65-1.04-4.88-2.47-.02 2.9-.01 5.8 0 8.7-.13 2.13-.97 4.22-2.44 5.75-1.63 1.77-4.04 2.76-6.44 2.66-2.58-.09-5.04-1.39-6.43-3.56-1.57-2.39-1.78-5.59-.57-8.15C2.1 11.23 4.22 9.54 6.78 9.17c.05 1.48.02 2.96.03 4.44-1.21.24-2.29.98-2.88 2.07-.63 1.08-.66 2.45-.07 3.56.59 1.15 1.82 1.93 3.12 1.99 1.25.07 2.52-.42 3.27-1.42.59-.75.83-1.72.78-2.68V0h1.49z"/></svg>
+            </a>
+            <a href="#" className="portal-footer-social-icon" aria-label="Instagram">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+            </a>
+            <a href="#" className="portal-footer-social-icon" aria-label="Facebook">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+            </a>
+            <a href="#" className="portal-footer-social-icon" aria-label="YouTube">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg>
+            </a>
+          </div>
+
+          {/* Currency Dropdown Selector */}
+          <div className="portal-footer-currency">
+            <div className="portal-currency-trigger">
+              <span>SRI LANKA (LKR Rs)</span>
+              <ChevronDown size={14} />
+            </div>
+          </div>
+
+          {/* Copyright Section */}
+          <div className="portal-footer-bottom">
+            <p className="text-[10px] text-slate-500 font-bold text-center w-full">
+              © VMS PORTAL 2026 / POWERED BY VMS SOLUTIONS
+            </p>
           </div>
         </footer>
 
@@ -500,10 +726,10 @@ const VmsPortal = () => {
           </div>
         )}
 
-        {/* Slide-Up Cart & Checkout Drawer Sheet */}
+        {/* Slide-Up Cart & Checkout Drawer Sheet (Modern Full Screen Experience) */}
         {isCartOpen && (
           <div className="portal-sheet-backdrop" onClick={() => setIsCartOpen(false)}>
-            <div className="portal-sheet" onClick={(e) => e.stopPropagation()}>
+            <div className="portal-sheet portal-sheet-fullscreen" onClick={(e) => e.stopPropagation()}>
               <div className="portal-sheet-handle" onClick={() => setIsCartOpen(false)}></div>
               
               <div className="portal-sheet-header">
@@ -517,9 +743,9 @@ const VmsPortal = () => {
               </div>
 
               {/* Items List */}
-              <div className="portal-cart-list">
+              <div className="portal-cart-list flex-grow">
                 {Object.keys(cart).length === 0 ? (
-                  <div className="text-center py-10 text-slate-500">
+                  <div className="text-center py-20 text-slate-500">
                     <ShoppingBag size={48} className="mx-auto mb-3 opacity-30" />
                     <p className="font-bold text-xs uppercase">Your cart is empty</p>
                   </div>
@@ -609,7 +835,7 @@ const VmsPortal = () => {
                   {/* Checkout CTA */}
                   <button 
                     onClick={handleCheckout}
-                    className="portal-checkout-btn"
+                    className="portal-checkout-btn mb-4"
                   >
                     <span>Proceed to Checkout</span>
                     <ArrowRight size={16} />

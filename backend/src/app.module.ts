@@ -34,6 +34,7 @@ import { join } from 'path';
       username: process.env.DB_USERNAME || 'root',
       password: process.env.DB_PASSWORD || '',
       database: process.env.DB_NAME || 'vms_db',
+      ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : undefined,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       migrations: [__dirname + '/../migrations/*{.ts,.js}'],
       synchronize: true, // Always false in production, enabled here for development schema auto-creation
