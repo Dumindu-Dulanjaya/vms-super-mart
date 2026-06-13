@@ -9,7 +9,7 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     css: true,
-    exclude: ['**/node_modules/**', '**/dist/**', '**/backend/**'],
+    exclude: ['**/node_modules/**', '**/dist/**', '**/backend/**', '**/hf-space/**'],
   },
   resolve: {
     alias: {

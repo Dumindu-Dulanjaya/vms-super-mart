@@ -49,7 +49,7 @@ describe('Navbar Component', () => {
     renderNavbar();
 
     const logo = screen.queryByText(/vms|supermart/i) || 
-                 screen.queryByRole('img', { name: /logo/i });
+                 screen.queryAllByRole('img', { name: /logo/i })[0];
     
     expect(logo || document.querySelector('[href="/"]')).toBeTruthy();
   });
