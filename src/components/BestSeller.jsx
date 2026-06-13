@@ -7,7 +7,7 @@ export default function BestSellers() {
   return (
     <section className="py-8 px-4">
       <h2 className="text-2xl font-bold mb-6">Best Sellers</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
         {bestSellers.map((item) => (
           <ProductCard key={item.id} product={item} />
         ))}
@@ -36,7 +36,7 @@ function ProductCard({ product }) {
   return (
     <div className="bg-white shadow rounded-none overflow-hidden hover:shadow-lg transition p-4 flex flex-col">
       {/* Product Image */}
-      <div className="flex items-center justify-center h-40 overflow-hidden">
+      <div className="flex items-center justify-center h-28 sm:h-40 overflow-hidden">
         <img
           src={product.image}
           alt={product.name}

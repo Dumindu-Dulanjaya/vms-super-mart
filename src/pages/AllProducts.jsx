@@ -121,6 +121,32 @@ const AllProducts = () => {
           </button>
         </div>
 
+        {/* Horizontal scroll style category tabs (like the reference) */}
+        <div className="flex sm:hidden gap-6 overflow-x-auto pb-3 mb-6 scrollbar-none border-b border-slate-200 select-none">
+          <button
+            onClick={() => setSelectedCategories([])}
+            className={`whitespace-nowrap pb-2 text-xs font-black uppercase tracking-wider relative transition-colors ${
+              selectedCategories.length === 0 ? 'text-green-600 border-b-2 border-[#00F631]' : 'text-slate-400 hover:text-slate-600'
+            }`}
+          >
+            All Collections
+          </button>
+          {categories.map((cat) => {
+            const isActive = selectedCategories.includes(cat);
+            return (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategories([cat])}
+                className={`whitespace-nowrap pb-2 text-xs font-black uppercase tracking-wider relative transition-colors ${
+                  isActive ? 'text-green-600 border-b-2 border-[#00F631]' : 'text-slate-400 hover:text-slate-600'
+                }`}
+              >
+                {cat}
+              </button>
+            );
+          })}
+        </div>
+
         <div className="flex gap-6">
           {/* Sidebar Filters */}
           <div className={`${showFilters ? 'block' : 'hidden'} lg:block fixed lg:static inset-0 z-50 lg:z-auto bg-black bg-opacity-50 lg:bg-transparent`}>
@@ -247,7 +273,7 @@ const AllProducts = () => {
                     </div>
                   ) : (
                     <>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                         {paginatedProducts.map((product) => (
                           <ProductCard key={product.id} product={product} />
                         ))}

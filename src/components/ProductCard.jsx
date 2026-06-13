@@ -26,7 +26,7 @@ const ProductCard = ({ product }) => {
 
       <Link to={`/product/${product.slug}`}>
         {/* Product Image */}
-        <div className="bg-gray-50 p-6 flex items-center justify-center h-52">
+        <div className="bg-gray-50 p-4 sm:p-6 flex items-center justify-center h-36 xs:h-40 sm:h-52">
           <img
             className="w-full h-full object-contain hover:scale-110 transition-transform duration-300"
             src={product.image}
@@ -38,35 +38,35 @@ const ProductCard = ({ product }) => {
       </Link>
 
       {/* Product Details */}
-      <div className="p-4">
+      <div className="p-3 sm:p-4">
         {/* Category */}
-        <p className="text-gray-400 text-sm mb-1">{product.category}</p>
+        <p className="text-gray-400 text-xs sm:text-sm mb-1">{product.category}</p>
 
         {/* Product Name */}
         <Link to={`/product/${product.slug}`}>
-          <h3 className="text-gray-800 font-semibold text-base mb-2 hover:text-green-600 transition-colors line-clamp-2 min-h-[3rem]">
+          <h3 className="text-gray-800 font-semibold text-xs sm:text-base mb-1.5 sm:mb-2 hover:text-green-600 transition-colors line-clamp-2 min-h-[2.5rem] sm:min-h-[3rem]">
             {product.name}
           </h3>
         </Link>
 
         {/* Rating */}
-        <div className="flex items-center gap-1 mb-3">
+        <div className="flex items-center gap-0.5 sm:gap-1 mb-2.5 sm:mb-3">
           {Array(5)
             .fill("")
             .map((_, i) => (
-              <span key={i} className={i < product.rating ? "text-yellow-400 text-sm" : "text-gray-300 text-sm"}>
+              <span key={i} className={i < product.rating ? "text-yellow-400 text-xs sm:text-sm" : "text-gray-300 text-xs sm:text-sm"}>
                 ★
               </span>
             ))}
-          <span className="text-gray-400 text-xs ml-1">({product.reviews})</span>
+          <span className="text-gray-400 text-[10px] sm:text-xs ml-1">({product.reviews})</span>
         </div>
 
         {/* Price */}
-        <div className="mb-3">
-          <div className="flex items-center gap-2">
-            <span className="text-green-600 font-bold text-xl">{currency}{product.price}</span>
+        <div className="mb-2.5 sm:mb-3">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <span className="text-green-600 font-bold text-base sm:text-xl">{currency}{product.price}</span>
             {product.oldPrice > product.price && (
-              <span className="text-gray-400 line-through text-sm">{currency}{product.oldPrice}</span>
+              <span className="text-gray-400 line-through text-xs sm:text-sm">{currency}{product.oldPrice}</span>
             )}
           </div>
         </div>
@@ -75,22 +75,22 @@ const ProductCard = ({ product }) => {
         {product.stock === 0 ? (
           <button
             disabled
-            className="w-full bg-gray-50 text-gray-400 border border-gray-200 px-4 py-2.5 rounded-none flex items-center justify-center gap-2 cursor-not-allowed font-medium"
+            className="w-full bg-gray-50 text-gray-400 border border-gray-200 px-3 sm:px-4 py-2 sm:py-2.5 rounded-none flex items-center justify-center gap-1.5 sm:gap-2 cursor-not-allowed text-xs sm:text-sm font-medium"
           >
-            <ShoppingCart size={18} />
+            <ShoppingCart size={16} />
             <span>Out of Stock</span>
           </button>
         ) : cartQuantity === 0 ? (
           <button
             onClick={() => addToCart(product.id)}
-            className="w-full bg-green-50 hover:bg-green-600 text-green-600 hover:text-white border border-green-200 hover:border-green-600 px-4 py-2.5 rounded-none flex items-center justify-center gap-2 transition-all duration-200 font-medium"
+            className="w-full bg-green-50 hover:bg-green-600 text-green-600 hover:text-white border border-green-200 hover:border-green-600 px-3 sm:px-4 py-2 sm:py-2.5 rounded-none flex items-center justify-center gap-1.5 sm:gap-2 transition-all duration-200 text-xs sm:text-sm font-medium"
           >
-            <ShoppingCart size={18} />
+            <ShoppingCart size={16} />
             <span>Add to Cart</span>
           </button>
         ) : (
-          <div className="w-full flex items-center justify-center gap-2 bg-green-100 px-3 py-2.5 rounded-none border border-green-300">
-            <span className="text-green-800 font-semibold">{cartQuantity} in cart</span>
+          <div className="w-full flex items-center justify-center gap-1.5 sm:gap-2 bg-green-100 px-2 sm:px-3 py-2 sm:py-2.5 rounded-none border border-green-300 text-xs sm:text-sm font-bold text-green-800">
+            <span>{cartQuantity} in cart</span>
           </div>
         )}
       </div>

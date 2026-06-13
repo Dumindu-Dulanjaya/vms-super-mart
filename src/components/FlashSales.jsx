@@ -91,7 +91,7 @@ const FlashSales = () => {
                 </div>
 
                 {/* Products Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 sm:gap-6">
                     {flashSaleProducts.map((product) => (
                         <div key={product.id} className="relative">
                             {/* Discount Badge */}
