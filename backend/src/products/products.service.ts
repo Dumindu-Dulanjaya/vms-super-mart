@@ -111,7 +111,7 @@ export class ProductsService {
     await this.flashSaleRepository.createQueryBuilder()
       .update(FlashSale)
       .set({ status: 'expired', isActive: false })
-      .where('endTime < :now AND status != "expired"', { now })
+      .where("endTime < :now AND status != 'expired'", { now })
       .execute();
 
     const activeSale = await this.flashSaleRepository.findOne({

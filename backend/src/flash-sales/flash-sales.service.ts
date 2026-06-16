@@ -26,7 +26,7 @@ export class FlashSalesService {
     await this.flashSaleRepository.createQueryBuilder()
       .update(FlashSale)
       .set({ status: 'expired', isActive: false })
-      .where('endTime < :now AND status != "expired"', { now })
+      .where("endTime < :now AND status != 'expired'", { now })
       .execute();
 
     // 2. Mark active scheduled sales as active if they are in their time bounds and set to active
@@ -51,7 +51,7 @@ export class FlashSalesService {
     await this.flashSaleRepository.createQueryBuilder()
       .update(FlashSale)
       .set({ isActive: false, status: 'scheduled' })
-      .where('id != :activeSaleId AND (isActive = true OR status = "active")', { activeSaleId })
+      .where("id != :activeSaleId AND (isActive = true OR status = 'active')", { activeSaleId })
       .execute();
   }
 

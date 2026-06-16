@@ -22,7 +22,7 @@ async function bootstrap() {
       if (!origin) return callback(null, true);
       if (
         allowedOrigins.some((allowed) =>
-          allowed === '*' || origin === allowed || origin.endsWith('.choreoapis.dev') || origin.endsWith('.choreoapps.dev')
+          allowed === '*' || origin === allowed || origin.endsWith('.choreoapis.dev') || origin.endsWith('.choreoapps.dev') || origin.endsWith('.vercel.app')
         )
       ) {
         return callback(null, true);
