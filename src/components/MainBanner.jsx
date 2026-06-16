@@ -69,7 +69,7 @@ const MainBanner = () => {
             <div className="flex flex-wrap items-center gap-4">
               <Link 
                 to="/all-products" 
-                className="px-6 py-3 bg-[#00FF33] hover:bg-[#00CC29] text-slate-900 font-extrabold rounded-full transition-all duration-300 shadow-[0_0_15px_rgba(0,255,51,0.4)] hover:shadow-[0_0_25px_rgba(0,255,51,0.6)] flex items-center gap-2 transform hover:-translate-y-0.5"
+                className="px-6 py-3 bg-[#00FF33] hover:bg-[#00CC29] text-slate-900 font-extrabold rounded-none transition-all duration-300 shadow-[0_0_15px_rgba(0,255,51,0.4)] hover:shadow-[0_0_25px_rgba(0,255,51,0.6)] flex items-center gap-2 transform hover:-translate-y-0.5"
               >
                 <ShoppingBag size={18} />
                 Shop Now
@@ -115,7 +115,7 @@ const MainBanner = () => {
           {/* Shop Now Button */}
           <Link 
             to="/all-products" 
-            className="px-6 py-3 bg-[#00FF33] hover:bg-[#00CC29] text-slate-900 font-extrabold rounded-full transition-all duration-300 shadow-[0_0_15px_rgba(0,255,51,0.3)] flex items-center gap-2"
+            className="px-6 py-3 bg-[#00FF33] hover:bg-[#00CC29] text-slate-900 font-extrabold rounded-none transition-all duration-300 shadow-[0_0_15px_rgba(0,255,51,0.3)] flex items-center gap-2"
           >
             <ShoppingBag size={18} />
             Shop Now
