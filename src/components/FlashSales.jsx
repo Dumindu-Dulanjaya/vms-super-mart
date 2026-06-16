@@ -63,12 +63,18 @@ const FlashSales = () => {
     }
 
     // Map flash sale products for card display overriding price and old price
-    const flashSaleProducts = activeSale.flashSaleProducts.map(fp => ({
-        ...fp.product,
-        price: Number(fp.salePrice),
-        oldPrice: Number(fp.product.price),
-        discountPercentage: fp.discountPercentage
-    }));
+    const flashSaleProducts = activeSale.flashSaleProducts.map(fp => {
+        const prod = fp.product || {};
+        return {
+            ...prod,
+            category: prod.category && typeof prod.category === 'object'
+                ? (prod.category.label || prod.category.slug || '')
+                : (prod.category || ''),
+            price: Number(fp.salePrice),
+            oldPrice: Number(prod.price),
+            discountPercentage: fp.discountPercentage
+        };
+    });
 
     return (
         <div className="py-12 bg-gradient-to-r from-orange-50 to-red-50">

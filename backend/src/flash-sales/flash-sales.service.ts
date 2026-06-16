@@ -18,6 +18,23 @@ export class FlashSalesService {
     private readonly productRepository: Repository<Product>,
   ) {}
 
+  private formatFlashSale(sale: FlashSale | null) {
+    if (!sale) return null;
+    return {
+      ...sale,
+      flashSaleProducts: sale.flashSaleProducts?.map(fsp => {
+        if (!fsp.product) return fsp;
+        return {
+          ...fsp,
+          product: {
+            ...fsp.product,
+            category: fsp.product.category?.slug ?? '',
+          }
+        };
+      })
+    };
+  }
+
   // Automatically update statuses based on time
   private async autoCheckSales() {
     const now = new Date();
@@ -91,10 +108,11 @@ export class FlashSalesService {
 
   async findAll() {
     await this.autoCheckSales();
-    return this.flashSaleRepository.find({
+    const sales = await this.flashSaleRepository.find({
       relations: ['flashSaleProducts', 'flashSaleProducts.product'],
       order: { startTime: 'DESC' },
     });
+    return sales.map(s => this.formatFlashSale(s));
   }
 
   async findOne(id: number) {
@@ -106,7 +124,7 @@ export class FlashSalesService {
     if (!flashSale) {
       throw new NotFoundException(`Flash Sale with ID ${id} not found`);
     }
-    return flashSale;
+    return this.formatFlashSale(flashSale);
   }
 
   async update(id: number, updateDto: Partial<CreateFlashSaleDto>) {
@@ -213,7 +231,7 @@ export class FlashSalesService {
       relations: ['flashSaleProducts', 'flashSaleProducts.product'],
     });
 
-    return activeSale;
+    return this.formatFlashSale(activeSale);
   }
 
   async remove(id: number) {

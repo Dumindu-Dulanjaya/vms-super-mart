@@ -54,9 +54,15 @@ export const AppContextProvider = ({ children }) => {
       const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/products`);
       if (res.ok) {
         const data = await res.json();
-        setProducts(data);
+        const normalizedData = data.map(p => ({
+          ...p,
+          category: p.category && typeof p.category === 'object'
+            ? (p.category.label || p.category.slug || '')
+            : (p.category || '')
+        }));
+        setProducts(normalizedData);
         if (typeof localStorage !== 'undefined') {
-          localStorage.setItem('vms_products', JSON.stringify(data));
+          localStorage.setItem('vms_products', JSON.stringify(normalizedData));
         }
 
         // Auto-cap cart items if they exceed refreshed stock
@@ -165,11 +171,14 @@ export const AppContextProvider = ({ children }) => {
       .then(async (res) => {
         if (!res.ok) throw new Error('Failed to create product');
         const created = await res.json();
-        const updatedProducts = [created, ...products];
+        const normalizedCreated = created && created.category && typeof created.category === 'object'
+          ? { ...created, category: created.category.label || created.category.slug || '' }
+          : created;
+        const updatedProducts = [normalizedCreated, ...products];
         setProducts(updatedProducts);
         localStorage.setItem('vms_products', JSON.stringify(updatedProducts));
         toast.success('Product added successfully!');
-        return created;
+        return normalizedCreated;
       })
       .catch((err) => {
         toast.error('Failed to add product via backend. Saved locally instead.');
@@ -561,13 +570,16 @@ export const AppContextProvider = ({ children }) => {
         }
 
         const updatedProduct = await res.json();
+        const normalizedProduct = updatedProduct && updatedProduct.category && typeof updatedProduct.category === 'object'
+          ? { ...updatedProduct, category: updatedProduct.category.label || updatedProduct.category.slug || '' }
+          : updatedProduct;
         
         // Update local state list of products in AppContext
-        const updatedProducts = products.map((p) => p.id === productId ? updatedProduct : p);
+        const updatedProducts = products.map((p) => p.id === productId ? normalizedProduct : p);
         setProducts(updatedProducts);
         localStorage.setItem('vms_products', JSON.stringify(updatedProducts));
         
-        return updatedProduct;
+        return normalizedProduct;
       } catch (e) {
         toast.error(e.message || 'Failed to submit rating');
         throw e;

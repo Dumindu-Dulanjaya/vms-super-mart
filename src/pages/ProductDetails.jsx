@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { useAppContext } from "../context/useAppContext";
 import { ChevronLeft, ChevronRight, AlertCircle, CheckCircle } from "lucide-react";
 import toast from "react-hot-toast";
+import { categories } from "../assets/assets";
 
 const ProductDetails  = () => {
     const { products, addToCart, rateProduct, cartItems, refreshProducts } = useAppContext();
@@ -22,6 +23,11 @@ const ProductDetails  = () => {
     const [hasRated, setHasRated] = useState(false);
 
     const product = products.find((item) => item.slug === slug);
+    const categoryObj = product ? categories.find(
+        (c) => c.type?.toLowerCase() === product.category?.toLowerCase() || 
+               c.path?.toLowerCase() === product.category?.toLowerCase()
+    ) : null;
+    const categoryPath = product ? (categoryObj ? categoryObj.path : (product.category?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || '')) : '';
     const currentQtyInCart = product && cartItems ? (cartItems[product.id] || 0) : 0;
     const maxAvailable = product && product.batches && product.batches.length > 0
         ? product.batches[0].quantity
@@ -93,7 +99,7 @@ const ProductDetails  = () => {
             <p className="text-sm text-gray-600 mb-4">
                 <Link to="/" className="hover:text-[#00FF33]">Home</Link> /
                 <Link to="/all-products" className="hover:text-[#00FF33]"> Products</Link> /
-                <Link to={`/products/category/${product.category.toLowerCase().replace(/\s+/g, '')}`} className="hover:text-[#00FF33]"> {product.category}</Link> /
+                <Link to={`/products/category/${categoryPath}`} className="hover:text-[#00FF33]"> {product.category}</Link> /
                 <span className="text-indigo-500"> {product.name}</span>
             </p>
 
