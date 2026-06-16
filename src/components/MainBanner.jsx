@@ -65,12 +65,9 @@ const MainBanner = () => {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.6, ease: "easeOut" }}
-              className="relative z-10 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#00FF33]/10 border border-[#00FF33]/25 mb-4 md:mb-6"
+              className="relative z-10 text-xs md:text-sm font-bold tracking-widest text-[#00FF33] uppercase mb-4 md:mb-6"
             >
-              <Sparkles className="w-4 h-4 text-[#00FF33]" />
-              <span className="text-xs md:text-sm font-semibold tracking-wider text-[#00FF33] uppercase">
-                Welcome to VMS Super Mart
-              </span>
+              Welcome to VMS Super Mart
             </motion.div>
 
             {/* Main Title */}
