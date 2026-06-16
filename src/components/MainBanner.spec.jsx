@@ -19,8 +19,15 @@ describe('MainBanner Component', () => {
     expect(screen.getByText(/Welcome to VMS Super Mart/i)).toBeInTheDocument();
     
     // Should render the main heading text
-    expect(screen.getByText(/Delivered Daily/i)).toBeInTheDocument();
-    expect(screen.getByText(/Discover unbeatable deals on fresh vegetables/i)).toBeInTheDocument();
+    const matchText = (text) => (content, node) => {
+      const hasText = (el) => el.textContent.replace(/\s+/g, ' ').trim() === text;
+      const nodeHasText = hasText(node);
+      const childrenDontHaveText = Array.from(node.children).every(child => !hasText(child));
+      return nodeHasText && childrenDontHaveText;
+    };
+    
+    expect(screen.getByText(matchText("For Everyday Living"))).toBeInTheDocument();
+    expect(screen.getByText(matchText("Quality Products At The Best Prices"))).toBeInTheDocument();
   });
 
   it('toggles hover state on mouse enter and leave', () => {

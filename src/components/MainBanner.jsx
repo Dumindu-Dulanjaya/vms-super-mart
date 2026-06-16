@@ -6,6 +6,56 @@ import vmsHero from '../assets/vms hero.png';
 import { ArrowRight, ShoppingBag, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+const AnimatedText = ({ text, delay = 0, className = "" }) => {
+  const words = text.split(" ");
+  
+  const containerVariants = {
+    hidden: { opacity: 1 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.03,
+        delayChildren: delay,
+      }
+    }
+  };
+
+  const childVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.15, ease: "easeOut" }
+    }
+  };
+
+  return (
+    <motion.span
+      className={`inline-block ${className}`}
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      {words.map((word, wordIndex) => (
+        <React.Fragment key={wordIndex}>
+          {wordIndex > 0 && " "}
+          <span className="inline-block whitespace-nowrap">
+            {word.split("").map((char, charIndex) => (
+              <motion.span
+                key={charIndex}
+                className="inline-block"
+                variants={childVariants}
+              >
+                {char}
+              </motion.span>
+            ))}
+          </span>
+        </React.Fragment>
+      ))}
+    </motion.span>
+  );
+};
+
 const MainBanner = () => {
   const banners = [banner1, banner2];
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
@@ -72,50 +122,33 @@ const MainBanner = () => {
 
             {/* Main Title */}
             <h1 className="relative z-10 text-3xl md:text-5xl font-black text-white leading-tight mb-4 tracking-tight drop-shadow-md">
+              <span className="block">
+                <AnimatedText text="Everything You Need" delay={0.4} />
+              </span>
               <motion.span 
-                className="block"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4, duration: 0.6, ease: "easeOut" }}
+                className="inline-block text-[#00FF33] font-extrabold"
+                animate={{
+                  filter: [
+                    "drop-shadow(0 0 0px rgba(0, 255, 51, 0))",
+                    "drop-shadow(0 0 10px rgba(0, 255, 51, 0.45))",
+                    "drop-shadow(0 0 0px rgba(0, 255, 51, 0))"
+                  ]
+                }}
+                transition={{
+                  delay: 2.0,
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
               >
-                Freshness & Quality
-              </motion.span>
-              <motion.span 
-                className="inline-block bg-gradient-to-r from-white via-[#00FF33] to-[#00CC29] bg-clip-text text-transparent font-extrabold"
-                initial={{ opacity: 0, y: 25, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ delay: 0.7, duration: 0.7, ease: "easeOut" }}
-              >
-                <motion.span
-                  className="inline-block"
-                  animate={{
-                    filter: [
-                      "drop-shadow(0 0 0px rgba(0, 255, 51, 0))",
-                      "drop-shadow(0 0 10px rgba(0, 255, 51, 0.45))",
-                      "drop-shadow(0 0 0px rgba(0, 255, 51, 0))"
-                    ]
-                  }}
-                  transition={{
-                    delay: 1.4,
-                    duration: 3,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
-                >
-                  Delivered Daily
-                </motion.span>
+                <AnimatedText text="For Everyday Living" delay={1.0} />
               </motion.span>
             </h1>
 
             {/* Description */}
-            <motion.p 
-              className="relative z-10 text-gray-300 text-sm md:text-base leading-relaxed mb-6 md:mb-8 font-medium"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.0, duration: 0.6, ease: "easeOut" }}
-            >
-              Discover unbeatable deals on fresh vegetables, grocery essentials, dairy, and household goods. Experience smart shopping designed just for you.
-            </motion.p>
+            <div className="relative z-10 text-gray-300 text-sm md:text-base leading-relaxed mb-6 md:mb-8 font-medium">
+              <AnimatedText text="Quality Products At The Best Prices" delay={1.6} />
+            </div>
 
             {/* Actions */}
             <motion.div 
@@ -127,7 +160,7 @@ const MainBanner = () => {
                 visible: {
                   transition: {
                     staggerChildren: 0.15,
-                    delayChildren: 1.2
+                    delayChildren: 2.8
                   }
                 }
               }}
