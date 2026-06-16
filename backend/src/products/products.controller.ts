@@ -104,7 +104,9 @@ export class ProductsController {
     @Query('search') search?: string,
     @Query('category') category?: string,
     @Query('sort') sort?: string,
+    @Query('admin') admin?: string,
   ) {
+    const isAdmin = admin === 'true';
     if (page || limit || search || category || sort) {
       return this.productsService.findPaginated({
         page: page ? Number(page) : 1,
@@ -112,24 +114,34 @@ export class ProductsController {
         search,
         category,
         sort,
+        admin: isAdmin,
       });
     }
-    return this.productsService.findAll();
+    return this.productsService.findAll(isAdmin);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.productsService.findOne(id);
+  findOne(
+    @Param('id', ParseIntPipe) id: number,
+    @Query('admin') admin?: string,
+  ) {
+    return this.productsService.findOne(id, admin === 'true');
   }
 
   @Get('slug/:slug')
-  findBySlug(@Param('slug') slug: string) {
-    return this.productsService.findBySlug(slug);
+  findBySlug(
+    @Param('slug') slug: string,
+    @Query('admin') admin?: string,
+  ) {
+    return this.productsService.findBySlug(slug, admin === 'true');
   }
 
   @Get('category/:category')
-  findByCategory(@Param('category') category: string) {
-    return this.productsService.findByCategory(category);
+  findByCategory(
+    @Param('category') category: string,
+    @Query('admin') admin?: string,
+  ) {
+    return this.productsService.findByCategory(category, admin === 'true');
   }
 
   @Post()

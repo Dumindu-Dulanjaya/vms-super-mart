@@ -4,6 +4,8 @@ import { ProductsService } from './products.service';
 import { Product } from '../entities/product.entity';
 import { Category } from '../entities/category.entity';
 import { InventoryBatch } from '../entities/inventory-batch.entity';
+import { FlashSale } from '../entities/flash-sale.entity';
+import { FlashSaleProduct } from '../entities/flash-sale-product.entity';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 describe('ProductsService', () => {
@@ -11,6 +13,8 @@ describe('ProductsService', () => {
   let mockProductRepository: any;
   let mockCategoryRepository: any;
   let mockBatchRepository: any;
+  let mockFlashSaleRepository: any;
+  let mockFlashSaleProductRepository: any;
 
   const mockCategory = {
     id: 1,
@@ -70,6 +74,28 @@ describe('ProductsService', () => {
       remove: jest.fn(),
     };
 
+    mockFlashSaleRepository = {
+      findOne: jest.fn(),
+      find: jest.fn(),
+      save: jest.fn(),
+      create: jest.fn(),
+      remove: jest.fn(),
+      createQueryBuilder: jest.fn(() => ({
+        update: jest.fn().mockReturnThis(),
+        set: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        execute: jest.fn().mockResolvedValue({}),
+      })),
+    };
+
+    mockFlashSaleProductRepository = {
+      findOne: jest.fn(),
+      find: jest.fn(),
+      save: jest.fn(),
+      create: jest.fn(),
+      remove: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ProductsService,
@@ -84,6 +110,14 @@ describe('ProductsService', () => {
         {
           provide: getRepositoryToken(InventoryBatch),
           useValue: mockBatchRepository,
+        },
+        {
+          provide: getRepositoryToken(FlashSale),
+          useValue: mockFlashSaleRepository,
+        },
+        {
+          provide: getRepositoryToken(FlashSaleProduct),
+          useValue: mockFlashSaleProductRepository,
         },
       ],
     }).compile();

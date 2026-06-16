@@ -11,7 +11,8 @@ import {
   TrendingUp,
   ShoppingCart,
   BarChart3,
-  ClipboardList
+  ClipboardList,
+  Zap
 } from 'lucide-react';
 import Dashboard from './Dashboard';
 import AddProduct from './AddProduct';
@@ -21,6 +22,7 @@ import EditProduct from './EditProduct';
 import Reports from './Reports';
 import Customers from './Customers';
 import OrderTracker from './OrderTracker';
+import FlashSaleManagement from './FlashSaleManagement';
 import { useAppContext } from '../../context/AppContext';
 import vmsLogo from '../../assets/VMS logo.png';
 
@@ -32,6 +34,7 @@ const AdminSidebar = () => {
     { name: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
     { name: 'Add Product', path: '/admin/add-product', icon: PlusCircle },
     { name: 'Inventory', path: '/admin/inventory', icon: Package },
+    { name: 'Flash Sales', path: '/admin/flash-sales', icon: Zap },
     { name: 'Orders', path: '/admin/orders', icon: ShoppingCart },
     { name: 'Order Tracker', path: '/admin/order-tracker', icon: ClipboardList },
     { name: 'Reports', path: '/admin/reports', icon: BarChart3 },
@@ -149,6 +152,7 @@ const AdminLayout = () => {
             <Route path="add-product" element={<AddProduct />} />
             <Route path="inventory" element={<Inventory />} />
             <Route path="inventory/edit/:id" element={<EditProduct />} />
+            <Route path="flash-sales" element={<FlashSaleManagement />} />
             <Route path="customers" element={<Customers />} />
             <Route path="orders" element={<Orders />} />
             <Route path="order-tracker" element={<OrderTracker />} />

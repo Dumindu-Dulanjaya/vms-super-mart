@@ -15,7 +15,7 @@ const EditProduct = () => {
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/products/${id}`);
+        const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/products/${id}?admin=true`);
         const data = await res.json();
         setFormData({
           name: data.name || '',

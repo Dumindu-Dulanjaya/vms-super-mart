@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 import { Product } from '../entities/product.entity';
 import { Category } from '../entities/category.entity';
 import { InventoryBatch } from '../entities/inventory-batch.entity';
+import { FlashSale } from '../entities/flash-sale.entity';
+import { FlashSaleProduct } from '../entities/flash-sale-product.entity';
 
 type ProductBatchInfo = {
   id: number;
@@ -57,6 +59,10 @@ export class ProductsService {
     private readonly categoryRepository: Repository<Category>,
     @InjectRepository(InventoryBatch)
     private readonly batchRepository: Repository<InventoryBatch>,
+    @InjectRepository(FlashSale)
+    private readonly flashSaleRepository: Repository<FlashSale>,
+    @InjectRepository(FlashSaleProduct)
+    private readonly flashSaleProductRepository: Repository<FlashSaleProduct>,
   ) {}
 
   private toResponse(product: Product): ProductResponse {
@@ -98,12 +104,68 @@ export class ProductsService {
     };
   }
 
-  async findAll() {
+  private async getActiveFlashSaleInfo(): Promise<FlashSale | null> {
+    const now = new Date();
+    
+    // Auto check/update expired active flash sales
+    await this.flashSaleRepository.createQueryBuilder()
+      .update(FlashSale)
+      .set({ status: 'expired', isActive: false })
+      .where('endTime < :now AND status != "expired"', { now })
+      .execute();
+
+    const activeSale = await this.flashSaleRepository.findOne({
+      where: {
+        isActive: true,
+        status: 'active',
+      },
+      relations: ['flashSaleProducts'],
+    });
+
+    if (!activeSale) return null;
+
+    if (new Date(activeSale.endTime) < now) {
+      activeSale.status = 'expired';
+      activeSale.isActive = false;
+      await this.flashSaleRepository.save(activeSale);
+      return null;
+    }
+
+    if (new Date(activeSale.startTime) > now) {
+      return null;
+    }
+
+    return activeSale;
+  }
+
+  private applyFlashSaleOverrides(productResp: ProductResponse, activeSale: FlashSale | null): ProductResponse {
+    if (!activeSale || !activeSale.flashSaleProducts) return productResp;
+
+    const flashProduct = activeSale.flashSaleProducts.find(
+      (fp) => fp.productId === productResp.id,
+    );
+
+    if (flashProduct) {
+      return {
+        ...productResp,
+        oldPrice: Number(productResp.price),
+        price: Number(flashProduct.salePrice),
+      };
+    }
+
+    return productResp;
+  }
+
+  async findAll(admin = false) {
     const products = await this.productRepository.find({
       relations: ['category', 'batches'],
       order: { id: 'ASC' },
     });
-    return products.map((product) => this.toResponse(product));
+    const responses = products.map((product) => this.toResponse(product));
+    if (admin) return responses;
+
+    const activeSale = await this.getActiveFlashSaleInfo();
+    return responses.map(res => this.applyFlashSaleOverrides(res, activeSale));
   }
 
   async findPaginated(options: {
@@ -112,6 +174,7 @@ export class ProductsService {
     search?: string;
     category?: string;
     sort?: string;
+    admin?: boolean;
   }) {
     const page = options.page || 1;
     const limit = options.limit || 10;
@@ -156,9 +219,25 @@ export class ProductsService {
     query.skip(skip).take(limit);
 
     const [products, total] = await query.getManyAndCount();
+    const responses = products.map((product) => this.toResponse(product));
+
+    if (options.admin) {
+      return {
+        data: responses,
+        meta: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit),
+        },
+      };
+    }
+
+    const activeSale = await this.getActiveFlashSaleInfo();
+    const overridden = responses.map(res => this.applyFlashSaleOverrides(res, activeSale));
 
     return {
-      data: products.map((product) => this.toResponse(product)),
+      data: overridden,
       meta: {
         total,
         page,
@@ -168,7 +247,7 @@ export class ProductsService {
     };
   }
 
-  async findOne(id: number) {
+  async findOne(id: number, admin = false) {
     const product = await this.productRepository.findOne({
       where: { id },
       relations: ['category', 'batches'],
@@ -178,10 +257,14 @@ export class ProductsService {
       throw new NotFoundException(`Product with id ${id} not found`);
     }
 
-    return this.toResponse(product);
+    const response = this.toResponse(product);
+    if (admin) return response;
+
+    const activeSale = await this.getActiveFlashSaleInfo();
+    return this.applyFlashSaleOverrides(response, activeSale);
   }
 
-  async findBySlug(slug: string) {
+  async findBySlug(slug: string, admin = false) {
     const product = await this.productRepository.findOne({
       where: { slug },
       relations: ['category', 'batches'],
@@ -191,10 +274,14 @@ export class ProductsService {
       throw new NotFoundException(`Product with slug ${slug} not found`);
     }
 
-    return this.toResponse(product);
+    const response = this.toResponse(product);
+    if (admin) return response;
+
+    const activeSale = await this.getActiveFlashSaleInfo();
+    return this.applyFlashSaleOverrides(response, activeSale);
   }
 
-  async findByCategory(category: string) {
+  async findByCategory(category: string, admin = false) {
     const products = await this.productRepository
       .createQueryBuilder('product')
       .leftJoinAndSelect('product.category', 'category')
@@ -203,7 +290,11 @@ export class ProductsService {
       .orderBy('product.id', 'ASC')
       .getMany();
 
-    return products.map((product) => this.toResponse(product));
+    const responses = products.map((product) => this.toResponse(product));
+    if (admin) return responses;
+
+    const activeSale = await this.getActiveFlashSaleInfo();
+    return responses.map(res => this.applyFlashSaleOverrides(res, activeSale));
   }
 
   async create(productInput: CreateProductInput) {

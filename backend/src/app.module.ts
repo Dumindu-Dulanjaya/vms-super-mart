@@ -13,6 +13,7 @@ import { UsersModule } from './users/users.module';
 import { EmailModule } from './email/email.module';
 import { ChatbotModule } from './chatbot/chatbot.module';
 import { EventsModule } from './events/events.module';
+import { FlashSalesModule } from './flash-sales/flash-sales.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 
@@ -49,6 +50,7 @@ import { join } from 'path';
     EmailModule,
     ChatbotModule,
     EventsModule,
+    FlashSalesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

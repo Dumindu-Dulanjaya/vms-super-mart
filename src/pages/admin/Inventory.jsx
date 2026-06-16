@@ -41,7 +41,7 @@ const Inventory = () => {
   const load = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/products`);
+      const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/products?admin=true`);
       const data = await res.json();
       setProducts(data);
     } catch (e) {
