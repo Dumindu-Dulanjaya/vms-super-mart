@@ -17,8 +17,8 @@ const Footer = () => {
         {/* Top footer row: Brand and Stay in Touch Newsletter */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 pb-12 border-b border-slate-200">
           <div className="space-y-4">
-            <div className="flex items-center bg-slate-900 p-2 inline-block rounded-none">
-              <img src={logo} alt="VMS Super Mart" className="h-12 w-auto object-contain brightness-110" />
+            <div className="flex items-center">
+              <img src={logo} alt="VMS Super Mart" className="h-16 w-auto object-contain brightness-110" />
             </div>
             <p className="text-sm font-medium leading-relaxed text-slate-500 max-w-md">
               Premium fresh groceries, dairy, beverages, and daily essentials delivered directly to your doorstep. Experience modern digital shopping.
@@ -26,19 +26,19 @@ const Footer = () => {
           </div>
 
           {/* Stay in Touch Newsletter */}
-          <div className="bg-slate-50 p-6 border border-slate-200 space-y-4 rounded-none max-w-lg lg:ml-auto w-full">
+          <div className="bg-slate-850 p-6 border border-slate-800/80 space-y-4 rounded-none max-w-lg lg:ml-auto w-full">
             <div className="flex items-center gap-3">
               <Mail size={20} className="text-[#00F631]" />
-              <h3 className="text-slate-800 text-xs font-black uppercase tracking-[0.2em]">STAY IN TOUCH</h3>
+              <h3 className="text-white text-xs font-black uppercase tracking-[0.2em]">STAY IN TOUCH</h3>
             </div>
-            <p className="text-xs text-slate-500 font-bold leading-relaxed">
+            <p className="text-xs text-slate-400 font-bold leading-relaxed">
               Subscribe to get special offers, free giveaways, and once-in-a-lifetime deals.
             </p>
-            <form onSubmit={handleSubscribe} className="flex border border-slate-300 bg-white">
+            <form onSubmit={handleSubscribe} className="flex border border-slate-700 bg-slate-900/50">
               <input 
                 type="email" 
                 placeholder="your-email@example.com" 
-                className="py-3 px-4 bg-transparent outline-none text-slate-800 placeholder-slate-400 text-sm w-full border-none animate-none"
+                className="py-3 px-4 bg-transparent outline-none text-white text-sm w-full border-none animate-none"
                 required
               />
               <button type="submit" className="bg-[#00F631] hover:bg-[#00D629] text-slate-950 px-6 cursor-pointer font-bold border-none transition-colors">
