@@ -343,12 +343,6 @@ const Navbar = () => {
                             ))}
                         </div>
 
-                        {/* Currency Selector */}
-                        <div className="pt-2 flex justify-center">
-                            <div className="inline-flex items-center gap-2 bg-slate-800 border border-[#00F631] px-4 py-2 text-[#00F631] text-[10px] font-black uppercase tracking-wider">
-                                <span>Sri Lanka (LKR Rs)</span>
-                            </div>
-                        </div>
 
                         {/* Copyright */}
                         <div className="pt-4 border-t border-slate-800 text-[10px] text-slate-500 font-bold tracking-wider text-center">
