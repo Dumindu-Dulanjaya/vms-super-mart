@@ -4,6 +4,7 @@ import banner1 from '../assets/banner.jpg';
 import banner2 from '../assets/baner 2.png';
 import vmsHero from '../assets/vms hero.png';
 import { ArrowRight, ShoppingBag, Sparkles } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const MainBanner = () => {
   const banners = [banner1, banner2];
@@ -44,46 +45,127 @@ const MainBanner = () => {
             {/* Top decorative neon glow line */}
             <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#00FF33] to-transparent"></div>
             
+            {/* Floating gradient background effect */}
+            <motion.div 
+              className="absolute -inset-10 bg-[radial-gradient(circle_at_center,rgba(0,255,51,0.12),transparent_60%)] blur-2xl pointer-events-none z-0"
+              animate={{
+                scale: [1, 1.2, 1],
+                x: [0, 20, 0],
+                y: [0, -15, 0],
+              }}
+              transition={{
+                duration: 8,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            />
+
             {/* Tagline */}
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#00FF33]/10 border border-[#00FF33]/25 mb-4 md:mb-6">
+            <motion.div 
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.6, ease: "easeOut" }}
+              className="relative z-10 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#00FF33]/10 border border-[#00FF33]/25 mb-4 md:mb-6"
+            >
               <Sparkles className="w-4 h-4 text-[#00FF33]" />
               <span className="text-xs md:text-sm font-semibold tracking-wider text-[#00FF33] uppercase">
                 Welcome to VMS Super Mart
               </span>
-            </div>
+            </motion.div>
 
             {/* Main Title */}
-            <h1 className="text-3xl md:text-5xl font-black text-white leading-tight mb-4 tracking-tight drop-shadow-md">
-              Freshness & Quality <br />
-              <span className="bg-gradient-to-r from-white via-[#00FF33] to-[#00CC29] bg-clip-text text-transparent font-extrabold">
-                Delivered Daily
-              </span>
+            <h1 className="relative z-10 text-3xl md:text-5xl font-black text-white leading-tight mb-4 tracking-tight drop-shadow-md">
+              <motion.span 
+                className="block"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4, duration: 0.6, ease: "easeOut" }}
+              >
+                Freshness & Quality
+              </motion.span>
+              <motion.span 
+                className="inline-block bg-gradient-to-r from-white via-[#00FF33] to-[#00CC29] bg-clip-text text-transparent font-extrabold"
+                initial={{ opacity: 0, y: 25, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ delay: 0.7, duration: 0.7, ease: "easeOut" }}
+              >
+                <motion.span
+                  className="inline-block"
+                  animate={{
+                    filter: [
+                      "drop-shadow(0 0 0px rgba(0, 255, 51, 0))",
+                      "drop-shadow(0 0 10px rgba(0, 255, 51, 0.45))",
+                      "drop-shadow(0 0 0px rgba(0, 255, 51, 0))"
+                    ]
+                  }}
+                  transition={{
+                    delay: 1.4,
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                >
+                  Delivered Daily
+                </motion.span>
+              </motion.span>
             </h1>
 
             {/* Description */}
-            <p className="text-gray-300 text-sm md:text-base leading-relaxed mb-6 md:mb-8 font-medium">
+            <motion.p 
+              className="relative z-10 text-gray-300 text-sm md:text-base leading-relaxed mb-6 md:mb-8 font-medium"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.0, duration: 0.6, ease: "easeOut" }}
+            >
               Discover unbeatable deals on fresh vegetables, grocery essentials, dairy, and household goods. Experience smart shopping designed just for you.
-            </p>
+            </motion.p>
 
             {/* Actions */}
-            <div className="flex flex-wrap items-center gap-4">
-              <Link 
-                to="/all-products" 
-                className="px-6 py-3 bg-[#00FF33] hover:bg-[#00CC29] text-slate-900 font-extrabold rounded-none transition-all duration-300 shadow-[0_0_15px_rgba(0,255,51,0.4)] hover:shadow-[0_0_25px_rgba(0,255,51,0.6)] flex items-center gap-2 transform hover:-translate-y-0.5"
+            <motion.div 
+              className="relative z-10 flex flex-wrap items-center gap-4"
+              initial="hidden"
+              animate="visible"
+              variants={{
+                hidden: {},
+                visible: {
+                  transition: {
+                    staggerChildren: 0.15,
+                    delayChildren: 1.2
+                  }
+                }
+              }}
+            >
+              <motion.div
+                variants={{
+                  hidden: { opacity: 0, y: 15 },
+                  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
+                }}
               >
-                <ShoppingBag size={18} />
-                Shop Now
-              </Link>
+                <Link 
+                  to="/all-products" 
+                  className="px-6 py-3 bg-[#00FF33] hover:bg-[#00CC29] text-slate-900 font-extrabold rounded-none transition-all duration-300 shadow-[0_0_15px_rgba(0,255,51,0.4)] hover:shadow-[0_0_25px_rgba(0,255,51,0.6)] flex items-center gap-2 transform hover:-translate-y-0.5"
+                >
+                  <ShoppingBag size={18} />
+                  Shop Now
+                </Link>
+              </motion.div>
 
-              <Link 
-                to="/all-products"
-                onMouseEnter={() => setIsHovered(true)}
-                className="flex items-center gap-2 text-white font-bold hover:gap-3 transition-all duration-300 group/btn"
+              <motion.div
+                variants={{
+                  hidden: { opacity: 0, y: 15 },
+                  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
+                }}
               >
-                <span>Explore Deals</span> 
-                <ArrowRight size={18} className="text-[#00FF33] group-hover/btn:translate-x-1 transition-transform" />
-              </Link>
-            </div>
+                <Link 
+                  to="/all-products"
+                  onMouseEnter={() => setIsHovered(true)}
+                  className="flex items-center gap-2 text-white font-bold hover:gap-3 transition-all duration-300 group/btn"
+                >
+                  <span>Explore Deals</span> 
+                  <ArrowRight size={18} className="text-[#00FF33] group-hover/btn:translate-x-1 transition-transform" />
+                </Link>
+              </motion.div>
+            </motion.div>
           </div>
         </div>
       </div>
