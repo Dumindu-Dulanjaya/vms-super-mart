@@ -39,7 +39,7 @@ const BottomBanner = () => {
       />
 
       {/* ✅ Overlay Content */}
-  <div className="absolute inset-0 flex flex-col items-center md:items-end md:justify-center pt-16 md:pt-0 md:pr-24 z-10">
+      <div className="relative md:absolute md:inset-0 flex flex-col items-center md:items-end md:justify-center p-6 pt-10 md:p-0 md:pr-24 z-10">
         <div>
           <h1 className="text-2xl md:text-3xl font-semibold text-primary mb-6 transition-all duration-300 hover:scale-105 hover:text-blue-600 cursor-pointer">
             Why We Are the Best?

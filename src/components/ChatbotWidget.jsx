@@ -159,7 +159,7 @@ const ChatbotWidget = () => {
           setIsOpen(!isOpen);
           setHasNewMessage(false);
         }}
-        className="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-tr from-[#00CC29] to-[#00FF33] text-slate-950 rounded-full flex items-center justify-center shadow-2xl cursor-pointer z-50 border-2 border-white/20 hover:shadow-[#00FF33]/20 shadow-lg"
+        className="fixed bottom-20 right-4 sm:bottom-6 sm:right-6 w-14 h-14 bg-gradient-to-tr from-[#00CC29] to-[#00FF33] text-slate-950 rounded-full flex items-center justify-center shadow-2xl cursor-pointer z-50 border-2 border-white/20 hover:shadow-[#00FF33]/20 shadow-lg"
       >
         {isOpen ? (
           <X className="w-6 h-6 text-slate-950" />
@@ -181,7 +181,7 @@ const ChatbotWidget = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 50, scale: 0.9 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed bottom-24 right-6 w-[360px] h-[520px] bg-slate-900/95 backdrop-blur-xl border border-slate-800 shadow-2xl flex flex-col justify-between z-50 rounded-2xl overflow-hidden"
+            className="fixed bottom-36 right-4 left-4 w-auto sm:w-[360px] sm:right-6 sm:left-auto h-[460px] sm:h-[520px] bg-slate-900/95 backdrop-blur-xl border border-slate-800 shadow-2xl flex flex-col justify-between z-50 rounded-2xl overflow-hidden"
           >
             {/* Top Glowing Trim */}
             <div className="h-[3px] bg-gradient-to-r from-[#00CC29] via-[#00FF33] to-[#00FF33] w-full" />

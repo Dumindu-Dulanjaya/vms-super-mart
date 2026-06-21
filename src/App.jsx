@@ -5,6 +5,7 @@ import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ChatbotWidget from './components/ChatbotWidget';
+import MobileBottomNav from './components/MobileBottomNav';
 
 // Pages
 import Home from './pages/Home';
@@ -46,7 +47,10 @@ const App = () => {
       {/* Dynamic Floating AI Chatbot Assistant for Shoppers */}
       {isFullLayoutPath && <ChatbotWidget />}
 
-      <div className={`${isFullLayoutPath ? (isHomePage ? "p-0" : "px-6 md:px-16 lg:px-24 xl:px-32 py-10") : "p-0"} flex-1`}>
+      {/* Mobile Bottom Navigation Bar */}
+      {isFullLayoutPath && <MobileBottomNav />}
+
+      <div className={`${isFullLayoutPath ? (isHomePage ? "pb-16 sm:pb-0" : "px-6 md:px-16 lg:px-24 xl:px-32 py-10 pb-24 sm:pb-10") : "p-0"} flex-1`}>
         <Routes>
           {/* Normal user routes */}
           <Route path='/' element={<Home />} />
