@@ -164,7 +164,7 @@ const DeliveryDashboard = () => {
     return (
         <div className="min-h-screen bg-slate-950 text-slate-100 font-sans flex flex-col">
             {/* Header */}
-            <header className="bg-slate-900 border-b border-slate-800 px-6 py-4 flex items-center justify-between">
+            <header className="bg-slate-900 border-b border-slate-800 px-4 py-3.5 sm:px-6 sm:py-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-auto">
                         <img src={vmsLogo} alt="VMS Logo" className="w-full h-full object-contain" />
@@ -180,39 +180,47 @@ const DeliveryDashboard = () => {
 
                 <button 
                     onClick={handleLogout}
-                    className="flex items-center gap-2 text-slate-400 hover:text-red-400 transition-colors text-xs font-black uppercase tracking-wider bg-transparent border-none cursor-pointer"
+                    className="flex items-center justify-center bg-red-500/10 hover:bg-red-500/20 active:scale-95 text-red-400 rounded-xl transition-all cursor-pointer border-none p-2 sm:px-3 sm:py-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-wider gap-1.5"
                 >
                     <LogOut className="w-4 h-4 text-red-500" />
-                    <span>Exit</span>
+                    <span className="hidden sm:inline">Exit</span>
                 </button>
             </header>
 
             {/* Navigation Tabs */}
-            <div className="flex border-b border-slate-800 bg-slate-900/50">
+            <div className="flex border-b border-slate-800 bg-slate-900/50 p-2 gap-2">
                 <button 
                     onClick={() => setActiveTab('pickup')}
-                    className={`flex-1 py-4 text-center text-xs font-black uppercase tracking-widest transition-all cursor-pointer border-b-2 border-none ${
+                    className={`flex-1 py-3 text-center text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all cursor-pointer rounded-xl flex items-center justify-center gap-1.5 border-none ${
                         activeTab === 'pickup' 
-                            ? 'border-green-500! text-green-400 bg-slate-900' 
-                            : 'border-transparent text-slate-500 hover:text-slate-300'
+                            ? 'bg-green-500/10 text-green-400 font-extrabold shadow-sm shadow-green-500/5' 
+                            : 'bg-transparent text-slate-500 hover:text-slate-300 font-medium'
                     }`}
                 >
-                    Available Pickups ({getReadyOrders().length})
+                    <span className="hidden sm:inline">Available Pickups</span>
+                    <span className="inline sm:hidden">Pickups</span>
+                    <span className="px-1.5 py-0.5 rounded-full bg-slate-800 text-[9px] font-bold">
+                        {getReadyOrders().length}
+                    </span>
                 </button>
                 <button 
                     onClick={() => setActiveTab('active')}
-                    className={`flex-1 py-4 text-center text-xs font-black uppercase tracking-widest transition-all cursor-pointer border-b-2 border-none ${
+                    className={`flex-1 py-3 text-center text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all cursor-pointer rounded-xl flex items-center justify-center gap-1.5 border-none ${
                         activeTab === 'active' 
-                            ? 'border-green-500! text-green-400 bg-slate-900' 
-                            : 'border-transparent text-slate-500 hover:text-slate-300'
+                            ? 'bg-green-500/10 text-green-400 font-extrabold shadow-sm shadow-green-500/5' 
+                            : 'bg-transparent text-slate-500 hover:text-slate-300 font-medium'
                     }`}
                 >
-                    On the Way ({getShippedOrders().length})
+                    <span className="hidden sm:inline">On the Way</span>
+                    <span className="inline sm:hidden">Active</span>
+                    <span className="px-1.5 py-0.5 rounded-full bg-slate-800 text-[9px] font-bold">
+                        {getShippedOrders().length}
+                    </span>
                 </button>
             </div>
 
             {/* Content list */}
-            <main className="flex-1 p-6 max-w-lg mx-auto w-full space-y-6 overflow-y-auto">
+            <main className="flex-1 p-4 sm:p-6 max-w-lg mx-auto w-full space-y-4 sm:space-y-6 overflow-y-auto">
                 {displayedOrders.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-20 text-slate-600 text-center">
                         <Package className="w-16 h-16 stroke-1 mb-4 text-slate-800" />
@@ -225,11 +233,11 @@ const DeliveryDashboard = () => {
                     </div>
                 ) : (
                     displayedOrders.map(order => (
-                        <div key={order.id} className="bg-slate-900 border border-slate-800/80 p-5 space-y-4 hover:border-slate-700/80 transition-all shadow-lg rounded-none">
+                        <div key={order.id} className="bg-slate-900 border border-slate-800/60 p-4 sm:p-5 space-y-4 hover:border-slate-750 transition-all shadow-xl rounded-2xl">
                             {/* Card Metadata */}
                             <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
-                                <div>
-                                    <span className="font-mono text-xs font-black text-green-400 tracking-tight">{order.id}</span>
+                                <div className="min-w-0">
+                                    <span className="font-mono text-xs font-bold text-green-400 block truncate max-w-[150px] sm:max-w-none" title={order.id}>{order.id}</span>
                                     <p className="text-[9px] text-slate-500 font-bold uppercase mt-0.5">
                                         {new Date(order.createdAt).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
                                     </p>
@@ -250,12 +258,17 @@ const DeliveryDashboard = () => {
                                     <div>
                                         <p className="font-bold text-white">{order.customer?.firstName} {order.customer?.lastName}</p>
                                         {activeTab === 'active' && (
-                                            <div className="space-y-1 mt-1.5 text-slate-400 font-medium">
-                                                <a href={`tel:${order.customer?.phone}`} className="flex items-center gap-1 hover:text-green-400 transition-colors">
-                                                    <Phone className="w-3 h-3" />
-                                                    <span>{order.customer?.phone}</span>
-                                                </a>
-                                                <p className="text-[10px] text-slate-500 truncate max-w-[200px]">{order.customer?.email}</p>
+                                            <div className="space-y-2 mt-2">
+                                                <div className="flex gap-2">
+                                                    <a 
+                                                        href={`tel:${order.customer?.phone}`} 
+                                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-750 active:scale-95 text-slate-300 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all border border-slate-700/50 cursor-pointer"
+                                                    >
+                                                        <Phone className="w-3 h-3 text-green-400" />
+                                                        <span>Call Customer</span>
+                                                    </a>
+                                                </div>
+                                                <p className="text-[10px] text-slate-500 truncate max-w-[220px]">{order.customer?.email}</p>
                                             </div>
                                         )}
                                     </div>
@@ -263,32 +276,41 @@ const DeliveryDashboard = () => {
 
                                 <div className="flex items-start gap-3 border-t border-slate-800/50 pt-2.5">
                                     <MapPin className="w-4 h-4 text-slate-500 flex-shrink-0 mt-0.5" />
-                                    <div>
-                                        <p className="font-semibold text-slate-300">{order.customer?.address}</p>
-                                        <p className="text-[10px] text-slate-500 font-black tracking-wider uppercase mt-0.5">{order.customer?.city}, {order.customer?.province}</p>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="font-semibold text-slate-300 break-words">{order.customer?.address}</p>
+                                        <p className="text-[10px] text-slate-500 font-bold tracking-wider uppercase mt-0.5">{order.customer?.city}, {order.customer?.province}</p>
+                                        <a 
+                                            href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${order.customer?.address}, ${order.customer?.city}, ${order.customer?.province}`)}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-500/10 hover:bg-green-500/20 active:scale-95 text-green-400 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all border border-green-500/20 cursor-pointer"
+                                        >
+                                            <Navigation className="w-3 h-3 text-green-400" />
+                                            <span>Navigate on Map</span>
+                                        </a>
                                     </div>
                                 </div>
                             </div>
 
                             {/* COD / Payment Info */}
-                            <div className={`p-3 text-xs font-black uppercase tracking-wider flex items-center justify-between ${
+                            <div className={`p-3 rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-between ${
                                 order.paymentMethod === 'cod'
                                     ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
                                     : 'bg-green-500/10 text-green-400 border border-green-500/20'
                             }`}>
                                 <div className="flex items-center gap-1.5">
                                     <DollarSign className="w-4 h-4" />
-                                    <span>{order.paymentMethod === 'cod' ? 'Cash on Delivery (COD)' : 'Paid Online (No Collection)'}</span>
+                                    <span>{order.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Paid Online'}</span>
                                 </div>
                                 <span className="text-sm font-black">{currency}{order.summary?.total}</span>
                             </div>
 
                             {/* Item breakdown */}
-                            <div className="bg-slate-950/40 p-3 border border-slate-900/60 text-xs space-y-2">
-                                <p className="text-[9px] text-slate-600 font-black uppercase tracking-wider border-b border-slate-900 pb-1.5">Verification Checklist</p>
+                            <div className="bg-slate-950/40 p-3 rounded-xl border border-slate-900/60 text-xs space-y-2">
+                                <p className="text-[9px] text-slate-500 font-bold uppercase tracking-wider border-b border-slate-900 pb-1.5">Verification Checklist</p>
                                 {order.items?.map((item, idx) => (
                                     <div key={idx} className="flex items-center justify-between text-[11px]">
-                                        <span className="text-slate-400 font-semibold truncate max-w-[190px]">{item.name}</span>
+                                        <span className="text-slate-400 font-semibold truncate max-w-[170px] sm:max-w-[220px]">{item.name}</span>
                                         <span className="text-slate-500 font-black">x{item.quantity}</span>
                                     </div>
                                 ))}
@@ -299,26 +321,27 @@ const DeliveryDashboard = () => {
                                 {activeTab === 'pickup' ? (
                                     <button
                                         onClick={() => updateOrderStatus(order.id, 'shipped')}
-                                        className="w-full bg-green-500 hover:bg-green-400 text-white font-black text-xs uppercase tracking-widest py-3 flex items-center justify-center gap-2 cursor-pointer transition-all border-none"
+                                        className="w-full bg-green-500 hover:bg-green-400 text-white font-extrabold text-xs uppercase tracking-wider py-3.5 rounded-xl flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] transition-all border-none"
                                     >
                                         <Navigation className="w-4 h-4" />
                                         <span>Pick Up & Start Route</span>
                                     </button>
                                 ) : (
-                                    <div className="grid grid-cols-5 gap-3">
+                                    <div className="flex gap-2.5">
                                         <button
                                             onClick={() => updateOrderStatus(order.id, 'cancelled')}
-                                            className="col-span-2 bg-transparent hover:bg-red-500/10 border border-red-500/20 text-red-500 font-black text-[10px] uppercase tracking-widest py-3 flex items-center justify-center gap-1.5 cursor-pointer transition-all"
+                                            className="flex-1 bg-transparent hover:bg-red-500/10 border border-red-500/20 text-red-500 font-extrabold text-[11px] sm:text-xs uppercase tracking-wider py-3.5 rounded-xl flex items-center justify-center gap-1.5 cursor-pointer active:scale-[0.98] transition-all"
                                         >
-                                            <XCircle className="w-4 h-4" />
+                                            <XCircle className="w-4 h-4 flex-shrink-0" />
                                             <span>Cancel</span>
                                         </button>
                                         <button
                                             onClick={() => updateOrderStatus(order.id, 'delivered')}
-                                            className="col-span-3 bg-green-500 hover:bg-green-400 text-white font-black text-[10px] uppercase tracking-widest py-3 flex items-center justify-center gap-1.5 cursor-pointer transition-all border-none"
+                                            className="flex-[1.5] bg-green-500 hover:bg-green-400 text-white font-extrabold text-[11px] sm:text-xs uppercase tracking-wider py-3.5 rounded-xl flex items-center justify-center gap-1.5 cursor-pointer active:scale-[0.98] transition-all border-none"
                                         >
-                                            <CheckCircle className="w-4 h-4" />
-                                            <span>Deliver Order</span>
+                                            <CheckCircle className="w-4 h-4 flex-shrink-0" />
+                                            <span className="hidden sm:inline">Deliver Order</span>
+                                            <span className="inline sm:hidden">Deliver</span>
                                         </button>
                                     </div>
                                 )}
