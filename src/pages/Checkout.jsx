@@ -10,9 +10,25 @@ const Checkout = () => {
     const [cartData, setCartData] = useState([]);
     const [paymentMethod, setPaymentMethod] = useState('cod');
     const [saveAddressToBook, setSaveAddressToBook] = useState(false);
+    const [leafletLoaded, setLeafletLoaded] = useState(!!window.L);
 
     const mapInstanceRef = React.useRef(null);
     const markerRef = React.useRef(null);
+
+    // Poll to check when Leaflet script is fully loaded and available on window
+    useEffect(() => {
+        if (window.L) {
+            setLeafletLoaded(true);
+            return;
+        }
+        const interval = setInterval(() => {
+            if (window.L) {
+                setLeafletLoaded(true);
+                clearInterval(interval);
+            }
+        }, 100);
+        return () => clearInterval(interval);
+    }, []);
 
     useEffect(() => {
         refreshProducts();
@@ -68,31 +84,48 @@ const Checkout = () => {
 
         toast.loading('Detecting your GPS location...', { id: 'gps-loading' });
 
-        navigator.geolocation.getCurrentPosition(
-            async (position) => {
-                const { latitude, longitude } = position.coords;
-                toast.dismiss('gps-loading');
-                toast.success('Live location detected!');
+        const options = { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 };
 
-                if (mapInstanceRef.current && markerRef.current) {
-                    const latLng = [latitude, longitude];
-                    mapInstanceRef.current.setView(latLng, 16);
-                    markerRef.current.setLatLng(latLng);
-                    await reverseGeocode(latitude, longitude);
-                }
-            },
-            (error) => {
-                toast.dismiss('gps-loading');
-                console.error('GPS detection error', error);
-                toast.error('Unable to retrieve GPS coordinates. Please select manually on map.');
-            },
-            { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
-        );
+        const successCallback = async (position) => {
+            const { latitude, longitude } = position.coords;
+            toast.dismiss('gps-loading');
+            toast.success('Live location detected!');
+
+            if (mapInstanceRef.current && markerRef.current) {
+                const latLng = [latitude, longitude];
+                mapInstanceRef.current.setView(latLng, 16);
+                markerRef.current.setLatLng(latLng);
+                await reverseGeocode(latitude, longitude);
+            }
+        };
+
+        const errorCallback = (error) => {
+            // If high accuracy GPS timed out, fallback to low accuracy cellular/wifi geolocation
+            if (error.code === error.TIMEOUT && options.enableHighAccuracy) {
+                options.enableHighAccuracy = false;
+                options.timeout = 10000;
+                navigator.geolocation.getCurrentPosition(successCallback, finalErrorCallback, options);
+            } else {
+                finalErrorCallback(error);
+            }
+        };
+
+        const finalErrorCallback = (error) => {
+            toast.dismiss('gps-loading');
+            console.error('GPS detection error', error);
+            if (error.code === error.PERMISSION_DENIED) {
+                toast.error('Location permission denied. Please allow location access in your browser settings.');
+            } else {
+                toast.error('Unable to retrieve GPS location. Please select manually on map.');
+            }
+        };
+
+        navigator.geolocation.getCurrentPosition(successCallback, errorCallback, options);
     };
 
     useEffect(() => {
-        // If Leaflet is not loaded from CDN yet, wait or skip
-        if (!window.L) return;
+        // If Leaflet is not loaded from CDN yet, wait
+        if (!leafletLoaded || !window.L) return;
 
         if (!mapInstanceRef.current && document.getElementById('checkout-map')) {
             const defaultLatLng = [6.9271, 79.8612]; // Colombo
@@ -128,6 +161,11 @@ const Checkout = () => {
 
             mapInstanceRef.current = map;
             markerRef.current = marker;
+
+            // Invalidate size to correctly render map tiles and prevent grey/blank map issues
+            setTimeout(() => {
+                map.invalidateSize();
+            }, 250);
         }
 
         return () => {
@@ -137,7 +175,7 @@ const Checkout = () => {
                 markerRef.current = null;
             }
         };
-    }, []);
+    }, [leafletLoaded]);
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
