@@ -93,92 +93,106 @@ const Cart = () => {
                                 return (
                                     <div
                                         key={item.id}
-                                        className={`p-6 flex gap-6 ${index !== cartData.length - 1 ? 'border-b border-gray-200' : ''}`}
+                                        className={`p-4 sm:p-6 flex flex-col sm:flex-row gap-4 sm:gap-6 ${index !== cartData.length - 1 ? 'border-b border-gray-200' : ''}`}
                                     >
-                                        {/* Product Image */}
-                                        <Link to={`/product/${item.slug}`} className="flex-shrink-0">
-                                            <div className="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden">
-                                                <img
-                                                    src={item.image}
-                                                    alt={item.name}
-                                                    className="w-full h-full object-contain hover:scale-110 transition-transform"
-                                                />
-                                            </div>
-                                        </Link>
-
-                                        {/* Product Details */}
-                                        <div className="flex-1">
-                                            <Link to={`/product/${item.slug}`}>
-                                                <h3 className="text-lg font-semibold text-gray-800 hover:text-[#00FF33] mb-1">
-                                                    {item.name}
-                                                </h3>
+                                        {/* Top section: Product Image & Details */}
+                                        <div className="flex gap-4 sm:gap-6 items-start flex-1">
+                                            {/* Product Image */}
+                                            <Link to={`/product/${item.slug}`} className="flex-shrink-0">
+                                                <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
+                                                    <img
+                                                        src={item.image}
+                                                        alt={item.name}
+                                                        className="w-full h-full object-contain hover:scale-110 transition-transform"
+                                                    />
+                                                </div>
                                             </Link>
-                                            <p className="text-sm text-gray-500 mb-3">{item.category}</p>
 
-                                            <div className="flex items-center justify-between">
-                                                <div className="flex items-center gap-4">
-                                                    {/* Price */}
-                                                    <div>
-                                                        <p className="text-xl font-bold text-gray-900">{currency}{item.price}</p>
-                                                        {item.oldPrice > item.price && (
-                                                            <p className="text-sm text-gray-400 line-through">{currency}{item.oldPrice}</p>
-                                                        )}
-                                                    </div>
+                                            {/* Product Details */}
+                                            <div className="flex-1 min-w-0 text-left">
+                                                <Link to={`/product/${item.slug}`}>
+                                                    <h3 className="text-sm sm:text-lg font-semibold text-gray-800 hover:text-[#00FF33] mb-1 line-clamp-2">
+                                                        {item.name}
+                                                    </h3>
+                                                </Link>
+                                                <p className="text-xs sm:text-sm text-gray-500 mb-1.5">{item.category}</p>
+                                                
+                                                {/* Price for Mobile */}
+                                                <div className="sm:hidden mt-1">
+                                                    <span className="text-base font-bold text-gray-900">{currency}{item.price}</span>
+                                                    {item.oldPrice > item.price && (
+                                                        <span className="text-xs text-gray-400 line-through ml-2">{currency}{item.oldPrice}</span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
 
-                                                    {/* Quantity Controls */}
-                                                    <div className="flex items-center gap-2 bg-gray-100 px-3 py-2 rounded-lg border border-gray-300">
-                                                        <button
-                                                            onClick={() => {
-                                                                if (item.quantity > 1) {
-                                                                    updateCartItem(item.id, item.quantity - 1);
-                                                                } else {
-                                                                    removeFromCart(item.id);
-                                                                }
-                                                            }}
-                                                            className="text-gray-600 font-bold text-lg w-7 h-7 flex items-center justify-center hover:bg-gray-200 rounded transition-colors"
-                                                        >
-                                                            -
-                                                        </button>
-                                                        <span className="text-gray-800 font-semibold w-10 text-center">{item.quantity}</span>
-                                                        <button
-                                                            onClick={() => {
-                                                                if (item.quantity < maxAvailable) {
-                                                                    updateCartItem(item.id, item.quantity + 1);
-                                                                }
-                                                            }}
-                                                            disabled={item.quantity >= maxAvailable}
-                                                            className={`text-gray-600 font-bold text-lg w-7 h-7 flex items-center justify-center rounded transition-colors ${
-                                                                item.quantity >= maxAvailable 
-                                                                    ? 'opacity-30 cursor-not-allowed' 
-                                                                    : 'hover:bg-gray-200'
-                                                            }`}
-                                                            title={item.quantity >= maxAvailable ? "Stock limit reached" : "Increase quantity"}
-                                                        >
-                                                            +
-                                                        </button>
-                                                    </div>
+                                        {/* Bottom section (mobile) / Right section (desktop): Controls & Price summaries */}
+                                        <div className="flex-1 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 sm:mt-0">
+                                            {/* Price for Desktop */}
+                                            <div className="hidden sm:block text-left">
+                                                <p className="text-xl font-bold text-gray-900">{currency}{item.price}</p>
+                                                {item.oldPrice > item.price && (
+                                                    <p className="text-sm text-gray-400 line-through">{currency}{item.oldPrice}</p>
+                                                )}
+                                            </div>
+
+                                            {/* Quantity Controls & Delete button */}
+                                            <div className="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto">
+                                                {/* Quantity Controls */}
+                                                <div className="flex items-center gap-2 bg-gray-50 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg border border-gray-200">
+                                                    <button
+                                                        onClick={() => {
+                                                            if (item.quantity > 1) {
+                                                                updateCartItem(item.id, item.quantity - 1);
+                                                            } else {
+                                                                removeFromCart(item.id);
+                                                            }
+                                                        }}
+                                                        className="text-gray-500 font-bold text-base w-7 h-7 flex items-center justify-center hover:bg-gray-200 rounded transition-colors"
+                                                    >
+                                                        -
+                                                    </button>
+                                                    <span className="text-gray-800 font-semibold w-8 text-center text-sm sm:text-base">{item.quantity}</span>
+                                                    <button
+                                                        onClick={() => {
+                                                            if (item.quantity < maxAvailable) {
+                                                                updateCartItem(item.id, item.quantity + 1);
+                                                            }
+                                                        }}
+                                                        disabled={item.quantity >= maxAvailable}
+                                                        className={`text-gray-500 font-bold text-base w-7 h-7 flex items-center justify-center rounded transition-colors ${
+                                                            item.quantity >= maxAvailable 
+                                                                ? 'opacity-30 cursor-not-allowed' 
+                                                                : 'hover:bg-gray-200'
+                                                        }`}
+                                                        title={item.quantity >= maxAvailable ? "Stock limit reached" : "Increase quantity"}
+                                                    >
+                                                        +
+                                                    </button>
                                                 </div>
 
-                                            {/* Remove Button */}
-                                            <button
-                                                onClick={() => removeFromCart(item.id)}
-                                                className="text-red-500 hover:text-red-700 p-2 hover:bg-red-50 rounded-lg transition-colors"
-                                                title="Remove from cart"
-                                            >
-                                                <Trash2 size={20} />
-                                            </button>
-                                        </div>
+                                                {/* Remove Button */}
+                                                <button
+                                                    onClick={() => removeFromCart(item.id)}
+                                                    className="text-red-500 hover:text-red-700 p-2.5 hover:bg-red-50 rounded-lg transition-colors border border-gray-100 sm:border-none flex items-center justify-center"
+                                                    title="Remove from cart"
+                                                >
+                                                    <Trash2 size={18} />
+                                                </button>
+                                            </div>
 
-                                        {/* Subtotal for this item */}
-                                        <div className="mt-3 pt-3 border-t border-gray-100">
-                                            <p className="text-sm text-gray-600">
-                                                Subtotal: <span className="font-semibold text-gray-800">{currency}{item.price * item.quantity}</span>
-                                            </p>
+                                            {/* Subtotal for this item */}
+                                            <div className="border-t border-gray-100 pt-3 sm:pt-0 sm:border-none flex justify-between sm:block text-right">
+                                                <span className="text-xs text-gray-500 sm:hidden">Item Subtotal:</span>
+                                                <p className="text-sm font-semibold text-gray-800">
+                                                    Subtotal: <span className="font-bold text-[#00FF33]">{currency}{(item.price * item.quantity).toLocaleString()}</span>
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            );
-                        })}
+                                );
+                            })}
                         </div>
 
                         {/* Continue Shopping */}
