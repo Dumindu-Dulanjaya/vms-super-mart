@@ -212,7 +212,6 @@ const DeliveryDashboard = () => {
                                 <img src={profileIcon} className="w-14 h-14 rounded-full border-2 border-white shadow bg-white" alt="Profile" />
                                 <div>
                                     <h3 className="font-extrabold text-sm tracking-tight text-white">{riderUser.name}</h3>
-                                    <p className="text-[9px] text-white/80 font-bold uppercase tracking-widest mt-0.5">ID: {riderUser.id || '508879'}</p>
                                 </div>
                             </div>
                             
@@ -230,25 +229,20 @@ const DeliveryDashboard = () => {
                             {[
                                 { label: 'Profile', icon: <User className="w-5 h-5 text-slate-500" /> },
                                 { label: 'Earnings', icon: <DollarSign className="w-5 h-5 text-slate-500" /> },
-                                { label: 'Opportunities', icon: <Gift className="w-5 h-5 text-slate-500" /> },
-                                { label: 'My Performance', icon: <TrendingUp className="w-5 h-5 text-slate-500" /> },
-                                { label: 'Notice Board', icon: <FileText className="w-5 h-5 text-slate-500" /> },
-                                { label: 'Help Centre', icon: <HelpCircle className="w-5 h-5 text-slate-500" /> },
+                                { label: 'Logout', icon: <LogOut className="w-5 h-5 text-slate-500" />, action: handleLogout },
                             ].map((item, idx) => (
                                 <div 
                                     key={idx} 
                                     className="flex items-center gap-4 px-4 py-3.5 hover:bg-slate-50 text-slate-700 hover:text-slate-900 font-bold text-xs uppercase tracking-wider cursor-pointer transition-colors rounded-xl"
-                                    onClick={() => setIsDrawerOpen(false)}
+                                    onClick={() => {
+                                        setIsDrawerOpen(false);
+                                        if (item.action) item.action();
+                                    }}
                                 >
                                     {item.icon}
                                     <span>{item.label}</span>
                                 </div>
                             ))}
-                        </div>
-
-                        {/* Drawer Footer */}
-                        <div className="p-5 border-t border-slate-100 bg-slate-50 text-center">
-                            <p className="text-[10px] text-slate-400 font-black tracking-widest uppercase">Version 37.070.0_401302</p>
                         </div>
                     </div>
                 </div>
