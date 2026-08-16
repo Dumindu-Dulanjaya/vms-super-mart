@@ -162,70 +162,68 @@ const DeliveryDashboard = () => {
     const displayedOrders = activeTab === 'pickup' ? getReadyOrders() : getShippedOrders();
 
     return (
-        <div className="min-h-screen bg-slate-950 text-slate-100 font-sans flex flex-col">
-            {/* Header */}
-            <header className="bg-slate-900 border-b border-slate-800 px-4 py-3.5 sm:px-6 sm:py-4 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-auto">
-                        <img src={vmsLogo} alt="VMS Logo" className="w-full h-full object-contain" />
+        <div className="min-h-screen bg-[#121212] text-[#f5f5f5] font-sans flex flex-col antialiased">
+            {/* Premium Header */}
+            <header className="bg-[#171717] border-b border-[#262626] px-6 py-5 flex items-center justify-between shadow-[0_4px_20px_rgba(0,0,0,0.3)]">
+                <div className="flex items-center gap-4">
+                    <div className="w-12 h-auto hover:rotate-6 transition-transform duration-300">
+                        <img src={vmsLogo} alt="VMS Logo" className="w-full h-full object-contain brightness-110" />
                     </div>
                     <div>
-                        <h1 className="text-sm font-black tracking-widest uppercase text-white flex items-center gap-2">
-                            <span>VMS Logistics</span>
-                            <span className="bg-green-500/20 text-green-400 px-1.5 py-0.5 rounded text-[8px] font-black uppercase">Rider Portal</span>
+                        <h1 className="text-sm font-black tracking-[0.25em] uppercase text-white flex items-center gap-2">
+                            <span>VMS LOGISTICS</span>
+                            <span className="bg-[#00FF33]/15 text-[#00FF33] px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest">RIDER PORTAL</span>
                         </h1>
-                        <p className="text-[9px] text-slate-500 font-bold uppercase mt-0.5">Agent: {riderUser.name}</p>
+                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Agent: <span className="text-slate-350">{riderUser.name}</span></p>
                     </div>
                 </div>
 
                 <button 
                     onClick={handleLogout}
-                    className="flex items-center justify-center bg-red-500/10 hover:bg-red-500/20 active:scale-95 text-red-400 rounded-xl transition-all cursor-pointer border-none p-2 sm:px-3 sm:py-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-wider gap-1.5"
+                    className="flex items-center justify-center bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-none border border-red-500/30 px-4 py-2 text-[10px] font-black uppercase tracking-widest transition-all cursor-pointer hover:shadow-[0_0_15px_rgba(239,68,68,0.1)] active:scale-95"
                 >
-                    <LogOut className="w-4 h-4 text-red-500" />
-                    <span className="hidden sm:inline">Exit</span>
+                    <LogOut className="w-3.5 h-3.5 text-red-500 mr-2" />
+                    <span>Exit Session</span>
                 </button>
             </header>
 
-            {/* Navigation Tabs */}
-            <div className="flex border-b border-slate-800 bg-slate-900/50 p-2 gap-2">
+            {/* Premium Minimal Navigation Tabs */}
+            <div className="flex border-b border-[#262626] bg-[#171717]/60 p-3 gap-3">
                 <button 
                     onClick={() => setActiveTab('pickup')}
-                    className={`flex-1 py-3 text-center text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all cursor-pointer rounded-xl flex items-center justify-center gap-1.5 border-none ${
+                    className={`flex-1 py-4 text-center text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] transition-all cursor-pointer rounded-none flex items-center justify-center gap-2.5 border-2 ${
                         activeTab === 'pickup' 
-                            ? 'bg-green-500/10 text-green-400 font-extrabold shadow-sm shadow-green-500/5' 
-                            : 'bg-transparent text-slate-500 hover:text-slate-300 font-medium'
+                            ? 'bg-[#00FF33]/10 text-[#00FF33] border-[#00FF33] font-black shadow-[0_0_15px_rgba(0,255,51,0.15)]' 
+                            : 'bg-transparent border-slate-800 text-slate-500 hover:text-slate-300 font-bold'
                     }`}
                 >
-                    <span className="hidden sm:inline">Available Pickups</span>
-                    <span className="inline sm:hidden">Pickups</span>
-                    <span className="px-1.5 py-0.5 rounded-full bg-slate-800 text-[9px] font-bold">
+                    <span>AVAILABLE PICKUPS</span>
+                    <span className="px-2.5 py-0.5 rounded bg-slate-900 text-[10px] font-black border border-slate-800 text-white">
                         {getReadyOrders().length}
                     </span>
                 </button>
                 <button 
                     onClick={() => setActiveTab('active')}
-                    className={`flex-1 py-3 text-center text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all cursor-pointer rounded-xl flex items-center justify-center gap-1.5 border-none ${
+                    className={`flex-1 py-4 text-center text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] transition-all cursor-pointer rounded-none flex items-center justify-center gap-2.5 border-2 ${
                         activeTab === 'active' 
-                            ? 'bg-green-500/10 text-green-400 font-extrabold shadow-sm shadow-green-500/5' 
-                            : 'bg-transparent text-slate-500 hover:text-slate-300 font-medium'
+                            ? 'bg-[#00FF33]/10 text-[#00FF33] border-[#00FF33] font-black shadow-[0_0_15px_rgba(0,255,51,0.15)]' 
+                            : 'bg-transparent border-slate-800 text-slate-500 hover:text-slate-300 font-bold'
                     }`}
                 >
-                    <span className="hidden sm:inline">On the Way</span>
-                    <span className="inline sm:hidden">Active</span>
-                    <span className="px-1.5 py-0.5 rounded-full bg-slate-800 text-[9px] font-bold">
+                    <span>ON THE WAY</span>
+                    <span className="px-2.5 py-0.5 rounded bg-slate-900 text-[10px] font-black border border-slate-800 text-white">
                         {getShippedOrders().length}
                     </span>
                 </button>
             </div>
 
-            {/* Content list */}
-            <main className="flex-1 p-4 sm:p-6 max-w-lg mx-auto w-full space-y-4 sm:space-y-6 overflow-y-auto">
+            {/* Content List */}
+            <main className="flex-1 p-4 sm:p-6 max-w-lg mx-auto w-full space-y-6 overflow-y-auto">
                 {displayedOrders.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-20 text-slate-600 text-center">
-                        <Package className="w-16 h-16 stroke-1 mb-4 text-slate-800" />
-                        <h3 className="font-black uppercase tracking-wider text-xs text-slate-500">No active shipments</h3>
-                        <p className="text-[10px] text-slate-600 mt-1 max-w-[250px]">
+                    <div className="flex flex-col items-center justify-center py-24 text-slate-600 text-center bg-[#171717] border border-[#262626] p-6 shadow-xl">
+                        <Package className="w-16 h-16 stroke-[1.5] mb-4 text-slate-500 animate-pulse" />
+                        <h3 className="font-black uppercase tracking-[0.2em] text-xs text-white">No Active Shipments</h3>
+                        <p className="text-[10px] text-slate-500 uppercase tracking-wider mt-2.5 max-w-[280px] leading-relaxed">
                             {activeTab === 'pickup' 
                                 ? 'When the supermarket admin packages an order and marks it ready, it will instantly show up here.'
                                 : 'You are not currently delivering any orders. Go to available pickups to grab one!'}
@@ -233,16 +231,16 @@ const DeliveryDashboard = () => {
                     </div>
                 ) : (
                     displayedOrders.map(order => (
-                        <div key={order.id} className="bg-slate-900 border border-slate-800/60 p-4 sm:p-5 space-y-4 hover:border-slate-750 transition-all shadow-xl rounded-2xl">
-                            {/* Card Metadata */}
-                            <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
+                        <div key={order.id} className="bg-[#171717] border border-[#262626] p-5 sm:p-6 space-y-5 hover:border-slate-700 transition-all shadow-[0_10px_30px_rgba(0,0,0,0.5)] relative">
+                            {/* Card Header & Status */}
+                            <div className="flex items-center justify-between border-b border-[#262626] pb-3.5">
                                 <div className="min-w-0">
-                                    <span className="font-mono text-xs font-bold text-green-400 block truncate max-w-[150px] sm:max-w-none" title={order.id}>{order.id}</span>
-                                    <p className="text-[9px] text-slate-500 font-bold uppercase mt-0.5">
-                                        {new Date(order.createdAt).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
+                                    <span className="font-mono text-xs font-black text-[#00FF33] block truncate max-w-[150px] sm:max-w-none uppercase tracking-widest">{order.id}</span>
+                                    <p className="text-[10px] text-slate-500 font-bold uppercase mt-1 tracking-wider">
+                                        Received: {new Date(order.createdAt).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
                                     </p>
                                 </div>
-                                <span className={`text-[8px] font-black uppercase tracking-widest px-2.5 py-1 ${
+                                <span className={`text-[9px] font-black uppercase tracking-widest px-3 py-1 ${
                                     order.status?.toLowerCase() === 'ready'
                                         ? 'bg-teal-500/10 text-teal-400 border border-teal-500/20'
                                         : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
@@ -251,107 +249,106 @@ const DeliveryDashboard = () => {
                                 </span>
                             </div>
 
-                            {/* Customer information */}
-                            <div className="space-y-2 text-xs">
-                                <div className="flex items-start gap-3">
-                                    <User className="w-4 h-4 text-slate-500 flex-shrink-0 mt-0.5" />
+                            {/* Customer & Destination details */}
+                            <div className="space-y-3.5 text-xs">
+                                <div className="flex items-start gap-3.5">
+                                    <div className="w-8 h-8 rounded bg-slate-900 flex items-center justify-center flex-shrink-0 border border-slate-800">
+                                        <User className="w-4 h-4 text-slate-400" />
+                                    </div>
                                     <div>
-                                        <p className="font-bold text-white">{order.customer?.firstName} {order.customer?.lastName}</p>
+                                        <p className="text-[10px] text-slate-500 font-black uppercase tracking-wider">Customer</p>
+                                        <p className="font-bold text-white text-xs mt-0.5">{order.customer?.firstName} {order.customer?.lastName}</p>
                                         {activeTab === 'active' && (
-                                            <div className="space-y-2 mt-2">
-                                                <div className="flex gap-2">
-                                                    <a 
-                                                        href={`tel:${order.customer?.phone}`} 
-                                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-750 active:scale-95 text-slate-300 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all border border-slate-700/50 cursor-pointer"
-                                                    >
-                                                        <Phone className="w-3 h-3 text-green-400" />
-                                                        <span>Call Customer</span>
-                                                    </a>
-                                                </div>
-                                                <p className="text-[10px] text-slate-500 truncate max-w-[220px]">{order.customer?.email}</p>
+                                            <div className="mt-2.5 flex items-center gap-2">
+                                                <a 
+                                                    href={`tel:${order.customer?.phone}`} 
+                                                    className="inline-flex items-center gap-2 px-3 py-2 bg-slate-900 border border-slate-800 hover:border-green-500 hover:text-white transition-all text-slate-300 font-black uppercase tracking-widest text-[9px] cursor-pointer"
+                                                >
+                                                    <Phone className="w-3 h-3 text-[#00FF33]" />
+                                                    <span>Call Customer</span>
+                                                </a>
                                             </div>
                                         )}
                                     </div>
                                 </div>
 
-                                <div className="flex items-start gap-3 border-t border-slate-800/50 pt-2.5">
-                                    <MapPin className="w-4 h-4 text-slate-500 flex-shrink-0 mt-0.5" />
+                                <div className="flex items-start gap-3.5 border-t border-[#262626] pt-3.5">
+                                    <div className="w-8 h-8 rounded bg-slate-900 flex items-center justify-center flex-shrink-0 border border-slate-800">
+                                        <MapPin className="w-4 h-4 text-slate-400" />
+                                    </div>
                                     <div className="flex-1 min-w-0">
-                                        <p className="font-semibold text-slate-300 break-words">{order.customer?.address}</p>
-                                        <p className="text-[10px] text-slate-500 font-bold tracking-wider uppercase mt-0.5">{order.customer?.city}, {order.customer?.province}</p>
+                                        <p className="text-[10px] text-slate-500 font-black uppercase tracking-wider">Delivery Address</p>
+                                        <p className="font-bold text-slate-200 mt-0.5 leading-relaxed">{order.customer?.address}</p>
+                                        <p className="text-[9px] text-[#00FF33] font-black tracking-widest uppercase mt-1">{order.customer?.city}, {order.customer?.province}</p>
+                                        
                                         <a 
                                             href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${order.customer?.address}, ${order.customer?.city}, ${order.customer?.province}`)}`}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-500/10 hover:bg-green-500/20 active:scale-95 text-green-400 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all border border-green-500/20 cursor-pointer"
+                                            className="mt-3 inline-flex items-center gap-2 px-3 py-2 bg-[#00FF33] hover:bg-[#00FF33]/85 text-slate-950 hover:scale-[1.03] transition-all font-black uppercase tracking-widest text-[9px] cursor-pointer border-none"
                                         >
-                                            <Navigation className="w-3 h-3 text-green-400" />
+                                            <Navigation className="w-3 h-3" />
                                             <span>Navigate on Map</span>
                                         </a>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* COD / Payment Info */}
-                            <div className={`p-3 rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-between ${
+                            {/* Payment details block */}
+                            <div className={`p-4 text-xs font-black uppercase tracking-[0.15em] flex items-center justify-between border ${
                                 order.paymentMethod === 'cod'
-                                    ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                                    : 'bg-green-500/10 text-green-400 border border-green-500/20'
+                                    ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                                    : 'bg-green-500/10 text-[#00FF33] border-[#00FF33]/20'
                             }`}>
-                                <div className="flex items-center gap-1.5">
+                                <div className="flex items-center gap-2">
                                     <DollarSign className="w-4 h-4" />
                                     <span>{order.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Paid Online'}</span>
                                 </div>
                                 <span className="text-sm font-black">{currency}{order.summary?.total}</span>
                             </div>
 
-                            {/* Item breakdown */}
-                            <div className="bg-slate-950/40 p-3 rounded-xl border border-slate-900/60 text-xs space-y-2">
-                                <p className="text-[9px] text-slate-500 font-bold uppercase tracking-wider border-b border-slate-900 pb-1.5">Verification Checklist</p>
+                            {/* Verification List / Items */}
+                            <div className="bg-slate-950/40 p-4 border border-slate-900/60 text-xs space-y-3.5">
+                                <p className="text-[9px] text-slate-500 font-black uppercase tracking-[0.2em] border-b border-slate-900 pb-2">Verification Checklist</p>
                                 {order.items?.map((item, idx) => (
-                                    <div key={idx} className="flex items-center justify-between text-[11px]">
-                                        <span className="text-slate-400 font-semibold truncate max-w-[170px] sm:max-w-[220px]">{item.name}</span>
-                                        <span className="text-slate-500 font-black">x{item.quantity}</span>
+                                    <div key={idx} className="flex items-center justify-between text-[10px] tracking-wide">
+                                        <span className="text-slate-400 font-bold truncate max-w-[170px] sm:max-w-[220px]">{item.name}</span>
+                                        <span className="text-[#00FF33] font-black">x{item.quantity}</span>
                                     </div>
                                 ))}
                             </div>
 
-                            {/* Action Buttons */}
-                            <div className="pt-2">
+                            {/* Workflow Actions */}
+                            <div className="pt-2 border-t border-[#262626]">
                                 {activeTab === 'pickup' ? (
                                     <button
                                         onClick={() => updateOrderStatus(order.id, 'accepted')}
-                                        className="w-full bg-green-500 hover:bg-green-400 text-white font-extrabold text-xs uppercase tracking-wider py-3.5 rounded-xl flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] transition-all border-none"
+                                        className="w-full bg-[#00FF33] hover:bg-[#00FF33]/85 text-slate-950 font-black text-[10px] uppercase tracking-[0.25em] py-4 cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all border-none"
                                     >
-                                        <CheckCircle className="w-4 h-4" />
-                                        <span>Accept Delivery Request</span>
+                                        Accept Delivery Request
                                     </button>
                                 ) : (
                                     <>
                                         {order.status?.toLowerCase() === 'accepted' ? (
                                             <button
                                                 onClick={() => updateOrderStatus(order.id, 'shipped')}
-                                                className="w-full bg-green-500 hover:bg-green-400 text-white font-extrabold text-xs uppercase tracking-wider py-3.5 rounded-xl flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] transition-all border-none"
+                                                className="w-full bg-[#00FF33] hover:bg-[#00FF33]/85 text-slate-950 font-black text-[10px] uppercase tracking-[0.25em] py-4 cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all border-none"
                                             >
-                                                <Navigation className="w-4 h-4" />
-                                                <span>Pick Up & Start Route</span>
+                                                Pick Up & Start Route
                                             </button>
                                         ) : (
-                                            <div className="flex gap-2.5">
+                                            <div className="flex gap-3">
                                                 <button
                                                     onClick={() => updateOrderStatus(order.id, 'cancelled')}
-                                                    className="flex-1 bg-transparent hover:bg-red-500/10 border border-red-500/20 text-red-500 font-extrabold text-[11px] sm:text-xs uppercase tracking-wider py-3.5 rounded-xl flex items-center justify-center gap-1.5 cursor-pointer active:scale-[0.98] transition-all"
+                                                    className="flex-1 bg-transparent hover:bg-red-500/10 border border-red-500/30 text-red-500 font-black text-[10px] uppercase tracking-[0.2em] py-4 cursor-pointer transition-all hover:scale-[1.02]"
                                                 >
-                                                    <XCircle className="w-4 h-4 flex-shrink-0" />
-                                                    <span>Cancel</span>
+                                                    Cancel
                                                 </button>
                                                 <button
                                                     onClick={() => updateOrderStatus(order.id, 'delivered')}
-                                                    className="flex-[1.5] bg-green-500 hover:bg-green-400 text-white font-extrabold text-[11px] sm:text-xs uppercase tracking-wider py-3.5 rounded-xl flex items-center justify-center gap-1.5 cursor-pointer active:scale-[0.98] transition-all border-none"
+                                                    className="flex-[1.5] bg-[#00FF33] hover:bg-[#00FF33]/85 text-slate-950 font-black text-[10px] uppercase tracking-[0.2em] py-4 cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all border-none"
                                                 >
-                                                    <CheckCircle className="w-4 h-4 flex-shrink-0" />
-                                                    <span className="hidden sm:inline">Deliver Order</span>
-                                                    <span className="inline sm:hidden">Deliver</span>
+                                                    Deliver Order
                                                 </button>
                                             </div>
                                         )}
