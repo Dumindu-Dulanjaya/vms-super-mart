@@ -240,7 +240,8 @@ describe('OrdersService', () => {
       expect(result).toEqual([mockOrder]);
       expect(mockOrderRepository.find).toHaveBeenCalledWith({
         where: [
-          { status: 'ready' },
+          { status: 'dispatched' },
+          { status: 'accepted' },
           { status: 'shipped' },
         ],
         order: { createdAt: 'DESC' },
