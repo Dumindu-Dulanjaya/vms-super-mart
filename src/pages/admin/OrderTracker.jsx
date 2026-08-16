@@ -97,9 +97,9 @@ const OrderTracker = () => {
 
     // Filter active tracking orders (placed, ready, shipped)
     const columns = {
-        placed: { title: 'New / Placed', color: 'border-blue-500 bg-blue-500/10 text-blue-700', nextStatus: 'ready', actionText: 'Mark Ready' },
-        ready: { title: 'Ready to Dispatch', color: 'border-teal-500 bg-teal-500/10 text-teal-700', nextStatus: 'shipped', actionText: 'Ship / Out' },
-        shipped: { title: 'Shipped / Out', color: 'border-amber-500 bg-amber-500/10 text-amber-700', nextStatus: 'delivered', actionText: 'Mark Delivered' },
+        placed: { title: 'New / Placed', color: 'border-blue-500 bg-blue-500/10 text-blue-700' },
+        ready: { title: 'Ready to Dispatch', color: 'border-teal-500 bg-teal-500/10 text-teal-700' },
+        shipped: { title: 'Shipped / Out', color: 'border-amber-500 bg-amber-500/10 text-amber-700' },
     };
 
     const getTimeElapsed = (createdAt) => {
@@ -112,7 +112,16 @@ const OrderTracker = () => {
     };
 
     const getColumnOrders = (statusKey) => {
-        return orders.filter(o => o.status?.toLowerCase() === statusKey);
+        if (statusKey === 'placed') {
+            return orders.filter(o => o.status?.toLowerCase() === 'placed');
+        }
+        if (statusKey === 'ready') {
+            return orders.filter(o => ['ready', 'dispatched'].includes(o.status?.toLowerCase()));
+        }
+        if (statusKey === 'shipped') {
+            return orders.filter(o => ['accepted', 'shipped', 'delivered', 'completed'].includes(o.status?.toLowerCase()));
+        }
+        return [];
     };
 
     if (loading) {
@@ -183,16 +192,65 @@ const OrderTracker = () => {
                                                 ))}
                                             </div>
 
-                                            {/* Price and Advance actions */}
-                                            <div className="flex items-center justify-between mt-4 gap-2">
+                                            {/* Delivery Timestamps Tracker */}
+                                            <div className="text-[10px] bg-slate-50 border border-slate-100 p-2.5 space-y-1 my-3 font-semibold text-slate-500">
+                                                <div className="font-bold border-b border-slate-100 pb-1 text-[9px] uppercase tracking-wider text-slate-400">Fulfillment Pipeline</div>
+                                                <div>Order Created: <span className="font-mono text-slate-700">{new Date(order.createdAt).toLocaleTimeString()}</span></div>
+                                                {order.readyToDispatchAt && <div>Ready to Dispatch: <span className="font-mono text-slate-700">{new Date(order.readyToDispatchAt).toLocaleTimeString()}</span></div>}
+                                                {order.dispatchedAt && <div>Dispatched to Driver: <span className="font-mono text-slate-700">{new Date(order.dispatchedAt).toLocaleTimeString()}</span></div>}
+                                                {order.driverAcceptedAt && <div>Driver Accepted: <span className="font-mono text-slate-700">{new Date(order.driverAcceptedAt).toLocaleTimeString()}</span></div>}
+                                                {order.deliveryStartedAt && <div>Delivery Started: <span className="font-mono text-slate-700">{new Date(order.deliveryStartedAt).toLocaleTimeString()}</span></div>}
+                                                {order.deliveryCompletedAt && <div>Delivery Completed: <span className="font-mono text-slate-700">{new Date(order.deliveryCompletedAt).toLocaleTimeString()}</span></div>}
+                                                {order.orderCompletedAt && <div>Order Completed: <span className="font-mono text-slate-700">{new Date(order.orderCompletedAt).toLocaleTimeString()}</span></div>}
+                                            </div>
+
+                                            {/* Price and Actions */}
+                                            <div className="flex items-center justify-between mt-4 gap-2 border-t border-slate-50 pt-3">
                                                 <div className="text-xs font-black text-slate-800">{currency}{order.summary?.total}</div>
-                                                <button
-                                                    onClick={() => updateOrderStatus(order.id, col.nextStatus)}
-                                                    className="inline-flex items-center gap-1 bg-slate-900 hover:bg-green-500 text-white hover:text-white px-2.5 py-1.5 text-[9px] font-black tracking-widest uppercase transition-all shadow-sm cursor-pointer border-none"
-                                                >
-                                                    <span>{col.actionText}</span>
-                                                    <ArrowRight className="w-3 h-3" />
-                                                </button>
+                                                
+                                                {order.status === 'placed' && (
+                                                    <button
+                                                        onClick={() => updateOrderStatus(order.id, 'ready')}
+                                                        className="inline-flex items-center gap-1 bg-slate-900 hover:bg-green-500 text-white px-2.5 py-1.5 text-[9px] font-black tracking-widest uppercase transition-all shadow-sm cursor-pointer border-none"
+                                                    >
+                                                        <span>Mark Ready</span>
+                                                        <ArrowRight className="w-3 h-3" />
+                                                    </button>
+                                                )}
+
+                                                {order.status === 'ready' && (
+                                                    <button
+                                                        onClick={() => updateOrderStatus(order.id, 'dispatched')}
+                                                        className="inline-flex items-center gap-1 bg-slate-900 hover:bg-teal-500 text-white px-2.5 py-1.5 text-[9px] font-black tracking-widest uppercase transition-all shadow-sm cursor-pointer border-none"
+                                                    >
+                                                        <span>Ready to Dispatch</span>
+                                                        <ArrowRight className="w-3 h-3" />
+                                                    </button>
+                                                )}
+
+                                                {order.status === 'dispatched' && (
+                                                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 bg-slate-100 px-2 py-1 rounded">
+                                                        Waiting for Driver...
+                                                    </span>
+                                                )}
+
+                                                {order.status === 'accepted' && (
+                                                    <span className="text-[9px] font-black uppercase tracking-widest text-blue-500 bg-blue-50 px-2 py-1 rounded">
+                                                        Driver Accepted
+                                                    </span>
+                                                )}
+
+                                                {order.status === 'shipped' && (
+                                                    <span className="text-[9px] font-black uppercase tracking-widest text-amber-500 bg-amber-50 px-2 py-1 rounded">
+                                                        Out for Delivery
+                                                    </span>
+                                                )}
+
+                                                {(order.status === 'delivered' || order.status === 'completed') && (
+                                                    <span className="text-[9px] font-black uppercase tracking-widest text-green-500 bg-green-50 px-2 py-1 rounded">
+                                                        Delivery Marked / Delivered
+                                                    </span>
+                                                )}
                                             </div>
                                         </div>
                                     ))

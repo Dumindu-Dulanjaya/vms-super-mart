@@ -137,8 +137,8 @@ const DeliveryDashboard = () => {
         };
     }, [riderUser]);
 
-    const getReadyOrders = () => orders.filter(o => o.status?.toLowerCase() === 'ready');
-    const getShippedOrders = () => orders.filter(o => o.status?.toLowerCase() === 'shipped');
+    const getReadyOrders = () => orders.filter(o => o.status?.toLowerCase() === 'dispatched');
+    const getShippedOrders = () => orders.filter(o => ['accepted', 'shipped'].includes(o.status?.toLowerCase()));
 
     if (loading) {
         return (
@@ -320,30 +320,42 @@ const DeliveryDashboard = () => {
                             <div className="pt-2">
                                 {activeTab === 'pickup' ? (
                                     <button
-                                        onClick={() => updateOrderStatus(order.id, 'shipped')}
+                                        onClick={() => updateOrderStatus(order.id, 'accepted')}
                                         className="w-full bg-green-500 hover:bg-green-400 text-white font-extrabold text-xs uppercase tracking-wider py-3.5 rounded-xl flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] transition-all border-none"
                                     >
-                                        <Navigation className="w-4 h-4" />
-                                        <span>Pick Up & Start Route</span>
+                                        <CheckCircle className="w-4 h-4" />
+                                        <span>Accept Delivery Request</span>
                                     </button>
                                 ) : (
-                                    <div className="flex gap-2.5">
-                                        <button
-                                            onClick={() => updateOrderStatus(order.id, 'cancelled')}
-                                            className="flex-1 bg-transparent hover:bg-red-500/10 border border-red-500/20 text-red-500 font-extrabold text-[11px] sm:text-xs uppercase tracking-wider py-3.5 rounded-xl flex items-center justify-center gap-1.5 cursor-pointer active:scale-[0.98] transition-all"
-                                        >
-                                            <XCircle className="w-4 h-4 flex-shrink-0" />
-                                            <span>Cancel</span>
-                                        </button>
-                                        <button
-                                            onClick={() => updateOrderStatus(order.id, 'delivered')}
-                                            className="flex-[1.5] bg-green-500 hover:bg-green-400 text-white font-extrabold text-[11px] sm:text-xs uppercase tracking-wider py-3.5 rounded-xl flex items-center justify-center gap-1.5 cursor-pointer active:scale-[0.98] transition-all border-none"
-                                        >
-                                            <CheckCircle className="w-4 h-4 flex-shrink-0" />
-                                            <span className="hidden sm:inline">Deliver Order</span>
-                                            <span className="inline sm:hidden">Deliver</span>
-                                        </button>
-                                    </div>
+                                    <>
+                                        {order.status?.toLowerCase() === 'accepted' ? (
+                                            <button
+                                                onClick={() => updateOrderStatus(order.id, 'shipped')}
+                                                className="w-full bg-green-500 hover:bg-green-400 text-white font-extrabold text-xs uppercase tracking-wider py-3.5 rounded-xl flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] transition-all border-none"
+                                            >
+                                                <Navigation className="w-4 h-4" />
+                                                <span>Pick Up & Start Route</span>
+                                            </button>
+                                        ) : (
+                                            <div className="flex gap-2.5">
+                                                <button
+                                                    onClick={() => updateOrderStatus(order.id, 'cancelled')}
+                                                    className="flex-1 bg-transparent hover:bg-red-500/10 border border-red-500/20 text-red-500 font-extrabold text-[11px] sm:text-xs uppercase tracking-wider py-3.5 rounded-xl flex items-center justify-center gap-1.5 cursor-pointer active:scale-[0.98] transition-all"
+                                                >
+                                                    <XCircle className="w-4 h-4 flex-shrink-0" />
+                                                    <span>Cancel</span>
+                                                </button>
+                                                <button
+                                                    onClick={() => updateOrderStatus(order.id, 'delivered')}
+                                                    className="flex-[1.5] bg-green-500 hover:bg-green-400 text-white font-extrabold text-[11px] sm:text-xs uppercase tracking-wider py-3.5 rounded-xl flex items-center justify-center gap-1.5 cursor-pointer active:scale-[0.98] transition-all border-none"
+                                                >
+                                                    <CheckCircle className="w-4 h-4 flex-shrink-0" />
+                                                    <span className="hidden sm:inline">Deliver Order</span>
+                                                    <span className="inline sm:hidden">Deliver</span>
+                                                </button>
+                                            </div>
+                                        )}
+                                    </>
                                 )}
                             </div>
                         </div>

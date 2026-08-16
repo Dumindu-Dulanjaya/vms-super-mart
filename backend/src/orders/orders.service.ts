@@ -228,7 +228,8 @@ export class OrdersService {
   async findDeliveryOrders() {
     return this.orderRepository.find({
       where: [
-        { status: 'ready' },
+        { status: 'dispatched' },
+        { status: 'accepted' },
         { status: 'shipped' },
       ],
       order: { createdAt: 'DESC' },
@@ -241,11 +242,31 @@ export class OrdersService {
       throw new NotFoundException(`Order ${id} not found`);
     }
 
-    order.status = status;
+    const now = new Date();
+    if (status === 'ready') {
+      order.readyToDispatchAt = now;
+    } else if (status === 'dispatched') {
+      order.dispatchedAt = now;
+    } else if (status === 'accepted') {
+      order.driverAcceptedAt = now;
+    } else if (status === 'shipped') {
+      order.deliveryStartedAt = now;
+    } else if (status === 'delivered') {
+      order.deliveryCompletedAt = now;
+      order.status = 'completed';
+      order.orderCompletedAt = now;
+    } else if (status === 'completed') {
+      order.orderCompletedAt = now;
+    }
+
+    if (status !== 'delivered') {
+      order.status = status;
+    }
+
     const updated = await this.orderRepository.save(order);
 
     // Notify clients via WebSockets
-    this.eventsGateway.emitOrderStatusUpdate({ orderId: id, status });
+    this.eventsGateway.emitOrderStatusUpdate({ orderId: id, status: order.status });
 
     return updated;
   }

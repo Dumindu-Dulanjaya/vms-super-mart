@@ -32,6 +32,24 @@ export class Order {
   @OneToMany(() => OrderItem, (item) => item.order, { cascade: true, eager: true })
   items!: OrderItem[];
 
+  @Column({ type: 'timestamp', nullable: true })
+  readyToDispatchAt!: Date | null;
+
+  @Column({ type: 'timestamp', nullable: true })
+  dispatchedAt!: Date | null;
+
+  @Column({ type: 'timestamp', nullable: true })
+  driverAcceptedAt!: Date | null;
+
+  @Column({ type: 'timestamp', nullable: true })
+  deliveryStartedAt!: Date | null;
+
+  @Column({ type: 'timestamp', nullable: true })
+  deliveryCompletedAt!: Date | null;
+
+  @Column({ type: 'timestamp', nullable: true })
+  orderCompletedAt!: Date | null;
+
   @CreateDateColumn()
   createdAt!: Date;
 }
