@@ -127,7 +127,16 @@ const Checkout = () => {
         // If Leaflet is not loaded from CDN yet, wait
         if (!leafletLoaded || !window.L) return;
 
-        if (!mapInstanceRef.current && document.getElementById('checkout-map')) {
+        let timeoutId;
+        const initMap = () => {
+            const container = document.getElementById('checkout-map');
+            if (!container) {
+                timeoutId = setTimeout(initMap, 100);
+                return;
+            }
+
+            if (mapInstanceRef.current) return;
+
             const defaultLatLng = [6.9271, 79.8612]; // Colombo
             
             const map = window.L.map('checkout-map', {
@@ -154,6 +163,13 @@ const Checkout = () => {
                 icon: customIcon
             }).addTo(map);
 
+            // Allow user to click on the map to move the marker/select location
+            map.on('click', async (e) => {
+                const { lat, lng } = e.latlng;
+                marker.setLatLng([lat, lng]);
+                await reverseGeocode(lat, lng);
+            });
+
             marker.on('dragend', async () => {
                 const position = marker.getLatLng();
                 await reverseGeocode(position.lat, position.lng);
@@ -166,9 +182,12 @@ const Checkout = () => {
             setTimeout(() => {
                 map.invalidateSize();
             }, 250);
-        }
+        };
+
+        initMap();
 
         return () => {
+            clearTimeout(timeoutId);
             if (mapInstanceRef.current) {
                 mapInstanceRef.current.remove();
                 mapInstanceRef.current = null;
